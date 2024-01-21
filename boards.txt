@@ -601,6 +601,8 @@ gd_generic_gd32f30x.build.usb_product="USB Test"
 gd_generic_gd32f30x.build.usb_manufacturer="Arduino"
 
 # create a new entry each board here
+
+# Generic GD32F303CC
 gd_generic_gd32f30x.menu.pnum.GD32F303CC_GENERIC=GD32F303CC (Generic)
 gd_generic_gd32f30x.menu.pnum.GD32F303CC_GENERIC.upload.maximum_size=262144
 gd_generic_gd32f30x.menu.pnum.GD32F303CC_GENERIC.upload.maximum_data_size=49152
@@ -609,6 +611,18 @@ gd_generic_gd32f30x.menu.pnum.GD32F303CC_GENERIC.build.series=GD32F30x
 gd_generic_gd32f30x.menu.pnum.GD32F303CC_GENERIC.build.product_line=GD32F30X_HD
 gd_generic_gd32f30x.menu.pnum.GD32F303CC_GENERIC.build.variant=GD32F303CC_GENERIC
 gd_generic_gd32f30x.menu.pnum.GD32F303CC_GENERIC.upload.openocd_script=target/stm32f1x.cfg
+
+# Generic GD32F303RETx
+gd_generic_gd32f30x.menu.pnum.GD32F303RETX_GENERIC=GD32F303CC (Generic)
+gd_generic_gd32f30x.menu.pnum.GD32F303RETX_GENERIC.upload.maximum_size=524288
+gd_generic_gd32f30x.menu.pnum.GD32F303RETX_GENERIC.upload.maximum_data_size=65536
+gd_generic_gd32f30x.menu.pnum.GD32F303RETX_GENERIC.build.board=GD32F303RETX_GENERIC
+gd_generic_gd32f30x.menu.pnum.GD32F303RETX_GENERIC.build.series=GD32F30x
+gd_generic_gd32f30x.menu.pnum.GD32F303RETX_GENERIC.build.product_line=GD32F30X_HD
+gd_generic_gd32f30x.menu.pnum.GD32F303RETX_GENERIC.build.variant=GD32F303RETX_GENERIC
+gd_generic_gd32f30x.menu.pnum.GD32F303RETX_GENERIC.upload.openocd_script=target/stm32f1x.cfg
+
+# USB
 gd_generic_gd32f30x.menu.usb.off=Off
 gd_generic_gd32f30x.menu.usb.on=On
 gd_generic_gd32f30x.menu.usb.on.build.enable_usb={build.usb_flags} -DUSBCON -DUSBD_USE_CDC
@@ -649,7 +663,7 @@ gd_generic_gd32f30x.menu.upload_method.dfuUtilMethod.upload.pid=0x004
 gd_generic_gd32f30x.menu.upload_method.dfuUtilMethod.upload.vid=0x1209
 
 # Optimizations
-gd_generic_gd32f30x.menu.opt.osstd=Smallest (default)
+gd_generic_gd32f30x.menu.opt.osstd=Smallest (-Os default)
 gd_generic_gd32f30x.menu.opt.o1std=Fast (-O1)
 gd_generic_gd32f30x.menu.opt.o1std.build.flags.optimize=-O1
 gd_generic_gd32f30x.menu.opt.o1std.build.flags.ldspecs=
@@ -661,6 +675,9 @@ gd_generic_gd32f30x.menu.opt.o3std.build.flags.optimize=-O3
 gd_generic_gd32f30x.menu.opt.o3std.build.flags.ldspecs=
 gd_generic_gd32f30x.menu.opt.ogstd=Debug (-Og)
 gd_generic_gd32f30x.menu.opt.ogstd.build.flags.optimize=-Og
+gd_generic_gd32f30x.menu.opt.ogstd.build.flags.ldspecs=
+gd_generic_gd32f30x.menu.opt.ogstd=No Optimization (-O0)
+gd_generic_gd32f30x.menu.opt.ogstd.build.flags.optimize=-O0
 gd_generic_gd32f30x.menu.opt.ogstd.build.flags.ldspecs=
 
 ##################################################

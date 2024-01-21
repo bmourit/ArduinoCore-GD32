@@ -42,12 +42,14 @@ enum {
     D140, D141, D142, D143, D144, D145, D146, D147, D148, D149,
     D150, D151, D152, D153, D154, D155, D156, D157, D158, D159,
     D160, D161, D162, D163, D164, D165, D166, D167, D168, D169,
-    D170, D171, D172, D173, D174, D175,
-    DMAX
+    D170, D171, D172, D173, D174, D175, D176, D177, D178, D179,
+    D180, D181, D182, D183, D184, D185, D186, D187, D188, D189,
+    D190, D191, DMAX
 };
 
 /* configure periphera pins */
 static const uint8_t SS   = PIN_SPI_SS;
+static const uint8_t SS1  = PIN_SPI_SS1;
 static const uint8_t MOSI = PIN_SPI_MOSI;
 static const uint8_t MISO = PIN_SPI_MISO;
 static const uint8_t SCK  = PIN_SPI_SCK;
@@ -130,12 +132,17 @@ static const uint8_t TX4 = SERIAL4_TX;
 
 /* configure analog pins */
 #ifndef ANALOG_PINS_NUM
-#define ANALOG_PINS_NUM 0
+#define ANALOG_PINS_NUM                 0
 #endif
+
+#define PIN_NUM_MASK        0xFF
+#define ANALOG_PINS_START   192
+#define PIN_ANALOG_INDEX    0x3F
 
 #if ANALOG_PINS_NUM > 0
 
-#define ANALOG_INTERNAL_START      (DIGITAL_PINS_NUM + 1)
+// Do these after the analog pins
+#define ANALOG_INTERNAL_PIN_START      (ANALOG_PINS_START + ANALOG_PINS_NUM)
 
 #if ANALOG_PINS_NUM > 0
 static const uint8_t A0 = ANALOG_PINS_START;
@@ -167,15 +174,60 @@ static const uint8_t A8 = ANALOG_PINS_START + 8;
 #if ANALOG_PINS_NUM > 9
 static const uint8_t A9 = ANALOG_PINS_START + 9;
 #endif
+#if ANALOG_PINS_NUM > 10
+static const uint8_t A10 = ANALOG_PINS_START + 10;
+#endif
+#if ANALOG_PINS_NUM > 11
+static const uint8_t A11 = ANALOG_PINS_START + 11;
+#endif
+#if ANALOG_PINS_NUM > 12
+static const uint8_t A12 = ANALOG_PINS_START + 12;
+#endif
+#if ANALOG_PINS_NUM > 13
+static const uint8_t A13 = ANALOG_PINS_START + 13;
+#endif
+#if ANALOG_PINS_NUM > 14
+static const uint8_t A14 = ANALOG_PINS_START + 14;
+#endif
+#if ANALOG_PINS_NUM > 15
+static const uint8_t A15 = ANALOG_PINS_START + 15;
+#endif
+#if ANALOG_PINS_NUM > 16
+static const uint8_t A16 = ANALOG_PINS_START + 16;
+#endif
+#if ANALOG_PINS_NUM > 17
+static const uint8_t A17 = ANALOG_PINS_START + 17;
+#endif
+#if ANALOG_PINS_NUM > 18
+static const uint8_t A18 = ANALOG_PINS_START + 18;
+#endif
+#if ANALOG_PINS_NUM > 19
+static const uint8_t A19 = ANALOG_PINS_START + 19;
+#endif
+#if ANALOG_PINS_NUM > 20
+static const uint8_t A20 = ANALOG_PINS_START + 20;
+#endif
+#if ANALOG_PINS_NUM > 21
+static const uint8_t A21 = ANALOG_PINS_START + 21;
+#endif
+#if ANALOG_PINS_NUM > 22
+static const uint8_t A22 = ANALOG_PINS_START + 22;
+#endif
+#if ANALOG_PINS_NUM > 23
+static const uint8_t A23 = ANALOG_PINS_START + 23;
+#endif
+#if ANALOG_PINS_NUM > 24
+static const uint8_t A24 = ANALOG_PINS_START + 24;
+#endif
 #endif /* ANALOG_PINS_NUM > 0 */
 
 
 /* ADC internal channels */
 #if defined(ADC_CHANNEL_TEMPSENSOR) || defined(ADC_CHANNEL_TEMPSENSOR_ADC1)
-#define ATEMP        (ANALOG_INTERNAL_START)
+#define ATEMP        (ANALOG_INTERNAL_PIN_START)
 #endif
 #ifdef ADC_CHANNEL_VREFINT
-#define AVREF        (ANALOG_INTERNAL_START + 2)
+#define AVREF        (ANALOG_INTERNAL_PIN_START + 2)
 #endif
 
 #ifdef __cplusplus
@@ -183,38 +235,37 @@ extern "C" {
 #endif
 extern const PinName digital_pins[];
 extern const uint32_t analog_pins[];
+
 extern const uint32_t gpio_port[];
 extern const uint32_t gpio_pin[];
-#define NOT_INTERRUPT            NC
+
+#define NOT_INTERRUPT         (uint32_t)NC
 
 /* Convert a digital pin to a PinName */
-#ifndef ANALOG_PINS_LAST
-#define DIGITAL_TO_PINNAME(p)      (((uint32_t)p < DIGITAL_PINS_NUM) ? digital_pins[p] : NC)
+#if ANALOG_PINS_NUM > 0
+#define DIGITAL_TO_PINNAME(p)      ((((uint32_t)(p) & PIN_NUM_MASK) < DIGITAL_PINS_NUM) ? \
+                                      (PinName)(digital_pins[(uint32_t)(p) & PIN_NUM_MASK] | ((p) & ALT_PINS_MASK)) : \
+                                      (((uint32_t)(p) & ANALOG_PINS_START) == ANALOG_PINS_START) && \
+                                      (((uint32_t)(p) & PIN_NUM_MASK) < ANALOG_INTERNAL_PIN_START) ? \
+                                      (PinName)(digital_pins[analog_pins[(p) & PIN_ANALOG_INDEX]] | ((p) & ALT_PINS_MASK)) : NC)
 #else
-#define DIGITAL_TO_PINNAME(p)      (((uint32_t)p < DIGITAL_PINS_NUM) ? digital_pins[p] : \
-                                    ((uint32_t)p >= ANALOG_PINS_START) && ((uint32_t)p <= ANALOG_PINS_LAST) ? \
-                                    digital_pins[analog_pins[p-ANALOG_PINS_START]] : NC)
-#endif
+#define DIGITAL_TO_PINNAME(p)      ((((uint32_t)(p) & PIN_NUM_MASK) < DIGITAL_PINS_NUM) ? \
+                                      (PinName)(digital_pins[(uint32_t)(p) & PIN_NUM_MASK] | ((p) & ALT_PINS_MASK)) : NC)
+#endif /* ANALOG_PINS_NUM > 0 */
 /* Convert a PinName to a digital pin */
 uint32_t PinName_to_digital(PinName p);
 
 /* Convert an analog pin to a digital pin */
 #if ANALOG_PINS_NUM > 0
-#ifndef ANALOG_PINS_LAST
-#define ANALOG_PINS_TO_DIGITAL(p)  ( \
-                                     ((uint32_t)p < ANALOG_PINS_NUM) ? analog_pins[p] : \
-                                     ((uint32_t)p >= ANALOG_PINS_START) && ((uint32_t)p < DIGITAL_PINS_NUM) ? \
-                                     analog_pins[p-ANALOG_PINS_START] : p)
-#else
-#define ANALOG_PINS_TO_DIGITAL(p)  ( \
-                                     ((uint32_t)p < ANALOG_PINS_NUM) ? analog_pins[p] : \
-                                     ((uint32_t)p >= ANALOG_PINS_START) && ((uint32_t)p <= ANALOG_PINS_LAST) ? \
-                                     analog_pins[p-ANALOG_PINS_START] : p)
-#endif
+#define ANALOG_PINS_TO_DIGITAL(p)  ((((uint32_t)(p) & PIN_NUM_MASK) < ANALOG_PINS_NUM) ? \
+                                    analog_pins[(uint32_t)(p) & PIN_NUM_MASK] | ((uint32_t)(p) & ALT_PINS_MASK) : \
+                                     (((uint32_t)(p) & ANALOG_PINS_START) == ANALOG_PINS_START) && \
+                                     (((uint32_t)(p) & PIN_NUM_MASK) < ANALOG_INTERNAL_PIN_START) ? \
+                                     analog_pins[(p) & PIN_ANALOG_INDEX] | ((uint32_t)(p) & ALT_PINS_MASK) : (uint32_t)NC)
 #else
 /* No analog pin defined */
 #define ANALOG_PINS_TO_DIGITAL(p)  (DIGITAL_PINS_NUM)
-#endif /* ANALOG_PINS_NUM> 0 */
+#endif /* ANALOG_PINS_NUM > 0 */
 
 /* Convert an analog pin to a PinName */
 PinName analog_pin_to_PinName(uint32_t pin);
@@ -234,7 +285,7 @@ PinName analog_pin_to_PinName(uint32_t pin);
                                      pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_SSEL))
 
 
-#define DIGITAL_PIN_TO_PORT(p)       ((GD_PORT_GET(DIGITAL_TO_PINNAME(p)) < GPIO_PORT_NUM) ? gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(p))] : (uint32_t )NULL )
+#define DIGITAL_PIN_TO_PORT(p)       ((GD_PORT_GET(DIGITAL_TO_PINNAME(p)) < GPIO_PORT_NUM) ? gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(p))] : (uint32_t )NULL)
 
 #define DIGITAL_PIN_TO_BIT_MASK(p)   ((uint16_t)(1 << GD_PIN_GET(DIGITAL_TO_PINNAME(p))))
 
@@ -252,7 +303,7 @@ PinName analog_pin_to_PinName(uint32_t pin);
 #if defined(GD32F30x)
 #define PORT_CTL_REG(p)             (GPIO_CTL0(P))
 #else
-#define PORT_CTL_REG (p)            (GPIO_CTL(P))
+#define PORT_CTL_REG(p)             (GPIO_CTL(P))
 #endif
 #define PORT_CFG_REG(p)             (PORT_CTL_REG(P))
 
@@ -261,8 +312,10 @@ PinName analog_pin_to_PinName(uint32_t pin);
 #define ANALOG_PINS_FIRST_LINK(p) (PinName_to_digital(DIGITAL_TO_PINNAME(p)))
 /*  ensure pin is not one of the serial pins */
 #if defined(PIN_SERIAL_RX) && defined(PIN_SERIAL_TX)
-#define PIN_IS_SERIAL(p)             ((ANALOG_PINS_FIRST_LINK(p) == PIN_SERIAL_RX) ||\
-                                      (ANALOG_PINS_FIRST_LINK(p) == PIN_SERIAL_TX))
+#define PIN_IS_SERIAL(p)             ((DIGITAL_TO_PINNAME(p) == \
+                                        DIGITAL_TO_PINNAME(PIN_SERIAL_RX & PIN_NUM_MASK)) || \
+                                      (DIGITAL_TO_PINNAME(p) == \
+                                        DIGITAL_TO_PINNAME(PIN_SERIAL_TX & PIN_NUM_MASK)))
 #endif
 /* Convert a digital pin to an analog pin */
 bool pin_in_analog_pins(uint32_t pin);
@@ -275,8 +328,6 @@ uint32_t digital_pin_to_analog(uint32_t pin);
 #define portInputRegister(PORT) (&PORT_INPUT_REG(PORT))
 #define portOutputRegister(PORT) (&PORT_OUTPUT_REG(PORT))
 #define portModeRegister(PORT) (&PORT_CTL_REG(PORT))
-
-
 
 #ifdef __cplusplus
 }

@@ -17,17 +17,20 @@
 */
 
 #include "Arduino.h"
-#include "gd32/PinConfigured.h"
-#include "gd32/PinNames.h"
+#include "PinConfigured.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pinMode(pin_size_t ulPin, PinMode ulMode)
+extern uint32_t g_anOutputPinConfigured[MAX_NB_PORT];
+
+void pinMode(uint32_t ulPin, uint32_t ulMode)
 {
     PinName p = DIGITAL_TO_PINNAME(ulPin);
-    switch (ulMode) {
+
+    if (p != NC) {
+        switch (ulMode) {
         case INPUT:
         #if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
             pin_function(p, GD_PIN_FUNCTION3(PIN_MODE_IN_FLOATING, 0, 0));
@@ -67,7 +70,7 @@ void pinMode(pin_size_t ulPin, PinMode ulMode)
         #else
             pin_function(p, GD_PIN_FUNCTION3(PIN_MODE_ANALOG, 0, 0));
         #endif
-            break;
+        break;
 #pragma GCC diagnostic ignored "-Wswitch"
         case OUTPUT_OPEN_DRAIN: // From PinModeExtension
         #if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
@@ -78,6 +81,7 @@ void pinMode(pin_size_t ulPin, PinMode ulMode)
             break;
         default:
             break;
+        }
     }
 }
 

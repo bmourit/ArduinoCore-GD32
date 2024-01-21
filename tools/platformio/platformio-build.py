@@ -22,7 +22,7 @@ Arduino Wiring-based Framework allows writing cross-platform software to
 control devices attached to a wide range of Arduino boards to create all
 kinds of creative coding, interactive objects, spaces or physical experiences.
 
-https://github.com/CommunityGD32Cores/GD32Core-New
+https://github.com/CommunityGD32Cores/Arduino_Core_GD32
 """
 
 import json
@@ -99,6 +99,8 @@ def get_arm_math_lib(cpu):
     core = board_config.get("build.cpu")
     if "m33" in core:
         return "arm_ARMv8MMLlfsp_math"
+    elif "m3" in core:
+        return "arm_cortexM3l_math"
     elif "m4" in core:
         return "arm_cortexM4lf_math"
     elif "m7" in core:

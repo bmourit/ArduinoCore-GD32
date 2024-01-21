@@ -14,7 +14,7 @@ compiler.warning_flags.default=
 compiler.warning_flags.more=-Wall
 compiler.warning_flags.all=-Wall -Wextra
 ## compile path/command
-compiler.path={runtime.tools.xpack-arm-none-eabi-gcc-9.3.1-1.3.path}/bin/
+compiler.path={runtime.tools.xpack-arm-none-eabi-gcc-13.2.1-1.1.path}/bin/
 compiler.S.cmd=arm-none-eabi-gcc
 compiler.c.cmd=arm-none-eabi-gcc
 compiler.cpp.cmd=arm-none-eabi-g++
@@ -115,7 +115,7 @@ tools.serial_upload.upload.pattern="{path}/{cmd}" {serial.port.file} {upload.alt
 
 ##stlink upload
 tools.stlink_upload.cmd=openocd
-tools.stlink_upload.path={runtime.tools.xpack-openocd-0.11.0-1.path}/bin
+tools.stlink_upload.path={runtime.tools.xpack-openocd-0.12.0-2.path}/bin
 tools.stlink_upload.upload.params.verbose=-d2
 tools.stlink_upload.upload.params.quiet=n
 tools.stlink_upload.upload.pattern="{path}/{cmd}" -s "{path}/scripts" -f interface/stlink.cfg -c "transport select hla_swd" -c "set CPUTAPID 0" -f {upload.openocd_script} -c "program {{build.path}/{build.project_name}.elf} verify reset; shutdown"
@@ -123,14 +123,14 @@ tools.stlink_upload.upload.pattern="{path}/{cmd}" -s "{path}/scripts" -f interfa
 
 ##gdlink upload
 tools.gdlink_upload.cmd=openocd
-tools.gdlink_upload.path={runtime.tools.xpack-openocd-0.11.0-1.path}/bin
+tools.gdlink_upload.path={runtime.tools.xpack-openocd-0.12.0-2.path}/bin
 tools.gdlink_upload.upload.params.verbose=-d2
 tools.gdlink_upload.upload.params.quiet=n
 tools.gdlink_upload.upload.pattern="{path}/{cmd}" -s "{path}/scripts" -f interface/cmsis-dap.cfg -c "transport select swd" -c "set CPUTAPID 0" -f {upload.openocd_script} -c "program {{build.path}/{build.project_name}.elf} verify reset; shutdown"
 
 ##jlink_upload
 tools.jlink_upload.cmd=openocd
-tools.jlink_upload.path={runtime.tools.xpack-openocd-0.11.0-1.path}/bin
+tools.jlink_upload.path={runtime.tools.xpack-openocd-0.12.0-2.path}/bin
 tools.jlink_upload.upload.params.verbose=-d2
 tools.jlink_upload.upload.params.quiet=n
 tools.jlink_upload.upload.pattern="{path}/{cmd}" -s "{path}/scripts" -f interface/jlink.cfg -c "transport select swd" -c "set CPUTAPID 0" -f {upload.openocd_script} -c "program {{build.path}/{build.project_name}.elf} verify reset; shutdown"

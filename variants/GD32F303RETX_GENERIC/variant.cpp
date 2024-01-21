@@ -25,47 +25,86 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
-#ifndef _PORTNAMES_H
-#define _PORTNAMES_H
-
-#include "gd32_def.h"
+#include "pins_arduino.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef enum {
-    FirstPort = 0x00,
-    PORTA = FirstPort,
-    PORTB,
-#if defined GPIOC
-    PORTC,
-#endif
-#if defined GPIOD
-    PORTD,
-#endif
-#if defined GPIOE
-    PORTE,
-#endif
-#if defined GPIOF
-    PORTF,
-#endif
-#if defined GPIOG
-    PORTG,
-#endif
-#if defined GPIOH
-    PORTH,
-#endif
-#if defined GPIOI
-    PORTI,
-#endif
-    PORTEND,
-    LastPort = PORTEND - 1
-} PortName;
+/* digital pins for pinmap list */
+const PinName digital_pins[] = {
+    PORTA_0,
+    PORTA_1,
+    PORTA_2,
+    PORTA_3,
+    PORTA_4,
+    PORTA_5,
+    PORTA_6,
+    PORTA_7,
+    PORTA_8,
+    PORTA_9,
+    PORTA_10,
+    PORTA_11,
+    PORTA_12,
+    PORTA_13,
+    PORTA_14,
+    PORTA_15,
+    PORTB_0,
+    PORTB_1,
+    PORTB_2,
+    PORTB_3,
+    PORTB_4,
+    PORTB_5,
+    PORTB_6,
+    PORTB_7,
+    PORTB_8,
+    PORTB_9,
+    PORTB_10,
+    PORTB_11,
+    PORTB_12,
+    PORTB_13,
+    PORTB_14,
+    PORTB_15,
+    PORTC_0,
+    PORTC_1,
+    PORTC_2,
+    PORTC_3,
+    PORTC_4,
+    PORTC_5,
+    PORTC_6,
+    PORTC_7,
+    PORTC_8,
+    PORTC_9,
+    PORTC_10,
+    PORTC_11,
+    PORTC_12,
+    PORTC_13,
+    PORTC_14,
+    PORTC_15,
+    PORTD_0,
+    PORTD_1,
+    PORTD_2
+};
 
-#define GPIO_PORT_NUM (LastPort - FirstPort +1)
-
+/* analog pins for pinmap list */
+const uint32_t analog_pins[] = {
+    0,//PA0, //A0  //Ardunio A0
+    1,//PA1, //A1  //Ardunio A1
+    2,//PA2, //A2  //Ardunio A2
+    3,//PA3, //A3  //Ardunio A3
+    4,//PA4, //A4  //Ardunio A4
+    5,//PA5, //A5  //Ardunio A5
+    6,//PA6, //A6
+    7,//PA7, //A7
+    16,//PB0, //A8
+    17,//PB1, //A9
+    32,//PC0, //A10
+    33,//PC1, //A11
+    34,//PC2, //A12
+    35,//PC3, //A13
+    36,//PC4, //A14
+    37//PC5, //A15
+};
 #ifdef __cplusplus
 }
-#endif
 #endif
