@@ -24,7 +24,7 @@ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWIS
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 */
-#if defined(ARDUINO_GENERIC_F303RETX)
+
 #include "pins_arduino.h"
 
 #ifdef __cplusplus
@@ -107,5 +107,4 @@ const uint32_t analog_pins[] = {
 };
 #ifdef __cplusplus
 }
-#endif
 #endif
