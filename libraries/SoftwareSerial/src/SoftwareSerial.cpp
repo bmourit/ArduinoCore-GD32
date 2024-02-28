@@ -36,39 +36,39 @@ http://arduiniana.org.
 
 /* default timer13 */
 #if !defined(TIMER_SERIAL)
-  #if defined (TIMER13)
+  #if defined(TIMER13)
     #define TIMER_SERIAL TIMER13
-  #elif defined(TIMER6
+  #elif defined(TIMER6)
     #define TIMER_SERIAL TIMER6
-  #elif defined (TIMER5)
+  #elif defined(TIMER5)
     #define TIMER_SERIAL TIMER5
-  #elif defined (TIMER16)
+  #elif defined(TIMER16)
     #define TIMER_SERIAL TIMER16
-  #elif defined (TIMER15)
+  #elif defined(TIMER15)
     #define TIMER_SERIAL TIMER15
-  #elif defined (TIMER14)
+  #elif defined(TIMER14)
     #define TIMER_SERIAL TIMER14
-  #elif defined (TIMER12)
+  #elif defined(TIMER12)
     #define TIMER_SERIAL TIMER12
-  #elif defined (TIMER11)
+  #elif defined(TIMER11)
     #define TIMER_SERIAL TIMER11
-  #elif defined (TIMER10)
+  #elif defined(TIMER10)
     #define TIMER_SERIAL TIMER10
-  #elif defined (TIMER9)
+  #elif defined(TIMER9)
     #define TIMER_SERIAL TIMER9
-  #elif defined (TIMER8)
+  #elif defined(TIMER8)
     #define TIMER_SERIAL TIMER8
-  #elif defined (TIMER7)
+  #elif defined(TIMER7)
     #define TIMER_SERIAL TIMER7
-  #elif defined (TIMER4)
+  #elif defined(TIMER4)
     #define TIMER_SERIAL TIMER4
-  #elif defined (TIMER3)
+  #elif defined(TIMER3)
     #define TIMER_SERIAL TIMER3
-  #elif defined (TIMER2)
+  #elif defined(TIMER2)
     #define TIMER_SERIAL TIMER2
-  #elif defined (TIMER1)
+  #elif defined(TIMER1)
     #define TIMER_SERIAL TIMER1
-  #elif defined (TIMER0)
+  #elif defined(TIMER0)
     #define TIMER_SERIAL TIMER0
   #else
     #error No suitable timer found for SoftwareSerial, define TIMER_SERIAL in variant.h

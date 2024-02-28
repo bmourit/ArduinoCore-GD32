@@ -1,5 +1,3 @@
-
-
 /* memory map */
 MEMORY
 {

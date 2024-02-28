@@ -167,7 +167,7 @@ void pin_function(PinName pin, int function)
 #elif defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32F4xx) || defined(GD32E23x)
 	gpio_af_set(gpio, GD_GPIO_AF[af], gd_pin);
 	gpio_mode_set(gpio, spl_mode, spl_pull, gd_pin);
-	if (spl_mode == GPIO_MODE_OUTPUT || slp_mode == GPIO_MODE_AF)
+	if (spl_mode == GPIO_MODE_OUTPUT || spl_mode == GPIO_MODE_AF)
 		gpio_output_options_set(gpio, spl_output, GD_GPIO_SPEED[speed], gd_pin);
 #endif
 }

@@ -165,8 +165,12 @@ extern "C" {
 #define PIN_WIRE_SCL            PB6
 
 /* TIMER or PWM definitions */
-#define TIMER_TONE              TIMER5
-#define TIMER_SERVO             TIMER6
+#ifndef TIMER_TONE
+   #define TIMER_TONE      TIMER5
+#endif
+#ifndef TIMER_SERVO
+   #define TIMER_SERVO     TIMER6
+#endif
 
 /* Serial definitions */
 /* "Serial" is by default Serial1 / USART1 */
