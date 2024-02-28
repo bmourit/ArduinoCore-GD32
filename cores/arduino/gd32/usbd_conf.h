@@ -25,12 +25,11 @@
  * ahead of time when using PluggableUSB. However, this wastes a fair
  * amount of memory: almost no device is going to have 256 interfaces.
  */
-#define USBD_CFG_MAX_NUM 1
-#define USBD_ITF_MAX_NUM 256
+#define USBD_CFG_MAX_NUM	1
+#define USBD_ITF_MAX_NUM	256
 
-#define EP_COUNT 8
-
-#define USB_STRING_COUNT 4
+#define EP_COUNT		8
+#define USB_STRING_COUNT	4
 
 /*
  * Offset from USBD RAM base used to store endpoint buffer
@@ -38,7 +37,7 @@
  *
  * cf. GD32F30x User Manual §24.6.1.
  */
-#define BTABLE_OFFSET 0
+#define BTABLE_OFFSET	0
 
 /*
  * Offsets from BTABLE in the peripheral for transmission and
@@ -52,8 +51,8 @@
  * maximum packet size is the same for all endpoints, at
  * ‘USBD_EP0_MAX_SIZE’ octets.
  */
-#define EP0_TX_ADDR 0x40
-#define EP0_RX_ADDR (EP0_TX_ADDR+USBD_EP0_MAX_SIZE)
+#define EP0_TX_ADDR	0x40
+#define EP0_RX_ADDR	(EP0_TX_ADDR + USBD_EP0_MAX_SIZE)
 
-#endif
+#endif /* USBCON */
 #endif /* __USBD_CONF_H */

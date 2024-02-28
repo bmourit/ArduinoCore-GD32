@@ -110,7 +110,7 @@ void gpio_afio_deinit(void)
 
 /*!
     \brief      GPIO parameter initialization
-    \param[in]  gpio_periph: GPIOx(x = A,B,C,D,E,F,G) 
+    \param[in]  gpio_periph: GPIOx(x = A,B,C,D,E,F,G)
     \param[in]  mode: gpio pin mode
                 only one parameter can be selected which is shown as below:
       \arg        GPIO_MODE_AIN: analog input mode
@@ -141,23 +141,24 @@ void gpio_init(uint32_t gpio_periph, uint32_t mode, uint32_t speed, uint32_t pin
 
     /* GPIO mode configuration */
     temp_mode = (uint32_t)(mode & ((uint32_t)0x0FU));
-    
+
     /* GPIO speed configuration */
-    if(((uint32_t)0x00U) != ((uint32_t)mode & ((uint32_t)0x10U))){
+    /* only for output modes */
+    if (((uint32_t)0x00U) != ((uint32_t)mode & ((uint32_t)0x10U))) {
         /* output mode max speed */
-        if(GPIO_OSPEED_MAX == (uint32_t)speed){
+        if (GPIO_OSPEED_MAX == (uint32_t)speed) {
             temp_mode |= (uint32_t)0x03U;
             /* set the corresponding SPD bit */
-            GPIOx_SPD(gpio_periph) |= (uint32_t)pin ;
-        }else{
+            GPIOx_SPD(gpio_periph) |= (uint32_t)pin;
+        } else {
             /* output mode max speed:10MHz,2MHz,50MHz */
             temp_mode |= (uint32_t)speed;
         }
     }
 
-    /* configure the eight low port pins with GPIO_CTL0 */
-    for(i = 0U;i < 8U;i++){
-        if((1U << i) & pin){
+    /* configure the eight low port (mode bits) for all pins with GPIO_CTL0 */
+    for (i = 0U; i < 8U; i++) {
+        if ((1U << i) & pin) {
             reg = GPIO_CTL0(gpio_periph);
             
             /* clear the specified pin mode bits */
@@ -166,10 +167,10 @@ void gpio_init(uint32_t gpio_periph, uint32_t mode, uint32_t speed, uint32_t pin
             reg |= GPIO_MODE_SET(i, temp_mode);
             
             /* set IPD or IPU */
-            if(GPIO_MODE_IPD == mode){
+            if (GPIO_MODE_IPD == mode) {
                 /* reset the corresponding OCTL bit */
                 GPIO_BC(gpio_periph) = (uint32_t)((1U << i) & pin);
-            }else{
+            } else {
                 /* set the corresponding OCTL bit */
                 if(GPIO_MODE_IPU == mode){
                     GPIO_BOP(gpio_periph) = (uint32_t)((1U << i) & pin);
@@ -304,11 +305,11 @@ uint16_t gpio_input_port_get(uint32_t gpio_periph)
     \param[out] none
     \retval     output status of gpio pin: SET or RESET
 */
-FlagStatus gpio_output_bit_get(uint32_t gpio_periph,uint32_t pin)
+FlagStatus gpio_output_bit_get(uint32_t gpio_periph, uint32_t pin)
 {
-    if((uint32_t)RESET !=(GPIO_OCTL(gpio_periph)&(pin))){
+    if ((uint32_t)RESET != (GPIO_OCTL(gpio_periph) & (pin))) {
         return SET;
-    }else{
+    } else {
         return RESET;
     }
 }

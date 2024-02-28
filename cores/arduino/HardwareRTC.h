@@ -2,8 +2,10 @@
 #define _GD_HARDWARERTC_H_
 
 #include "rtc.h"
+
 extern class HWRTC rtc;
-typedef void(*RTCCallback_t)(void);
+
+typedef void (*RTCCallback_t)(void);
 
 class HWRTC
 {
@@ -18,7 +20,7 @@ class HWRTC
         void detachInterrupt(INT_MODE mode);                          //detach RTC interrupt
         void interruptHandler(INT_MODE mode);
     private:
-        UTCTimeStruct UTCTime;//time base
+        UTCTimeStruct UTCTime;                                        //time base
         RTCCallback_t callback[3] = {0};
 };
 

@@ -34,46 +34,57 @@ http://arduiniana.org.
 
 //#define TIMER_SERIAL TIMER1    TIMER1 timer1 is occupied
 
-//Default timer13
-
-#if defined (TIMER13)
-#define TIMER_SERIAL TIMER13
-#elif defined (TIMER12)
-#define TIMER_SERIAL TIMER112
-#elif defined (TIMER11)
-#define TIMER_SERIAL TIMER111
-#elif defined (TIMER10)
-#define TIMER_SERIAL TIMER110
-#elif defined (TIMER9)
-#define TIMER_SERIAL TIMER19
-#elif defined (TIMER8)
-#define TIMER_SERIAL TIMER18
-#elif defined (TIMER7)
-#define TIMER_SERIAL TIMER7
-#elif defined (TIMER6)
-#define TIMER_SERIAL TIMER6
-#elif defined (TIMER5)
-#define TIMER_SERIAL TIMER5
-#elif defined (TIMER4)
-#define TIMER_SERIAL TIMER4
-#elif defined (TIMER3)
-#define TIMER_SERIAL TIMER3
-#elif defined (TIMER2)
-#define TIMER_SERIAL TIMER2
-#elif defined (TIMER1)
-#define TIMER_SERIAL TIMER1
+/* default timer13 */
+#if !defined(TIMER_SERIAL)
+  #if defined (TIMER13)
+    #define TIMER_SERIAL TIMER13
+  #elif defined(TIMER6
+    #define TIMER_SERIAL TIMER6
+  #elif defined (TIMER5)
+    #define TIMER_SERIAL TIMER5
+  #elif defined (TIMER16)
+    #define TIMER_SERIAL TIMER16
+  #elif defined (TIMER15)
+    #define TIMER_SERIAL TIMER15
+  #elif defined (TIMER14)
+    #define TIMER_SERIAL TIMER14
+  #elif defined (TIMER12)
+    #define TIMER_SERIAL TIMER12
+  #elif defined (TIMER11)
+    #define TIMER_SERIAL TIMER11
+  #elif defined (TIMER10)
+    #define TIMER_SERIAL TIMER10
+  #elif defined (TIMER9)
+    #define TIMER_SERIAL TIMER9
+  #elif defined (TIMER8)
+    #define TIMER_SERIAL TIMER8
+  #elif defined (TIMER7)
+    #define TIMER_SERIAL TIMER7
+  #elif defined (TIMER4)
+    #define TIMER_SERIAL TIMER4
+  #elif defined (TIMER3)
+    #define TIMER_SERIAL TIMER3
+  #elif defined (TIMER2)
+    #define TIMER_SERIAL TIMER2
+  #elif defined (TIMER1)
+    #define TIMER_SERIAL TIMER1
+  #elif defined (TIMER0)
+    #define TIMER_SERIAL TIMER0
+  #else
+    #error No suitable timer found for SoftwareSerial, define TIMER_SERIAL in variant.h
+  #endif
 #endif
 
 HardwareTimer SoftwareSerial::timer(TIMER_SERIAL);
 SoftwareSerial *SoftwareSerial::active_listener = nullptr;
 SoftwareSerial *volatile SoftwareSerial::active_out = nullptr;
 SoftwareSerial *volatile SoftwareSerial::active_in = nullptr;
-int32_t SoftwareSerial::tx_tick_cnt = 0; // OVERSAMPLE ticks needed for a bit
-int32_t volatile SoftwareSerial::rx_tick_cnt = 0;  // OVERSAMPLE ticks needed for a bit
+int32_t SoftwareSerial::tx_tick_cnt = 0;		// OVERSAMPLE ticks needed for a bit
+int32_t volatile SoftwareSerial::rx_tick_cnt = 0;	// OVERSAMPLE ticks needed for a bit
 uint32_t SoftwareSerial::tx_buffer = 0;
 int32_t SoftwareSerial::tx_bit_cnt = 0;
 uint32_t SoftwareSerial::rx_buffer = 0;
-int32_t SoftwareSerial::rx_bit_cnt = -1; // rx_bit_cnt = -1 :  waiting for start bit
+int32_t SoftwareSerial::rx_bit_cnt = -1;		// rx_bit_cnt = -1 : waiting for start bit
 uint32_t SoftwareSerial::cur_speed = 0;
 
 SoftwareSerial::SoftwareSerial(uint16_t receivePin, uint16_t transmitPin,
@@ -123,17 +134,18 @@ void SoftwareSerial::setSpeed(uint32_t speed)
     }
 }
 
-// This function sets the current object as the "listening"
-// one and returns true if it replaces another
+/**
+ * This function sets the current object as the "listening"
+ * one and returns true if it replaces another
+ */
 bool SoftwareSerial::listen()
 {
     if (active_listener != this) {
-        // wait for any transmit to complete as we may change speed
+        /* wait for any transmit to complete as we may change speed */
         while (active_out);
         active_listener->stopListening();
-        rx_tick_cnt =
-            1; // 1 : next interrupt will decrease rx_tick_cnt to 0 which means RX pin level will be considered.
-        rx_bit_cnt = -1; // rx_bit_cnt = -1 :  waiting for start bit
+        rx_tick_cnt = 1;	// 1 : next interrupt will decrease rx_tick_cnt to 0 which means RX pin level will be considered
+        rx_bit_cnt = -1;	// rx_bit_cnt = -1 : waiting for start bit
         setSpeed(_speed);
         active_listener = this;
         active_in = this;
@@ -142,15 +154,15 @@ bool SoftwareSerial::listen()
     return false;
 }
 
-// Stop listening. Returns true if we were actually listening.
+/* Stop listening and return true if we were actually listening */
 bool SoftwareSerial::stopListening()
 {
     if (active_listener == this) {
-        // wait for any output to complete
+        /* wait for any output to complete */
         while (active_out);
         active_listener = nullptr;
         active_in = nullptr;
-        // turn off ints
+        /* turn off ints */
         setSpeed(0);
         return true;
     }

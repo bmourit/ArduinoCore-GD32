@@ -17,7 +17,7 @@
 /*
  * This header has been adapted from the standard Arduino "Sever" libraries, as it e.g.
  * exists for AVR devices at https://github.com/arduino-libraries/Servo, but adapted for
- * the GigaDevice 32 core.
+ * the GigaDevice GD32 core.
 */
 
 #ifndef _SERVO_H_
@@ -51,7 +51,7 @@ typedef struct {
     volatile unsigned int ticks;
 } servo_t;
 
-/** Class for interfacing with RC servomotors. */
+/* Class for interfacing with RC servomotors */
 class Servo
 {
     public:

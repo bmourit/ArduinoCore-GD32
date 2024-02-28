@@ -48,7 +48,7 @@ class SPISettings
             this->datamode = dataMode;
         }
 
-        /* Set speed to default, SPI mode set to MODE 0 and Bit order set to MSB first. */
+        /* set speed to default, SPI mode set to MODE 0, and bit order to MSB first */
         SPISettings()
         {
             this->speed = SPI_SPEED_DEFAULT;
@@ -58,8 +58,8 @@ class SPISettings
 
     private:
         uint32_t speed;
-        uint8_t datamode;
         BitOrder bitorder;
+        uint8_t datamode;
 
         friend class SPIClass;
 };
@@ -79,8 +79,8 @@ class SPIClass
         void beginTransaction(SPISettings settings);
         void endTransaction(void);
 
-        uint8_t transfer(uint8_t val8);
-        uint16_t transfer16(uint16_t val16);
+        uint8_t transfer(uint8_t data);
+        uint16_t transfer16(uint16_t data);
         void transfer(void *buf, size_t count);
         void transfer(void *bufout, void *bufin, size_t count);
 

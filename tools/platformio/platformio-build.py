@@ -22,36 +22,38 @@ Arduino Wiring-based Framework allows writing cross-platform software to
 control devices attached to a wide range of Arduino boards to create all
 kinds of creative coding, interactive objects, spaces or physical experiences.
 
-https://github.com/CommunityGD32Cores/Arduino_Core_GD32
+https://github.com/CommunityGD32Cores/ArduinoCore-GD32
 """
 
 import json
 from os.path import isfile, isdir, join
-
 from platformio.util import get_systype
-
 from SCons.Script import COMMAND_LINE_TARGETS, DefaultEnvironment
 
+# get environment
 env = DefaultEnvironment()
 platform = env.PioPlatform()
 board_config = env.BoardConfig()
 board_name = env.subst("$BOARD")
 
+# check framework is installed
 FRAMEWORK_DIR = platform.get_package_dir("framework-arduinogd32")
 assert isdir(FRAMEWORK_DIR)
 
-
+# get mcu and board variant
 mcu = board_config.get("build.mcu", "")
 mcu_type = mcu[:-2]
-variant = board_config.get(
-    "build.variant", board_config.get("build.arduino.variant", "generic"))
+variant = board_config.get("build.variant", board_config.get("build.arduino.variant", "generic"))
 series = mcu_type[:6].upper() + "xx"
-variants_dir = (
-    join("$PROJECT_DIR", board_config.get("build.variants_dir"))
-    if board_config.get("build.variants_dir", "")
-    else join(FRAMEWORK_DIR, "variants")
-)
+variants_dir = (join("$PROJECT_DIR", board_config.get("build.variants_dir"))
+    if board_config.get("build.variants_dir", ""):
+        print("Warning! build.variant is not set")
+    else:
+        join(FRAMEWORK_DIR, "variants"))
+
 variant_dir = join(variants_dir, variant)
+assert isdir(variant_dir)
+
 inc_variant_dir = variant_dir
 if "windows" not in get_systype().lower() and not (
     set(["_idedata", "idedata"]) & set(COMMAND_LINE_TARGETS) and " " not in variant_dir
@@ -60,7 +62,6 @@ if "windows" not in get_systype().lower() and not (
 
 upload_protocol = env.subst("$UPLOAD_PROTOCOL")
 
-
 def process_standard_library_configuration(cpp_defines):
     if "PIO_FRAMEWORK_ARDUINO_STANDARD_LIB" in cpp_defines:
         env["LINKFLAGS"].remove("--specs=nano.specs")
@@ -68,7 +69,6 @@ def process_standard_library_configuration(cpp_defines):
         env.Append(LINKFLAGS=["-u_printf_float"])
     if "PIO_FRAMEWORK_ARDUINO_NANOLIB_FLOAT_SCANF" in cpp_defines:
         env.Append(LINKFLAGS=["-u_scanf_float"])
-
 
 def process_usart_configuration(cpp_defines):
     if "PIO_FRAMEWORK_ARDUINO_SERIAL_DISABLED" in cpp_defines:
@@ -90,7 +90,7 @@ def add_upload_protocol_defines(board, upload_protocol):
                 "SERIAL_USB"
             ])
 
-    is_generic = board.startswith("generic") or board == "hytiny_stm32f103t"
+    is_generic = board.startswith("generic")
     if upload_protocol in ("stlink", "dfu", "jlink") and is_generic:
         env.Append(CPPDEFINES=["GENERIC_BOOTLOADER"])
 
@@ -115,6 +115,8 @@ def configure_application_offset(mcu, upload_protocol):
     if upload_protocol == "hid":
         if mcu.startswith("gd32f1"):
             offset = 0x800
+        if mcu.startswith("gd32f3"):
+            offset = 0x800
         elif mcu.startswith("gd32f4"):
             offset = 0x4000
 
@@ -135,7 +137,6 @@ def configure_application_offset(mcu, upload_protocol):
 
     # LD_FLASH_OFFSET is mandatory even if there is no offset
     env.Append(LINKFLAGS=["-Wl,--defsym=LD_FLASH_OFFSET=%s" % hex(offset)])
-
 
 if any(mcu in board_config.get("build.cpu") for mcu in ("cortex-m4", "cortex-m7")):
     env.Append(
@@ -196,13 +197,13 @@ def get_arduino_board_id(board_config, mcu):
 
 
 board_id = get_arduino_board_id(board_config, mcu)
-spl_series = board_config.get("build.spl_series","")
+spl_series = board_config.get("build.spl_series", "")
 
 env.Append(
     ASFLAGS=["-x", "assembler-with-cpp"],
-    CFLAGS=["-std=gnu11"],
+    CFLAGS=["-std=gnu17"],
     CXXFLAGS=[
-        "-std=gnu++14",
+        "-std=gnu++17",
         "-fno-threadsafe-statics",
         "-fno-rtti",
         "-fno-exceptions",

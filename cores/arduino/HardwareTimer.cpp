@@ -27,6 +27,7 @@ OF SUCH DAMAGE.
 
 #include "HardwareTimer.h"
 #include "pins_arduino.h"
+
 #define TIMERNUMS   17
 
 HardwareTimer *hardwaretimerObj[TIMERNUMS] = {NULL};
@@ -96,12 +97,12 @@ void HardwareTimer::setCounter(uint16_t count)
 }
 
 /*!
-    \brief      set rpetition value
-    \param[in]  repetition: rpetition value
+    \brief      set repetition value
+    \param[in]  repetition: repetition value
     \param[out] none
     \retval     none
 */
-void HardwareTimer::setrRpetitionValue(uint16_t repetition)
+void HardwareTimer::setRepetitionValue(uint16_t repetition)
 {
     timer_repetition_value_config(timerDevice, repetition - 1);
 }

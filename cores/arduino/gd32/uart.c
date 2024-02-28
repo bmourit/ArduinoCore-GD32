@@ -33,7 +33,11 @@ OF SUCH DAMAGE.
 #if defined(USART_DATA)
 #define GD32_USART_TX_DATA USART_DATA
 #define GD32_USART_RX_DATA USART_DATA
+#ifdef GD32F10x
+#define GD32_USART_STAT    USART_STAT
+#else
 #define GD32_USART_STAT    USART_STAT0
+#endif
 #elif defined(USART_RDATA) && defined(USART_TDATA)
 #define GD32_USART_TX_DATA USART_TDATA
 #define GD32_USART_RX_DATA USART_RDATA
@@ -47,7 +51,8 @@ extern "C" {
 #endif
 
 struct serial_s *obj_s_buf[UART_NUM] = {NULL};
-static rcu_periph_enum usart_clk[UART_NUM]  = {
+
+static rcu_periph_enum usart_clk[UART_NUM] = {
     RCU_USART0,
     RCU_USART1,
 #ifdef USART2
@@ -60,7 +65,8 @@ static rcu_periph_enum usart_clk[UART_NUM]  = {
     RCU_UART4
 #endif
 };
-static IRQn_Type usart_irq_n[UART_NUM]      = {
+
+static IRQn_Type usart_irq_n[UART_NUM] = {
     USART0_IRQn,
     USART1_IRQn,
 #ifdef USART2
@@ -123,42 +129,50 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
     p_obj->uart = (UARTName)pinmap_merge(uart_tx, uart_rx);
 
     /* enable UART peripheral clock */
-    /* TODO: This code makes no sense. It checks p_obj->index to set p_obj->index to its exact same value as before */
-    /* however, since p_obj->index was already previously set, this is no problem. */
-    switch (p_obj->index) {
-#if defined(USART0)
-        case UART0_INDEX:
-            p_obj->index = UART0_INDEX;
-            rcu_periph_clock_enable(usart_clk[p_obj->index]);
-            break;
-#endif
-#if defined(USART1)
-        case UART1_INDEX:
-            p_obj->index = UART1_INDEX;
-            rcu_periph_clock_enable(usart_clk[p_obj->index]);
-            break;
-#endif
-#if defined(USART2)
-        case UART2_INDEX:
-            p_obj->index = UART2_INDEX;
-            rcu_periph_clock_enable(usart_clk[p_obj->index]);
-            break;
-#endif
-#if defined(UART3)
-        case UART3_INDEX:
-            p_obj->index = UART3_INDEX;
-            rcu_periph_clock_enable(usart_clk[p_obj->index]);
-            break;
-#endif
-#if defined(UART4)
-        case UART4_INDEX:
-            p_obj->index = UART4_INDEX;
-            rcu_periph_clock_enable(usart_clk[p_obj->index]);
-            break;
-#endif
-    }
+    /*
+    /* TODO: This code makes no sense. It checks p_obj->index to set p_obj->index to its exact same value as before
+    /* however, since p_obj->index was already previously set, this is no problem.
+    /* This could be simplified as the following:
+    /* rcu_periph_clock_enable(usart_clk[p_obj->index])
+    /* and get rid of the switch case
+     */
+//    switch (p_obj->index) {
+//#if defined(USART0)
+//        case UART0_INDEX:
+//            p_obj->index = UART0_INDEX;
+//            rcu_periph_clock_enable(usart_clk[p_obj->index]);
+//            break;
+//#endif
+//#if defined(USART1)
+//        case UART1_INDEX:
+//            p_obj->index = UART1_INDEX;
+//            rcu_periph_clock_enable(usart_clk[p_obj->index]);
+//            break;
+//#endif
+//#if defined(USART2)
+//        case UART2_INDEX:
+//            p_obj->index = UART2_INDEX;
+//            rcu_periph_clock_enable(usart_clk[p_obj->index]);
+//            break;
+//#endif
+//#if defined(UART3)
+//        case UART3_INDEX:
+//            p_obj->index = UART3_INDEX;
+//            rcu_periph_clock_enable(usart_clk[p_obj->index]);
+//            break;
+//#endif
+//#if defined(UART4)
+//        case UART4_INDEX:
+//            p_obj->index = UART4_INDEX;
+//            rcu_periph_clock_enable(usart_clk[p_obj->index]);
+//            break;
+//#endif
+//    }
 
-    /* configurte the pins */
+    rcu_periph_enum rcu_periph = usart_clk[p_obj->index];
+    rcu_periph_clock_enable(rcu_periph);
+
+    /* configure the pins */
     pinmap_pinout(tx, PinMap_UART_TX);
     pinmap_pinout(rx, PinMap_UART_RX);
 
@@ -188,7 +202,7 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
  */
 void serial_free(serial_t *obj)
 {
-    struct serial_s *p_obj     = GET_SERIAL_S(obj);
+    struct serial_s *p_obj = GET_SERIAL_S(obj);
     rcu_periph_enum rcu_periph = usart_clk[p_obj->index];
 
     /* reset USART and disable clock */

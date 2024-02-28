@@ -17,71 +17,39 @@
 */
 
 #include "Arduino.h"
-#include "PinConfigured.h"
+#include "gd32/PinConfigured.h"
+#include "gd32/PinNames.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern uint32_t g_anOutputPinConfigured[MAX_NB_PORT];
-
-void pinMode(uint32_t ulPin, uint32_t ulMode)
+void pinMode(pin_size_t ulPin, PinMode ulMode)
 {
     PinName p = DIGITAL_TO_PINNAME(ulPin);
-
-    if (p != NC) {
-        switch (ulMode) {
+    switch (ulMode) {
         case INPUT:
-        #if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
-            pin_function(p, GD_PIN_FUNCTION3(PIN_MODE_IN_FLOATING, 0, 0));
-        #else
-            pin_function(p, GD_PIN_FUNCTION3(PIN_MODE_INPUT, 0, 0));
-        #endif
+            pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT, 0));
             break;
         case INPUT_PULLUP:
-            // different chip series have different APIs and options for pin modes
-            // for one, we have "Input pullup" as a mode, for the other, we have
-            // "Input" as a mode with "Pullup"/"Pulldown" as a "pull mode".
-            // transport the information to the underlying function accordingly. 
-        #if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
-            pin_function(p, GD_PIN_FUNCTION3(PIN_MODE_IPU, 0, 0));
-        #else
-            pin_function(p, GD_PIN_FUNCTION4(PIN_MODE_INPUT, 0, PIN_PUPD_PULLUP, 0));
-        #endif
+            pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT_PU, 0));
             break;
         case INPUT_PULLDOWN:
-        #if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
-            pin_function(p, GD_PIN_FUNCTION3(PIN_MODE_IPD, 0, 0));
-        #else
-            pin_function(p, GD_PIN_FUNCTION4(PIN_MODE_INPUT, 0, PIN_PUPD_PULLDOWN, 0));
-        #endif
+            pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT_PD, 0));
             break;
         case OUTPUT:
-        #if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
-            pin_function(p, GD_PIN_FUNCTION3(PIN_MODE_OUT_PP, PIN_OTYPE_PP, 0));
-        #else
-            pin_function(p, GD_PIN_FUNCTION3(PIN_MODE_OUTPUT, PIN_OTYPE_PP, 0));
-        #endif
+            pin_function(p, GD_PIN_DATA(PIN_MODE_OUT_PP, 0));
             break;
 #pragma GCC diagnostic ignored "-Wswitch"
         case INPUT_ANALOG: // From PinModeExtension
-        #if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
-            pin_function(p, GD_PIN_FUNCTION3(PIN_MODE_AIN, 0, 0));
-        #else
-            pin_function(p, GD_PIN_FUNCTION3(PIN_MODE_ANALOG, 0, 0));
-        #endif
+            pin_function(p, GD_PIN_DATA(PIN_MODE_ANALOG, 0));
         break;
 #pragma GCC diagnostic ignored "-Wswitch"
         case OUTPUT_OPEN_DRAIN: // From PinModeExtension
-        #if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
-            pin_function(p, GD_PIN_FUNCTION3(PIN_MODE_OUT_OD, PIN_OTYPE_OD, 0));
-        #else
-            pin_function(p, GD_PIN_FUNCTION3(PIN_MODE_OUTPUT, PIN_OTYPE_OD, 0));
-        #endif
+            pin_function(p, GD_PIN_DATA(PIN_MODE_OUT_OD, 0));
             break;
         default:
             break;
-        }
     }
 }
 

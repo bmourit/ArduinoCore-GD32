@@ -55,6 +55,19 @@ OF SUCH DAMAGE.
 #define  TIMER0_Update_IRQ_Name TIMER0_UP_TIMER9_IRQn
 #define TIMER9_IRQ_NAME TIMER0_UP_TIMER9_IRQn
 #endif
+#elif defined(GD32F10x)
+// GD32F10X_XD has these, but requires work to add
+#define NO_TIMER_8
+#define NO_TIMER_9
+#define NO_TIMER_10
+#define NO_TIMER_11
+#define NO_TIMER_12
+#define NO_TIMER_13
+#if !defined(GD32F10X_XD)
+#define TIMER0_Update_IRQ_Name TIMER0_UP_IRQn
+#else
+#define TIMER0_Update_IRQ_Name TIMER0_UP_TIMER9_IRQn
+#endif
 #endif
 
 #if defined(GD32E50X)
@@ -72,7 +85,15 @@ OF SUCH DAMAGE.
 #define NO_TIMER_12
 #define NO_TIMER_13
 #endif
-#else 
+#elif defined(GD32F10x)
+#if !defined(GD32F10X_XD)
+#define TIMER7_IRQ_NAME TIMER7_UP_IRQn
+#define TIMER7_UP_IRQ_NAME TIMER7_UP_IRQn
+#else
+#define TIMER7_IRQ_NAME TIMER7_UP_TIMER12_IRQn
+#define TIMER7_UP_IRQ_NAME TIMER7_UP_TIMER12_IRQn
+#endif
+#else
 #define TIMER7_IRQ_NAME TIMER7_IRQn
 #define TIMER7_UP_IRQ_NAME TIMER7_IRQn
 #endif
@@ -91,6 +112,9 @@ OF SUCH DAMAGE.
 #define HAS_TIMER_13
 #endif
 #else
+#ifndef NO_TIMER_8
+#define HAS_TIMER_8
+#endif
 #ifndef NO_TIMER_9
 #define HAS_TIMER_9
 #endif
@@ -724,10 +748,12 @@ void Timer_disableCaptureIT(uint32_t instance, uint8_t channel)
 */
 void PWM_init(pwmDevice_t *pwmDevice, pwmPeriodCycle_t *pwmPeriodCycle)
 {
-    (void) pwmPeriodCycle; // ToDo remove parameter from API
+    (void) pwmPeriodCycle;	// TODO: remove parameter from API
     timer_oc_parameter_struct timer_ocintpara;
     timer_parameter_struct timer_initpara;
+
     uint32_t periph = pwmDevice->timer;
+
 #if defined(GD32E23x)
     /* no subprio */
     nvic_irq_enable(getTimerCCIrq(periph), 2);
@@ -1017,7 +1043,7 @@ uint32_t getTimerClkFrequency(uint32_t instance)
     if (0 != (APBx_PSC & 0x04)) {
         clk_src = 2 * rcu_clock_freq_get(timerclkSrc);
     } else {
-        clk_src =  rcu_clock_freq_get(timerclkSrc);
+        clk_src = rcu_clock_freq_get(timerclkSrc);
     }
     return clk_src;
 }

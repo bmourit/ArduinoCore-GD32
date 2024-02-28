@@ -48,12 +48,10 @@ OF SUCH DAMAGE.
 #else
 #define ADC_NUMS  2
 #endif
-#elif defined(GD32F3x0)
+#elif defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32E23x)
 #define ADC_NUMS  1
-#elif defined(GD32F1x0)
-#define ADC_NUMS  1
-#elif defined(GD32E23x)
-#define ADC_NUMS  1
+#elif defined(GD32F10x)
+#define ADC_NUMS  3
 #elif defined(GD32E50X)
 #ifdef ADC2
 #define ADC_NUMS  3
@@ -78,15 +76,15 @@ void set_dac_value(PinName pinname, uint16_t value)
     if (!DAC_[index].isactive) {
         pinmap_pinout(pinname, PinMap_DAC);
         rcu_periph_clock_enable(RCU_DAC);
-        // only do reset of DAC clock domain once when *every* DAC is being inactive.
+        // only do reset of DAC clock domain once *every* DAC is inactive.
         bool do_reset = true;
-        for(uint8_t i = 0; i < DAC_NUMS; i++) {
-            if(DAC_[i].isactive) {
+        for (uint8_t i = 0; i < DAC_NUMS; i++) {
+            if (DAC_[i].isactive) {
                 do_reset = false;
                 break;
             }
         }
-        if(do_reset) {
+        if (do_reset) {
             dac_deinit();
         }
 #if (defined(GD32F1x0) && defined(GD32F170_190)) || defined(GD32F30x) || defined(GD32E50X)
@@ -113,9 +111,9 @@ void set_dac_value(PinName pinname, uint16_t value)
         DAC_[index].isactive = true;
     } else {
         //set dac value
-#if defined(GD32F30x) || (defined(GD32F1x0) && defined(GD32F170_190)) || defined(GD32E50X)
+#if defined(GD32F30x) || (defined(GD32F1x0) && defined(GD32F170_190)) || defined(GD32E50X) || defined(GD32F10x)
         dac_data_set(dac_periph, DAC_ALIGN_12B_R, value);
-#elif defined(GD32F10x) && !defined(GD32F170_190)
+#elif defined(GD32F1x0) && !defined(GD32F170_190)
         dac0_data_set(DAC_ALIGN_12B_R, value);
 #elif defined(GD32F3x0)
         dac_data_set(DAC_ALIGN_12B_R, value);
@@ -124,7 +122,7 @@ void set_dac_value(PinName pinname, uint16_t value)
 #endif
 }
 
-//pwm set value
+/* pwm set value */
 void set_pwm_value(pin_size_t ulPin, uint32_t value)
 {
     uint16_t ulvalue = 1000 * value / 65535;
@@ -133,23 +131,23 @@ void set_pwm_value(pin_size_t ulPin, uint32_t value)
     pwm.start();
 }
 
-//pwm set value
-void set_pwm_value_with_base_period(pin_size_t ulPin, uint32_t base_period_us, uint32_t value)
+/* pwm set value and period */
+void set_pwm_value_with_base_period(pin_size_t ulPin, uint32_t base_period_us, uint32_t ulValue)
 {
-    uint16_t ulvalue = base_period_us * value / 65535;
+    uint16_t value = base_period_us * ulValue / 65535;
     PWM pwm(ulPin);
-    pwm.setPeriodCycle(base_period_us, ulvalue, FORMAT_US);
+    pwm.setPeriodCycle(base_period_us, value, FORMAT_US);
     pwm.start();
 }
 
-//pwm stop
+/* pwm stop */
 void stop_pwm(pin_size_t ulPin)
 {
     PWM pwm(ulPin);
     pwm.stop();
 }
 
-//get adc value
+/* get adc value */
 uint16_t get_adc_value(PinName pinname)
 {
     uint16_t value;
@@ -211,7 +209,7 @@ uint16_t get_adc_value(PinName pinname)
     return value;
 }
 
-//get adc index value
+/* get adc index value */
 uint8_t get_adc_index(uint32_t instance)
 {
     uint8_t index;
@@ -243,7 +241,7 @@ uint8_t get_adc_index(uint32_t instance)
     return index;
 }
 
-// get dac index value
+/* get dac index value */
 uint8_t get_dac_index(uint32_t instance)
 {
     uint8_t index;
@@ -270,7 +268,7 @@ uint8_t get_dac_index(uint32_t instance)
     return index;
 }
 
-//get adc channel
+/* get adc channel */
 uint8_t get_adc_channel(PinName pinname)
 {
     uint32_t function = pinmap_function(pinname, PinMap_ADC);
@@ -374,7 +372,7 @@ uint8_t get_adc_channel(PinName pinname)
     return gd_channel;
 }
 
-//adc clock enable
+/* adc clock enable */
 void adc_clock_enable(uint32_t instance)
 {
     rcu_periph_enum temp;

@@ -33,14 +33,14 @@ extern "C" {
 #endif // __cplusplus
 
 /* GPIO pins definitions */
-#define PA0                     A0
-#define PA1                     A1
-#define PA2                     A2
-#define PA3                     A3
-#define PA4                     A4
-#define PA5                     A5
-#define PA6                     A6
-#define PA7                     A7
+#define PA0                     0
+#define PA1                     1
+#define PA2                     2
+#define PA3                     3
+#define PA4                     4
+#define PA5                     5
+#define PA6                     6
+#define PA7                     7
 #define PA8                     8
 #define PA9                     9
 #define PA10                    10
@@ -49,8 +49,8 @@ extern "C" {
 #define PA13                    13
 #define PA14                    14
 #define PA15                    15
-#define PB0                     A8
-#define PB1                     A9
+#define PB0                     16
+#define PB1                     17
 #define PB2                     18
 #define PB3                     19
 #define PB4                     20
@@ -65,12 +65,12 @@ extern "C" {
 #define PB13                    29
 #define PB14                    30
 #define PB15                    31
-#define PC0                     A10
-#define PC1                     A11
-#define PC2                     A12
-#define PC3                     A13
-#define PC4                     A14
-#define PC5                     A15
+#define PC0                     32
+#define PC1                     33
+#define PC2                     34
+#define PC3                     35
+#define PC4                     36
+#define PC5                     37
 #define PC6                     38
 #define PC7                     39
 #define PC8                     40
@@ -140,7 +140,7 @@ extern "C" {
 //#define ANALOG_PINS_START       PA0
 //#define ANALOG_PINS_LAST        PB2
 
-#define PIN_NOT_DEFINED         DIGITAL_PINS_NUM
+#define PIN_NOT_DEFINED         (DIGITAL_PINS_NUM + ANALOG_PINS_NUM + 1)
 
 /* LED definitions */
 #ifndef LED_BUILTIN
@@ -169,15 +169,19 @@ extern "C" {
 #define TIMER_SERVO             TIMER6
 
 /* Serial definitions */
-/* "Serial" is by default Serial1 / USART0 */
+/* "Serial" is by default Serial1 / USART1 */
 #ifndef DEFAULT_HWSERIAL_INSTANCE
-   #define DEFAULT_HWSERIAL_INSTANCE   2
+#define DEFAULT_HWSERIAL_INSTANCE   2
 #endif
 
 /* USART0 */
 #define HAVE_HWSERIAL1
-#define SERIAL0_RX          PA3
-#define SERIAL0_TX          PA2
+#ifndef SERIAL0_RX
+   #define SERIAL0_RX          PA3
+#endif
+#ifndef SERIAL0_TX
+   #define SERIAL0_TX          PA2
+#endif
 
 /* ADC definitions */
 #define ADC_RESOLUTION         10
@@ -196,7 +200,7 @@ extern "C" {
   /* Port which normally prints to the Arduino Serial Monitor */
   #define SERIAL_PORT_MONITOR     Serial
   /* Hardware serial port, physical RX & TX pins. */
-  #define SERIAL_PORT_HARDWARE    Serial1
+  #define SERIAL_PORT_HARDWARE    Serial
 #endif
 
 #endif /* _VARIANT_ */

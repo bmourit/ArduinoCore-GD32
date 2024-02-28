@@ -35,35 +35,48 @@ extern "C" {
 #endif
 
 typedef enum {
-    FirstPort = 0x00,
-    PORTA = FirstPort,
+    PORTA = 0x00,
     PORTB,
 #if defined GPIOC
     PORTC,
+#else
+    PORTC_NOT_THERE,
 #endif
 #if defined GPIOD
     PORTD,
+#else
+    PORTD_NOT_THERE,
 #endif
 #if defined GPIOE
     PORTE,
+#else
+    PORTE_NOT_THERE,
 #endif
 #if defined GPIOF
     PORTF,
+#else
+    PORTF_NOT_THERE,
 #endif
 #if defined GPIOG
     PORTG,
+#else
+    PORTG_NOT_THERE,
 #endif
 #if defined GPIOH
     PORTH,
+#else
+    PORTH_NOT_THERE,
 #endif
 #if defined GPIOI
     PORTI,
+#else
+    PORTI_NOT_THERE,
 #endif
     PORTEND,
     LastPort = PORTEND - 1
 } PortName;
 
-#define GPIO_PORT_NUM (LastPort - FirstPort +1)
+#define GPIO_PORT_NUM (PORTEND)
 
 #ifdef __cplusplus
 }

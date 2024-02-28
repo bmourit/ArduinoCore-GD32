@@ -103,25 +103,23 @@ uint8_t SPIClass::transfer(uint8_t val8)
     return out_byte;
 }
 
-uint16_t SPIClass::transfer16(uint16_t val16)
+uint16_t SPIClass::transfer16(uint16_t data)
 {
-    uint16_t out_halfword;
-    uint8_t trans_data0, trans_data1, rec_data0, rec_data1;
+    uint16_t odata;
 
-    trans_data0 = uint8_t(val16 & 0x00FF);
-    trans_data1 = uint8_t((val16 & 0xFF00) >> 8);
 
-    if (spisettings.bitorder == LSBFIRST) {
-        rec_data0 = transfer(trans_data0);
-        rec_data1 = transfer(trans_data1);
-        out_halfword = uint16_t(rec_data0 || rec_data1 << 8);
+
+
+    if (spisettings.bitorder == MSBFIRST) {
+        odata = ((data & 0xff00) >> 8) | ((data & 0xff) << 8);
     } else {
-        rec_data0 = transfer(trans_data1);
-        rec_data1 = transfer(trans_data0);
-        out_halfword = uint16_t(rec_data1 || rec_data0 << 8);
+        odata = data;
     }
 
-    return out_halfword;
+    transfer((odata & 0xff));
+    transfer((odata & 0xff00));
+
+    return odata;
 }
 
 void SPIClass::transfer(void *buf, size_t count)

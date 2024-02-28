@@ -28,7 +28,6 @@ OF SUCH DAMAGE.
     Based on mbed-os/hal/include/hal/analogout_api.c
 */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __ANALOG_H
 #define __ANALOG_H
 
@@ -43,11 +42,7 @@ extern "C" {
 #endif
 
 typedef struct {
-    // uint32_t periph;
-    // uint8_t channel;
-    // uint8_t resolution;
     uint8_t isactive;
-    // uint32_t value;
 } analog_t;
 
 uint8_t get_adc_channel(PinName pinname);

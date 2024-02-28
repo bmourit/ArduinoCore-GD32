@@ -27,8 +27,10 @@ OF SUCH DAMAGE.
 
 #include "pwm.h"
 #include "pins_arduino.h"
-#define PWMNUMS   56
-PWM *pwmObj[PWMNUMS] = {NULL};
+
+#define PWMNUMS		56
+
+PWM *pwmObj[PWMNUMS] = { NULL };
 
 /*!
     \brief      PWM object construct
@@ -74,7 +76,7 @@ void PWM::stop(void)
 }
 
 /*!
-    \brief      set pwm period and cyclye
+    \brief      set pwm period and cycle
     \param[in]  time: period time
     \param[in]  cycle: cycle time
     \param[in]  format: time format

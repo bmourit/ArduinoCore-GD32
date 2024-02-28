@@ -54,13 +54,13 @@ OF SUCH DAMAGE.
 
 /* registers definitions */
 /* GPIO registers definitions */
-#define GPIO_CTL0(gpiox)           REG32((gpiox) + 0x00U)    /*!< GPIO port control register 0 */
-#define GPIO_CTL1(gpiox)           REG32((gpiox) + 0x04U)    /*!< GPIO port control register 1 */
-#define GPIO_ISTAT(gpiox)          REG32((gpiox) + 0x08U)    /*!< GPIO port input status register */
-#define GPIO_OCTL(gpiox)           REG32((gpiox) + 0x0CU)    /*!< GPIO port output control register */
-#define GPIO_BOP(gpiox)            REG32((gpiox) + 0x10U)    /*!< GPIO port bit operation register */
-#define GPIO_BC(gpiox)             REG32((gpiox) + 0x14U)    /*!< GPIO bit clear register */
-#define GPIO_LOCK(gpiox)           REG32((gpiox) + 0x18U)    /*!< GPIO port configuration lock register */
+#define GPIO_CTL0(gpiox)           REG32((gpiox) + 0x00U)    /*!< GPIO port control register 0 (low) */
+#define GPIO_CTL1(gpiox)           REG32((gpiox) + 0x04U)    /*!< GPIO port control register 1 (high) */
+#define GPIO_ISTAT(gpiox)          REG32((gpiox) + 0x08U)    /*!< GPIO port input status register (input data register) */
+#define GPIO_OCTL(gpiox)           REG32((gpiox) + 0x0CU)    /*!< GPIO port output control register (output data register) */
+#define GPIO_BOP(gpiox)            REG32((gpiox) + 0x10U)    /*!< GPIO port bit operation register (bit set/reset) */
+#define GPIO_BC(gpiox)             REG32((gpiox) + 0x14U)    /*!< GPIO bit clear register (bit reset) */
+#define GPIO_LOCK(gpiox)           REG32((gpiox) + 0x18U)    /*!< GPIO port configuration lock register (configuratioon lock) */
 #define GPIOx_SPD(gpiox)           REG32((gpiox) + 0x3CU)    /*!< GPIO port bit speed register */
 
 /* AFIO registers definitions */

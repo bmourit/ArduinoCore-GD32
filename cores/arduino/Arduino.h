@@ -38,6 +38,8 @@ using namespace arduino;
 #include "gd32/pins_arduino.h"
 #include "gd32/PeripheralPins.h"
 
+#define EXTENDED_PIN_MODE
+
 #define interrupts() __enable_irq()
 #define noInterrupts() __disable_irq()
 #define digitalPinToInterrupt(pin) (pin)

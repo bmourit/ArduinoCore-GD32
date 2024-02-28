@@ -37,6 +37,8 @@ typedef enum {
 } DACName;
 
 typedef enum {
+    UART_3 = (int)UART3,
+    UART_4 = (int)UART4,
     UART_0 = (int)USART0,
     UART_1 = (int)USART1,
     UART_2 = (int)USART2
@@ -62,6 +64,10 @@ typedef enum {
     PWM_7 = (int)TIMER7,
     PWM_8 = (int)TIMER8,
     PWM_9 = (int)TIMER9,
+    PWM_10 = (int)TIMER10,
+    PWM_11 = (int)TIMER11,
+    PWM_12 = (int)TIMER12,
+    PWM_13 = (int)TIMER13,
 } PWMName;
 
 

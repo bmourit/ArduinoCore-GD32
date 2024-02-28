@@ -45,7 +45,7 @@ OF SUCH DAMAGE.
 */
 void timer_deinit(uint32_t timer_periph)
 {
-    switch(timer_periph){
+    switch(timer_periph) {
     case TIMER0:
         /* reset TIMER0 */
         rcu_periph_reset_enable(RCU_TIMER0RST);
@@ -153,15 +153,15 @@ void timer_struct_para_init(timer_parameter_struct* initpara)
     \param[out] none
     \retval     none
 */
-void timer_init(uint32_t timer_periph, timer_parameter_struct* initpara)
+void timer_init(uint32_t timer_periph, timer_parameter_struct *initpara)
 {
     /* configure the counter prescaler value */
     TIMER_PSC(timer_periph) = (uint16_t)initpara->prescaler;
 
     /* configure the counter direction and aligned mode */
-    if((TIMER0 == timer_periph) || (TIMER1 == timer_periph) || (TIMER2 == timer_periph)
-        || (TIMER3 == timer_periph) || (TIMER4 == timer_periph) || (TIMER7 == timer_periph)){
-        TIMER_CTL0(timer_periph) &= ~(uint32_t)(TIMER_CTL0_DIR|TIMER_CTL0_CAM);
+    if ((TIMER0 == timer_periph) || (TIMER1 == timer_periph) || (TIMER2 == timer_periph)
+        || (TIMER3 == timer_periph) || (TIMER4 == timer_periph) || (TIMER7 == timer_periph)) {
+        TIMER_CTL0(timer_periph) &= ~(uint32_t)(TIMER_CTL0_DIR | TIMER_CTL0_CAM);
         TIMER_CTL0(timer_periph) |= (uint32_t)initpara->alignedmode;
         TIMER_CTL0(timer_periph) |= (uint32_t)initpara->counterdirection;
     }
@@ -169,13 +169,13 @@ void timer_init(uint32_t timer_periph, timer_parameter_struct* initpara)
     /* configure the autoreload value */
     TIMER_CAR(timer_periph) = (uint32_t)initpara->period;
 
-    if((TIMER5 != timer_periph) && (TIMER6 != timer_periph)){
+    if ((TIMER5 != timer_periph) && (TIMER6 != timer_periph)) {
         /* reset the CKDIV bit */
         TIMER_CTL0(timer_periph) &= ~(uint32_t)TIMER_CTL0_CKDIV;
         TIMER_CTL0(timer_periph) |= (uint32_t)initpara->clockdivision;
     }
 
-    if((TIMER0 == timer_periph) || (TIMER7 == timer_periph)){
+    if ((TIMER0 == timer_periph) || (TIMER7 == timer_periph)) {
         /* configure the repetition counter value */
         TIMER_CREP(timer_periph) = (uint32_t)initpara->repetitioncounter;
     }
@@ -328,7 +328,7 @@ void timer_repetition_value_config(uint32_t timer_periph, uint16_t repetition)
     \param[in]  autoreload: the counter auto-reload value,0~65535
     \param[out] none
     \retval     none
-*/         
+*/
 void timer_autoreload_value_config(uint32_t timer_periph, uint16_t autoreload)
 {
     TIMER_CAR(timer_periph) = (uint32_t)autoreload;
@@ -364,7 +364,7 @@ uint32_t timer_counter_read(uint32_t timer_periph)
     \param[in]  timer_periph: TIMERx(x=0..13)
     \param[out] none
     \retval     prescaler register value
-*/         
+*/
 uint16_t timer_prescaler_read(uint32_t timer_periph)
 {
     uint16_t prescaler_value = 0U;
@@ -1581,24 +1581,24 @@ void timer_input_pwm_capture_config(uint32_t timer_periph, uint16_t channel, tim
     uint16_t icselection = 0x0U;
 
     /* Set channel input polarity */
-    if(TIMER_IC_POLARITY_RISING == icpwm->icpolarity){
+    if (TIMER_IC_POLARITY_RISING == icpwm->icpolarity) {
         icpolarity = TIMER_IC_POLARITY_FALLING;
-    }else{
+    } else {
         icpolarity = TIMER_IC_POLARITY_RISING;
     }
 
-    /* Set channel input mode selection */
-    if(TIMER_IC_SELECTION_DIRECTTI == icpwm->icselection){
+    /* Set channel input pwm parameter */
+    if (TIMER_IC_SELECTION_DIRECTTI == icpwm->icselection) {
         icselection = TIMER_IC_SELECTION_INDIRECTTI;
-    }else{
+    } else {
         icselection = TIMER_IC_SELECTION_DIRECTTI;
     }
 
-    if(TIMER_CH_0 == channel){
+    if (TIMER_CH_0 == channel) {
         /* reset the CH0EN bit */
         TIMER_CHCTL2(timer_periph) &= (~(uint32_t)TIMER_CHCTL2_CH0EN);
         /* reset the CH0P and CH0NP bits */
-        TIMER_CHCTL2(timer_periph) &= (~(uint32_t)(TIMER_CHCTL2_CH0P|TIMER_CHCTL2_CH0NP));
+        TIMER_CHCTL2(timer_periph) &= (~(uint32_t)(TIMER_CHCTL2_CH0P | TIMER_CHCTL2_CH0NP));
         /* set the CH0P and CH0NP bits */
         TIMER_CHCTL2(timer_periph) |= (uint32_t)(icpwm->icpolarity);
         /* reset the CH0MS bit */
@@ -1612,12 +1612,12 @@ void timer_input_pwm_capture_config(uint32_t timer_periph, uint16_t channel, tim
         /* set the CH0EN bit */
         TIMER_CHCTL2(timer_periph) |= (uint32_t)TIMER_CHCTL2_CH0EN;
         /* configure TIMER channel input capture prescaler value */
-        timer_channel_input_capture_prescaler_config(timer_periph,TIMER_CH_0,(uint16_t)(icpwm->icprescaler));
+        timer_channel_input_capture_prescaler_config(timer_periph, TIMER_CH_0, (uint16_t)(icpwm->icprescaler));
 
         /* reset the CH1EN bit */
         TIMER_CHCTL2(timer_periph) &= (~(uint32_t)TIMER_CHCTL2_CH1EN);
         /* reset the CH1P and CH1NP bits */
-        TIMER_CHCTL2(timer_periph) &= (~(uint32_t)(TIMER_CHCTL2_CH1P|TIMER_CHCTL2_CH1NP));
+        TIMER_CHCTL2(timer_periph) &= (~(uint32_t)(TIMER_CHCTL2_CH1P | TIMER_CHCTL2_CH1NP));
         /* set the CH1P and CH1NP bits */
         TIMER_CHCTL2(timer_periph) |= (uint32_t)((uint32_t)icpolarity << 4U);
         /* reset the CH1MS bit */
@@ -1631,12 +1631,12 @@ void timer_input_pwm_capture_config(uint32_t timer_periph, uint16_t channel, tim
         /* set the CH1EN bit */
         TIMER_CHCTL2(timer_periph) |= (uint32_t)TIMER_CHCTL2_CH1EN;
         /* configure TIMER channel input capture prescaler value */
-        timer_channel_input_capture_prescaler_config(timer_periph,TIMER_CH_1,(uint16_t)(icpwm->icprescaler));
-    }else{
+        timer_channel_input_capture_prescaler_config(timer_periph, TIMER_CH_1, (uint16_t)(icpwm->icprescaler));
+    } else {
         /* reset the CH1EN bit */
         TIMER_CHCTL2(timer_periph) &= (~(uint32_t)TIMER_CHCTL2_CH1EN);
         /* reset the CH1P and CH1NP bits */
-        TIMER_CHCTL2(timer_periph) &= (~(uint32_t)(TIMER_CHCTL2_CH1P|TIMER_CHCTL2_CH1NP));
+        TIMER_CHCTL2(timer_periph) &= (~(uint32_t)(TIMER_CHCTL2_CH1P | TIMER_CHCTL2_CH1NP));
         /* set the CH1P and CH1NP bits */
         TIMER_CHCTL2(timer_periph) |= (uint32_t)((uint32_t)(icpwm->icpolarity) << 4U);
         /* reset the CH1MS bit */

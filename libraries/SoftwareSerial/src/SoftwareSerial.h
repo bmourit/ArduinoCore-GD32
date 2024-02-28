@@ -40,11 +40,12 @@
 //}
 #include <Arduino.h>
 #include <Stream.h>
+
 /******************************************************************************
 * Definitions
 ******************************************************************************/
 #ifndef _SS_MAX_RX_BUFF
-#define _SS_MAX_RX_BUFF 64 // RX buffer size
+#define _SS_MAX_RX_BUFF 64	// RX buffer size
 #endif
 
 typedef struct {
@@ -56,7 +57,7 @@ typedef struct {
 class SoftwareSerial : public Stream
 {
     private:
-        // per object data
+        /* per object data */
         uint16_t _receivePin;
         uint16_t _transmitPin;
         uint32_t _receivePinPort;
@@ -75,7 +76,7 @@ class SoftwareSerial : public Stream
         //volatile uint8_t _receive_buffer_tail;
         //volatile uint8_t _receive_buffer_head;
 
-        // static data
+        /* static data */
         static HardwareTimer timer;
         static SoftwareSerial *active_listener;
         static SoftwareSerial *volatile active_out;
@@ -88,14 +89,12 @@ class SoftwareSerial : public Stream
         static int32_t rx_bit_cnt;
         static uint32_t cur_speed;
 
-        // private methods
         void send();
         void recv();
         void setSpeed(uint32_t speed);
         static void handleInterrupt();
 
     public:
-        // public methods
         SoftwareSerial(uint16_t receivePin, uint16_t transmitPin, bool inverse_logic = false);
         virtual ~SoftwareSerial();
         void begin(long speed);

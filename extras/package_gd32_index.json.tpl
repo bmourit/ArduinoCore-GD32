@@ -21,7 +21,7 @@
               "name": "GD32F303CC Generic"
             },
 	    {
-	      "name": "GD32F303RETX Generic"
+	      "name": "GD32F303RE Generic"
 	    }
           ],
           "category": "Contributed",
@@ -156,6 +156,13 @@
           "systems": [
             {
               "host": "i386-apple-darwin11",
+              "url": "http://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-osx.tar.bz2",
+              "archiveFileName": "dfu-util-0.10.0-arduino1-osx.tar.bz2",
+              "size": "73921",
+              "checksum": "SHA-256:7562d128036759605828d64b8d672d42445a8d95555c4b9ba339f73a1711a640"
+            },
+            {
+              "host": "x86_64-apple-darwin11",
               "url": "http://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-osx.tar.bz2",
               "archiveFileName": "dfu-util-0.10.0-arduino1-osx.tar.bz2",
               "size": "73921",

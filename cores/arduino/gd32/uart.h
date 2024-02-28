@@ -30,12 +30,13 @@ OF SUCH DAMAGE.
 #ifndef UART_H
 #define UART_H
 
-/* Includes ------------------------------------------------------------------*/
+/* Includes */
 #include "gd32xxyy.h"
 #include "PinNames.h"
 #include "PeripheralNames.h"
 #include "pinmap.h"
 #include "PeripheralPins.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -118,35 +119,30 @@ typedef struct serial_s serial_t;
 struct serial_s {
     /* basic information */
     UARTName uart;
-    int     index;
+    int index;
     PinName pin_tx;
     PinName pin_rx;
-
     /* configure information */
     uint32_t baudrate;
     uint32_t databits;
     uint32_t stopbits;
     uint32_t parity;
-
     /* operating parameters */
-    uint16_t        rx_size;
-    uint8_t         *tx_buffer_ptr;
-    uint8_t         *rx_buffer_ptr;
-    //used in HardwareSerial
-    uint8_t         *rx_buff;
-    uint8_t         *tx_buff;
-    uint16_t   tx_count;
-    uint16_t   rx_count;
-
+    uint16_t rx_size;
+    uint8_t *tx_buffer_ptr;
+    uint8_t *rx_buffer_ptr;
+    /* used in HardwareSerial */
+    uint8_t *rx_buff;
+    uint8_t *tx_buff;
+    uint16_t tx_count;
+    uint16_t rx_count;
     volatile uint16_t rx_tail;
     volatile uint16_t tx_head;
     volatile uint16_t rx_head;
     volatile uint16_t tx_tail;
-
-    uint32_t   error_code;
-    operation_state_enum  tx_state;
-    operation_state_enum  rx_state;
-
+    uint32_t error_code;
+    operation_state_enum tx_state;
+    operation_state_enum rx_state;
     void (*tx_callback)(serial_t *obj);
     void (*rx_callback)(serial_t *obj);
 };

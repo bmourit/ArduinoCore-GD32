@@ -34,17 +34,15 @@ OF SUCH DAMAGE.
 extern "C" {
 #endif
 
-#define PINCFG_INDEX(X) (GD_PORT_GET(X) - FirstPort)
+#define PIN_MASK               0x01
+#define PIN_OFFSET(x)         (GD_PIN_GET(x))
+#define PIN_BIT(x)            (PIN_MASK << PIN_OFFSET(x))
 
-#define PINCFG_MASK     0x01
-#define PINCFG_OFFSET(x)   (GD_PIN_GET(x))
-#define PINCFG_BIT(x)      (PINCFG_MASK << PINCFG_OFFSET(x))
+#define PIN_STATE_VAL(x, y)  ((y >> PIN_OFFSET(x)) & PIN_MASK)
 
-#define PIN_STATE_VAL(x, y)   ((y >> PINCFG_OFFSET(x)) & PINCFG_MASK)
-
-#define CHECK_PIN_STATE(pin, port) (PIN_STATE_VAL(pin, port[PINCFG_INDEX(pin)]))
-#define SET_PIN_STATE(pin, port)   (port[PINCFG_INDEX(pin)] = port[PINCFG_INDEX(pin)] | PINCFG_BIT(pin))
-#define RESET_PIN_STATE(pin, port) (port[PINCFG_INDEX(pin)] = port[PINCFG_INDEX(pin)] & (~PINCFG_BIT(pin)))
+#define CHECK_PIN_STATE(pin, port) (PIN_STATE_VAL(pin, port[GD_PORT_GET(pin)]))
+#define SET_PIN_STATE(pin, port)   (port[GD_PORT_GET(pin)] |= PIN_BIT(pin))
+#define RESET_PIN_STATE(pin, port) (port[GD_PORT_GET(pin)] &= (~PIN_BIT(pin)))
 
 #ifdef __cplusplus
 }

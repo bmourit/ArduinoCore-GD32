@@ -129,8 +129,7 @@ OF SUCH DAMAGE.
 
 /* constants definitions */
 /* SPI and I2S parameter struct definitions */
-typedef struct
-{   
+typedef struct {   
     uint32_t device_mode;                                                       /*!< SPI master or slave */
     uint32_t trans_mode;                                                        /*!< SPI transtype */
     uint32_t frame_size;                                                        /*!< SPI frame size */
@@ -138,7 +137,7 @@ typedef struct
     uint32_t endian;                                                            /*!< SPI big endian or little endian */
     uint32_t clock_polarity_phase;                                              /*!< SPI clock phase and polarity */
     uint32_t prescale;                                                          /*!< SPI prescale factor */
-}spi_parameter_struct;
+} spi_parameter_struct;
 
 /* SPI mode definitions */
 #define SPI_MASTER                      (SPI_CTL0_MSTMOD | SPI_CTL0_SWNSS)      /*!< SPI as master */
