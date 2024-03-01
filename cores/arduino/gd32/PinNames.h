@@ -24,15 +24,15 @@
 extern "C" {
 #endif
 
-#define ALT1    				0x100
-#define ALT2    				0x200
-#define ALT3    				0x300
-#define ALT4    				0x400
-#define ALT5    				0x500
-#define ALT6    				0x600
-#define ALT7    				0x700
+#define ALT1		0x100
+#define ALT2		0x200
+#define ALT3		0x300
+#define ALT4		0x400
+#define ALT5		0x500
+#define ALT6		0x600
+#define ALT7		0x700
 
-#define ALTMASK 				0x700
+#define ALTMASK		0x700
 
 #define PIN_NAME_INT_ANALOG_BASE	0x1000
 
