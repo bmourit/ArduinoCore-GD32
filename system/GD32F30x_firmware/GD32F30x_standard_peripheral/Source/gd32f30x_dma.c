@@ -75,7 +75,7 @@ void dma_deinit(uint32_t dma_periph, dma_channel_enum channelx)
     \param[out] none
     \retval     none
 */
-void dma_struct_para_init(dma_parameter_struct* init_struct)
+void dma_struct_para_init(dma_parameter_struct *init_struct)
 {
     if(NULL == init_struct){
         DMA_WRONG_HANDLE

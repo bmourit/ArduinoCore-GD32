@@ -38,10 +38,12 @@ extern struct serial_s *obj_s_buf[UART_NUM];
 
 int HardwareSerial::availableSerialN(unsigned n)
 {
-    // copy of the HardwareSerial::available function but more direct.
+    /* copy of the HardwareSerial::available function, but more direct */
     if (n >= UART_NUM)
         return 0;
+
     auto _serial = obj_s_buf[n];
+
     return ((unsigned int)(SERIAL_RX_BUFFER_SIZE + _serial->rx_head - _serial->rx_tail)) %
            SERIAL_RX_BUFFER_SIZE;
 }
@@ -290,35 +292,3 @@ void HardwareSerial::_tx_complete_irq(serial_t *obj)
         serial_transmit(obj, &obj->tx_buff[obj->tx_tail], 1);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

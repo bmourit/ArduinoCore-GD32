@@ -33,7 +33,7 @@ OF SUCH DAMAGE.
 extern "C" {
 #endif
 
-#define SPI_S(obj)    (( struct spi_s *)(obj))
+#define SPI_S(obj)    ((struct spi_s *)(obj))
 #define SPI_PINS_FREE_MODE   0x00000001
 
 /** Initialize the SPI structure

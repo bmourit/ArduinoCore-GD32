@@ -32,7 +32,14 @@ OF SUCH DAMAGE.
 #include "PinNames.h"
 #include "PeripheralPins.h"
 
-/* ############# Timer interrupt definition ############# */
+/* timer interrupts */
+#ifndef TIMER_IRQ_PRIORITY
+	#define TIMER_IRQ_PRIORITY	14
+#endif
+#ifndef TIMER_IRQ_SUBPRIORITY
+	#define TIMER_IRQ_SUBPRIORITY	0
+#endif
+
 #if defined(TIMER0) && !defined(TIMER0_IRQn)
 #if defined(GD32F30x)
 #if defined(GD32F30X_CL) || defined(GD32F30X_XD)

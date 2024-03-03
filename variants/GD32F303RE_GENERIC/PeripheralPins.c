@@ -300,3 +300,16 @@ const PinMap PinMap_CAN_TD[] = {
     {NC,    NC,    0}
 };
 
+const PinMap PinMap_SD[] = {
+  {PORTB_8,  SDIO, GD_PIN_DATA_REMAP(PIN_MODE_AF_PP, PIN_MODE_INPUT_PU, REMAP_NONE)},                           /* SDIO_D4 */
+  {PORTB_9,  SDIO, GD_PIN_DATA_REMAP(PIN_MODE_AF_PP, PIN_MODE_INPUT_PU, REMAP_NONE)},                           /* SDIO_D5 */
+  {PORTC_6,  SDIO, GD_PIN_DATA_REMAP(PIN_MODE_AF_PP, PIN_MODE_INPUT_PU, REMAP_NONE)},                           /* SDIO_D6 */
+  {PORTC_7,  SDIO, GD_PIN_DATA_REMAP(PIN_MODE_AF_PP, PIN_MODE_INPUT_PU, REMAP_NONE)},                           /* SDIO_D7 */
+  {PORTC_8,  SDIO, GD_PIN_DATA_REMAP(PIN_MODE_AF_PP, PIN_MODE_INPUT_PU, REMAP_NONE)},                           /* SDIO_D0 */
+  {PORTC_9,  SDIO, GD_PIN_DATA_REMAP(PIN_MODE_AF_PP, PIN_MODE_INPUT_PU, REMAP_NONE)},                           /* SDIO_D1 */
+  {PORTC_10, SDIO, GD_PIN_DATA_REMAP(PIN_MODE_AF_PP, PIN_MODE_INPUT_PU, REMAP_NONE)},                           /* SDIO_D2 */
+  {PORTC_11, SDIO, GD_PIN_DATA_REMAP(PIN_MODE_AF_PP, PIN_MODE_INPUT_PU, REMAP_NONE)},                           /* SDIO_D3 */
+  {PORTC_12, SDIO, GD_PIN_DATA_REMAP(PIN_MODE_AF_PP, PIN_MODE_INPUT_FLOATING, REMAP_NONE)},                     /* SDIO_CK */
+  {PORTD_2,  SDIO, GD_PIN_DATA_REMAP(PIN_MODE_AF_PP, PIN_MODE_INPUT_FLOATING, REMAP_NONE)},                     /* SDIO_CMD */
+  {NC,    NC,    0}
+};

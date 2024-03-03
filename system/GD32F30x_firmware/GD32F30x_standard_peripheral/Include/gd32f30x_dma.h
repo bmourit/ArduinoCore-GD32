@@ -121,8 +121,7 @@ OF SUCH DAMAGE.
 
 /* constants definitions */
 /* DMA channel select */
-typedef enum 
-{
+typedef enum {
     DMA_CH0 = 0,                /*!< DMA Channel0 */
     DMA_CH1,                    /*!< DMA Channel1 */ 
     DMA_CH2,                    /*!< DMA Channel2 */ 
@@ -133,8 +132,7 @@ typedef enum
 } dma_channel_enum;
 
 /* DMA initialize struct */
-typedef struct
-{
+typedef struct {
     uint32_t periph_addr;       /*!< peripheral base address */
     uint32_t periph_width;      /*!< transfer data size of peripheral */
     uint32_t memory_addr;       /*!< memory base address */
@@ -144,7 +142,6 @@ typedef struct
     uint8_t periph_inc;         /*!< peripheral increasing mode */
     uint8_t memory_inc;         /*!< memory increasing mode */
     uint8_t direction;          /*!< channel data transfer direction */
-
 } dma_parameter_struct;
 
 #define DMA_FLAG_ADD(flag, shift)           ((flag) << ((shift) * 4U))                      /*!< DMA channel flag shift */

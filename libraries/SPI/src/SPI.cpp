@@ -23,12 +23,11 @@
 
 #include <Arduino.h>
 #include <assert.h>
-#include "SPI.h"
+
 #include "pins_arduino.h"
+#include "SPI.h"
 
-SPIClass SPI;
-
-SPIClass::SPIClass(void)
+SPIClassGD32::SPIClassGD32(void)
 {
     _spi.pin_miso = DIGITAL_TO_PINNAME(MISO);
     _spi.pin_mosi = DIGITAL_TO_PINNAME(MOSI);
@@ -38,7 +37,7 @@ SPIClass::SPIClass(void)
     initialized = false;
 }
 
-SPIClass::SPIClass(PinName mosi, PinName miso, PinName sclk, PinName ssel)
+SPIClassGD32::SPIClassGD32(PinName mosi, PinName miso, PinName sclk, PinName ssel)
 {
     _spi.pin_miso = miso;
     _spi.pin_mosi = mosi;
@@ -48,7 +47,7 @@ SPIClass::SPIClass(PinName mosi, PinName miso, PinName sclk, PinName ssel)
     initialized = false;
 }
 
-SPIClass::SPIClass(PinName mosi, PinName miso, PinName sclk)
+SPIClassGD32::SPIClassGD32(PinName mosi, PinName miso, PinName sclk)
 {
     _spi.pin_miso = miso;
     _spi.pin_mosi = mosi;
@@ -58,19 +57,18 @@ SPIClass::SPIClass(PinName mosi, PinName miso, PinName sclk)
     initialized = false;
 }
 
-void SPIClass::begin()
+void SPIClassGD32::begin()
 {
     uint32_t test = 0;
-    if (initialized) {
-        return;
-    }
 
-    spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
+    if (!initialized) {
+        spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
+    }
 
     initialized = true;
 }
 
-void SPIClass::end()
+void SPIClassGD32::end()
 {
     if (initialized) {
         spi_free(&_spi);
@@ -78,16 +76,14 @@ void SPIClass::end()
     }
 }
 
-void SPIClass::beginTransaction(SPISettings settings)
+void SPIClassGD32::beginTransaction(SPISettings settings)
 {
     config(settings);
-
     spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
-
     initialized = true;
 }
 
-void SPIClass::endTransaction(void)
+void SPIClassGD32::endTransaction(void)
 {
     if (initialized) {
         spi_free(&_spi);
@@ -95,7 +91,7 @@ void SPIClass::endTransaction(void)
     }
 }
 
-uint8_t SPIClass::transfer(uint8_t val8)
+uint8_t SPIClassGD32::transfer(uint8_t val8)
 {
     uint32_t out_byte;
     out_byte = spi_master_write(&_spi, val8);
@@ -103,12 +99,9 @@ uint8_t SPIClass::transfer(uint8_t val8)
     return out_byte;
 }
 
-uint16_t SPIClass::transfer16(uint16_t data)
+uint16_t SPIClassGD32::transfer16(uint16_t data)
 {
     uint16_t odata;
-
-
-
 
     if (spisettings.bitorder == MSBFIRST) {
         odata = ((data & 0xff00) >> 8) | ((data & 0xff) << 8);
@@ -122,29 +115,29 @@ uint16_t SPIClass::transfer16(uint16_t data)
     return odata;
 }
 
-void SPIClass::transfer(void *buf, size_t count)
+void SPIClassGD32::transfer(void *buf, size_t count)
 {
     spi_master_block_write(&_spi, ((uint8_t *)buf), ((uint8_t *)buf), count);
 }
 
-void SPIClass::transfer(void *bufout, void *bufin, size_t count)
+void SPIClassGD32::transfer(void *bufout, void *bufin, size_t count)
 {
     spi_master_block_write(&_spi, ((uint8_t *)bufout), ((uint8_t *)bufin), count);
 }
 
-void SPIClass::setBitOrder(BitOrder order)
+void SPIClassGD32::setBitOrder(BitOrder order)
 {
     spisettings.bitorder = order;
     spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
 }
 
-void SPIClass::setDataMode(uint8_t mode)
+void SPIClassGD32::setDataMode(uint8_t mode)
 {
     spisettings.datamode = mode;
     spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
 }
 
-void SPIClass::setClockDivider(uint32_t divider)
+void SPIClassGD32::setClockDivider(uint32_t divider)
 {
     if (divider == 0) {
         spisettings.speed = SPI_SPEED_DEFAULT;
@@ -156,9 +149,41 @@ void SPIClass::setClockDivider(uint32_t divider)
     spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
 }
 
-void SPIClass::config(SPISettings settings)
+void SPIClassGD32::config(SPISettings settings)
 {
-    spisettings.speed = settings.speed;
-    spisettings.datamode = settings.datamode;
-    spisettings.bitorder = settings.bitorder;
+    if (this->settings != settings) {
+        this->settings = settings;
+    }
+}
+
+/**
+  * @brief  Not implemented.
+  */
+void SPIClassGD32::usingInterrupt(int interruptNumber)
+{
+  UNUSED(interruptNumber);
+}
+
+/**
+  * @brief  Not implemented.
+  */
+void SPIClassGD32::notUsingInterrupt(int interruptNumber)
+{
+  UNUSED(interruptNumber);
+}
+
+/**
+  * @brief  Not implemented.
+  */
+void SPIClassGD32::attachInterrupt(void)
+{
+  // Should be enableInterrupt()
+}
+
+/**
+  * @brief  Not implemented.
+  */
+void SPIClassGD32::detachInterrupt(void)
+{
+  // Should be disableInterrupt()
 }
