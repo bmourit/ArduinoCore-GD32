@@ -526,7 +526,7 @@ void Timer_init(uint32_t instance, timerPeriod_t *timerPeriod)
     timer_parameter_struct timer_initpara;
 
 #if defined(GD32E23x)
-    /* no subprio */
+    /* no subpriority */
     nvic_irq_enable(getTimerUpIrq(instance), 2);
     nvic_irq_enable(getTimerCCIrq(instance), 2);
 #else

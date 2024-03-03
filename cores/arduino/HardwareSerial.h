@@ -156,14 +156,19 @@ class HardwareSerial : public Stream
 #if !defined(Serial)
 #if DEFAULT_HWSERIAL_INSTANCE == 1
 #define Serial Serial1
+#define HAVE_HWSERIAL1
 #elif DEFAULT_HWSERIAL_INSTANCE == 2
 #define Serial Serial2
+#define HAVE_HWSERIAL2
 #elif DEFAULT_HWSERIAL_INSTANCE == 3
 #define Serial Serial3
+#define HAVE_HWSERIAL3
 #elif DEFAULT_HWSERIAL_INSTANCE == 4
 #define Serial Serial4
+#define HAVE_HWSERIAL4
 #elif DEFAULT_HWSERIAL_INSTANCE == 5
 #define Serial Serial5
+#define HAVE_HWSERIAL5
 #endif /* DEFAULT_HWSERIAL_INSTANCE */
 #endif /* Serial */
 #endif /* USBD_USE_CDC */

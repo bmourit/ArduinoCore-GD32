@@ -179,7 +179,6 @@ extern "C" {
 #endif
 
 /* USART0 */
-#define HAVE_HWSERIAL1
 #ifndef SERIAL0_RX
    #define SERIAL0_RX          PA3
 #endif
