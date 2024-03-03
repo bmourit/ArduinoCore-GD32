@@ -29,44 +29,44 @@
 #include <stdio.h>
 
 extern "C" {
-#include "utility/drv_spi.h"
+  #include "utility/drv_spi.h"
 }
 
 class SPIClassGD32 : public arduino::HardwareSPI 
 {
-    public:
-        SPIClass();
-        SPIClassGD32(PinName mosi, PinName miso, PinName sclk, PinName ssel);
-        SPIClassGD32(PinName mosi, PinName miso, PinName sclk);
+	public:
+		SPIClassGD32();
+		SPIClassGD32(PinName mosi, PinName miso, PinName sclk, PinName ssel);
+		SPIClassGD32(PinName mosi, PinName miso, PinName sclk);
 
-        void begin();
-        void end();
+		void begin();
+		void end();
 
-        void beginTransaction(SPISettings settings) override;
-        void endTransaction(void) override;
+		void beginTransaction(SPISettings settings) override;
+		void endTransaction(void) override;
 
-        uint8_t transfer(uint8_t data);
-        uint16_t transfer16(uint16_t data);
-        void transfer(void *buf, size_t count);
-        void transfer(void *bufout, void *bufin, size_t count);
+		uint8_t transfer(uint8_t data);
+		uint16_t transfer16(uint16_t data);
+		void transfer(void *buf, size_t count);
+		void transfer(void *bufout, void *bufin, size_t count);
 
-        void setBitOrder(BitOrder order);
-        void setDataMode(uint8_t mode);
-        void setClockDivider(uint32_t divider);
+		void setBitOrder(BitOrder order);
+		void setDataMode(uint8_t mode);
+		void setClockDivider(uint32_t divider);
 
-        /* not implemented */
-        void usingInterrupt(int interruptNumber);
-        void notUsingInterrupt(int interruptNumber);
-        void attachInterrupt();
-        void detatchInterrupt();
+		/* not implemented */
+		void usingInterrupt(int interruptNumber);
+		void notUsingInterrupt(int interruptNumber);
+		void attachInterrupt();
+		void detatchInterrupt();
 
-    private:
-        void config(SPISettings settings);
+	private:
+		void config(SPISettings settings);
 
-        SPISettings spisettings;
+		SPISettings spisettings;
 
-        bool initialized;
-        spi_t _spi;
+		bool initialized;
+		spi_t _spi;
 };
 
 extern SPIClassGD32 SPI;
