@@ -228,7 +228,7 @@ uint32_t HardwareTimer::getCaptureValue(uint8_t channel)
     \param[out] none
     \retval     none
 */
-uint32_t HardwareTimer::getTimerClkFre(void)
+uint32_t HardwareTimer::getTimerClkFreq(void)
 {
     return getTimerClkFrequency(timerDevice);
 }

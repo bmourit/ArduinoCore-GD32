@@ -30,60 +30,60 @@ OF SUCH DAMAGE.
 
 #ifdef __cplusplus
 extern "C" {
-#endif // __cplusplus
+#endif 
 
 /* GPIO pins definitions */
-#define PA0                     0
-#define PA1                     1
-#define PA2                     2
-#define PA3                     3
-#define PA4                     4
-#define PA5                     5
-#define PA6                     6
-#define PA7                     7
-#define PA8                     8
-#define PA9                     9
-#define PA10                    10
-#define PA11                    11
-#define PA12                    12
-#define PA13                    13
-#define PA14                    14
-#define PA15                    15
-#define PB0                     16
-#define PB1                     17
-#define PB2                     18
-#define PB3                     19
-#define PB4                     20
-#define PB5                     21
-#define PB6                     22
-#define PB7                     23
-#define PB8                     24
-#define PB9                     25
-#define PB10                    26
-#define PB11                    27
-#define PB12                    28
-#define PB13                    29
-#define PB14                    30
-#define PB15                    31
-#define PC0                     32
-#define PC1                     33
-#define PC2                     34
-#define PC3                     35
-#define PC4                     36
-#define PC5                     37
-#define PC6                     38
-#define PC7                     39
-#define PC8                     40
-#define PC9                     41
-#define PC10                    42
-#define PC11                    43
-#define PC12                    44
-#define PC13                    45
-#define PC14                    46
-#define PC15                    47
-#define PD0                     48
-#define PD1                     49
-#define PD2                     50
+#define PA0    0
+#define PA1    1
+#define PA2    2
+#define PA3    3
+#define PA4    4
+#define PA5    5
+#define PA6    6
+#define PA7    7
+#define PA8    8
+#define PA9    9
+#define PA10   10
+#define PA11   11
+#define PA12   12
+#define PA13   13
+#define PA14   14
+#define PA15   15
+#define PB0    16
+#define PB1    17
+#define PB2    18
+#define PB3    19
+#define PB4    20
+#define PB5    21
+#define PB6    22
+#define PB7    23
+#define PB8    24
+#define PB9    25
+#define PB10   26
+#define PB11   27
+#define PB12   28
+#define PB13   29
+#define PB14   30
+#define PB15   31
+#define PC0    32
+#define PC1    33
+#define PC2    34
+#define PC3    35
+#define PC4    36
+#define PC5    37
+#define PC6    38
+#define PC7    39
+#define PC8    40
+#define PC9    41
+#define PC10   42
+#define PC11   43
+#define PC12   44
+#define PC13   45
+#define PC14   46
+#define PC15   47
+#define PD0    48
+#define PD1    49
+#define PD2    50
 
 // Alternate pins number
 #define PA0_ALT1                (PA0  | ALT1)
@@ -135,41 +135,39 @@ extern "C" {
 #define PC11_ALT1               (PC11 | ALT1)
 
 /* digital pins and analog pins number definitions */
-#define DIGITAL_PINS_NUM        51
-#define ANALOG_PINS_NUM         16
-//#define ANALOG_PINS_START       PA0
-//#define ANALOG_PINS_LAST        PB2
+#define DIGITAL_PINS_NUM   51
+#define ANALOG_PINS_NUM    16
 
-#define PIN_NOT_DEFINED         (DIGITAL_PINS_NUM + ANALOG_PINS_NUM + 1)
+#define PIN_NOT_DEFINED (DIGITAL_PINS_NUM + ANALOG_PINS_NUM + 1)
 
 /* LED definitions */
 #ifndef LED_BUILTIN
-   #define LED_BUILTIN          PIN_NOT_DEFINED
+   #define LED_BUILTIN  PIN_NOT_DEFINED
 #endif
 
 /* user keys definitions */
 #ifndef KEY0
-   #define KEY0                 PIN_NOT_DEFINED
+   #define KEY0         PIN_NOT_DEFINED
 #endif
 
 /* SPI definitions */
-#define PIN_SPI_SS              PA4
-#define PIN_SPI_SS1             PA15
-#define PIN_SPI_MOSI            PA7
-#define PIN_SPI_MISO            PA6
-#define PIN_SPI_SCK             PA5
+#define PIN_SPI_SS      PA4
+#define PIN_SPI_SS1     PA15
+#define PIN_SPI_MOSI    PA7
+#define PIN_SPI_MISO    PA6
+#define PIN_SPI_SCK     PA5
 
 /* I2C definitions */
 #define HAVE_I2C
-#define PIN_WIRE_SDA            PB7
-#define PIN_WIRE_SCL            PB6
+#define PIN_WIRE_SDA    PB7
+#define PIN_WIRE_SCL    PB6
 
 /* TIMER or PWM definitions */
 #ifndef TIMER_TONE
-   #define TIMER_TONE      TIMER5
+   #define TIMER_TONE   TIMER5
 #endif
 #ifndef TIMER_SERVO
-   #define TIMER_SERVO     TIMER6
+   #define TIMER_SERVO  TIMER6
 #endif
 
 /* Serial definitions */
@@ -180,15 +178,15 @@ extern "C" {
 
 /* USART0 */
 #ifndef SERIAL0_RX
-   #define SERIAL0_RX          PA3
+   #define SERIAL0_RX   PA3
 #endif
 #ifndef SERIAL0_TX
-   #define SERIAL0_TX          PA2
+   #define SERIAL0_TX   PA2
 #endif
 
 /* ADC definitions */
-#define ADC_RESOLUTION         10
-#define DAC_RESOLUTION         12
+#define ADC_RESOLUTION  10
+#define DAC_RESOLUTION  12
 
 /* USB definitions */
 #define USB_PULLUP                GPIOA

@@ -340,7 +340,7 @@ void timer_autoreload_value_config(uint32_t timer_periph, uint16_t autoreload)
     \param[in]  counter: the counter value,0~65535
     \param[out] none
     \retval     none
-*/         
+*/
 void timer_counter_value_config(uint32_t timer_periph, uint16_t counter)
 {
     TIMER_CNT(timer_periph) = (uint32_t)counter;
@@ -432,7 +432,7 @@ void timer_update_source_config(uint32_t timer_periph, uint32_t update)
 */
 void timer_interrupt_enable(uint32_t timer_periph, uint32_t interrupt)
 {
-    TIMER_DMAINTEN(timer_periph) |= (uint32_t) interrupt; 
+    TIMER_DMAINTEN(timer_periph) |= (uint32_t)interrupt; 
 }
 
 /*!

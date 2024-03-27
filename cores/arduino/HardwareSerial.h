@@ -26,6 +26,7 @@
 
 #include <inttypes.h>
 
+#include "api/HardwareSerial.h"
 #include "api/Stream.h"
 #include "uart.h"
 
@@ -48,17 +49,16 @@
 #if !defined(SERIAL_RX_BUFFER_SIZE)
 #define SERIAL_RX_BUFFER_SIZE 64
 #endif
-#if (SERIAL_TX_BUFFER_SIZE>256)
+#if (SERIAL_TX_BUFFER_SIZE > 256)
 typedef uint16_t tx_buffer_index_t;
 #else
 typedef uint8_t tx_buffer_index_t;
 #endif
-#if  (SERIAL_RX_BUFFER_SIZE>256)
+#if  (SERIAL_RX_BUFFER_SIZE > 256)
 typedef uint16_t rx_buffer_index_t;
 #else
 typedef uint8_t rx_buffer_index_t;
 #endif
-
 
 typedef struct {
     unsigned char buffer[SERIAL_RX_BUFFER_SIZE];

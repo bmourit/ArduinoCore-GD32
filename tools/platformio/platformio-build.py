@@ -44,7 +44,7 @@ assert isdir(FRAMEWORK_DIR)
 mcu = board_config.get("build.mcu", "")
 mcu_type = mcu[:-2]
 variant = board_config.get("build.variant", board_config.get("build.arduino.variant", "generic"))
-series = mcu_type[:6].upper() + "xx"
+series = mcu_type[:7].upper() + "x"
 variants_dir = (join("$PROJECT_DIR", board_config.get("build.variants_dir"))
     if board_config.get("build.variants_dir", ""):
         print("Warning! build.variant is not set")
@@ -53,8 +53,8 @@ variants_dir = (join("$PROJECT_DIR", board_config.get("build.variants_dir"))
 
 variant_dir = join(variants_dir, variant)
 assert isdir(variant_dir)
-
 inc_variant_dir = variant_dir
+
 if "windows" not in get_systype().lower() and not (
     set(["_idedata", "idedata"]) & set(COMMAND_LINE_TARGETS) and " " not in variant_dir
 ):
@@ -94,7 +94,6 @@ def add_upload_protocol_defines(board, upload_protocol):
     if upload_protocol in ("stlink", "dfu", "jlink") and is_generic:
         env.Append(CPPDEFINES=["GENERIC_BOOTLOADER"])
 
-
 def get_arm_math_lib(cpu):
     core = board_config.get("build.cpu")
     if "m33" in core:
@@ -123,7 +122,7 @@ def configure_application_offset(mcu, upload_protocol):
         env.Append(CPPDEFINES=["BL_HID"])
 
     elif upload_protocol == "dfu":
-        # GD32F103 series doesn't have embedded DFU over USB
+        # GD32F103/GD32F303 series doesn't have embedded DFU over USB
         # stm32duino bootloader (v1, v2) is used instead
         if mcu.startswith("gd32f103") or mcu.startswith("gd32f303"):
             if board_config.get("upload.boot_version", 2) == 1:
@@ -176,22 +175,12 @@ def get_arduino_board_id(board_config, mcu):
         return boards_remap[board_id]
 
     # Fall back to default cases according to MCU value for generic boards
-    if board_id.lower().startswith("generic"):
-        board_id = "GENERIC_"
+    if board_id.lower().startswith("gd32"):
+        board_id = "GD32"
         mcu = mcu.upper()
-        if len(mcu) > 11:
-            board_id += mcu[4:11] + "X"
-        else:
-            if len(mcu) > 10:
-                board_id += mcu[4:10] + "TX"
-            else:
-                board_id += mcu
-            print(
-                "Warning! Couldn't generate proper internal board id from the `%s` MCU "
-                "field! At least 12 symbols are required!" % mcu
-            )
+        board_id += mcu[4:9] + "_GENERIC"
 
-            print("Falling back to `%s`." % board_id)
+        print("Falling back to `%s`." % board_id)
 
     return board_id.upper()
 
@@ -227,6 +216,7 @@ env.Append(
         "ARDUINO_ARCH_GD32",
         "ARDUINO_%s" % board_id,
         ("BOARD_NAME", '\\"%s\\"' % board_id),
+        ("VARIANT_H", '\\"%s\\"' % board_config.get("build.arduino.variant_h", "variant.h"))
         ("ARDUINO_UPLOAD_MAXIMUM_SIZE", board_config.get("upload.maximum_size")),
     ],
     CPPPATH=[
@@ -266,7 +256,7 @@ env.Append(
 #    LIBPATH=[join(CMSIS_DIR, "DSP", "Lib", "GCC")],
 )
 
-# For boards supporting a USB stack: Include it.
+# For boards supporting a USB stack include it.
 if not board_config.get("build.spl_series").lower().startswith("gd32e23"):
     if isdir(join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library")):
         env.Append(
@@ -287,6 +277,15 @@ if not board_config.get("build.spl_series").lower().startswith("gd32e23"):
                 join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "core", "Source"),
             ]
         )
+
+#if board_config.get("build.spl_series").lower().startswith("gd32f30"):
+#if    if isdir(join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_sdio_library")):
+#        env.Append(
+#            CPPPATH=[
+#                join(FRAMEWORD_DIR, "system", spl_series + "_firmware", spl_series + "_sdio_library", "SDCard", "Include"),
+#                join(FRAMEWORD_DIR, "system", spl_series + "_firmware", spl_series + "_sdio_library", "SDCard", "Source"),
+#            ]
+#        )
 
 def process_usb_configuration(cpp_defines):
     # support standard way of enabling CDC

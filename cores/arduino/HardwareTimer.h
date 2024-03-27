@@ -38,7 +38,6 @@ OF SUCH DAMAGE.
 #define TIMER_IC_POLARITY_BOTH_EDGE         ((uint16_t)0x000AU)                     /*!< input capture both edge(not for timer1..6) */
 #endif
 
-
 typedef void(*timerCallback_t)(void);
 
 class HardwareTimer
@@ -51,16 +50,16 @@ class HardwareTimer
         void refresh(void);                                                       //update some registers to restart counters
         void setPrescaler(uint16_t prescaler);                                    //set prescaler
         void setCounter(uint16_t count);                                          //set counter
-        void setrRpetitionValue(uint16_t repetition);                             //set rpetition value
-        void setPeriodTime(uint32_t time, enum timeFormat format = FORMAT_MS);    //set timer period
-        void setReloadValue(uint32_t value);                                      //set timer period with the inital format (overflow)
+        void setRepetitionValue(uint16_t repetition);                             //set repetition value
+        void setPeriodTime(uint32_t time, enum timeFormat format = FORMAT_MS);    //set timer period with the inital format
+        void setReloadValue(uint32_t value);                                      //set reload value (overflow)
         void attachInterrupt(timerCallback_t callback, uint8_t channel = 0xff);   //attach callback for period/capture interrupt
         void detachInterrupt(uint8_t channel = 0xff);                             //detach callback for period/capture interrupt
         void periodCallback(void);                                                //period callback handler
         void captureCallback(uint8_t channel);                                    //capture callback handler
         void setCaptureMode(uint32_t ulpin, uint8_t channel, captureMode mode);   //set timer capture mode
         uint32_t getCaptureValue(uint8_t channel);                                //get timer channel capture value
-        uint32_t getTimerClkFre(void);                                            //get timer clock frequency
+        uint32_t getTimerClkFreq(void);                                           //get timer clock frequency
     private:
         uint32_t timerDevice;
         bool isTimerActive;

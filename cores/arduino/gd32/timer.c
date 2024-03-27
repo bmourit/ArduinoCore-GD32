@@ -144,7 +144,7 @@ timerhandle_t timerHandle = {
     .start                     = Timer_start,
     .stop                      = Timer_stop,
     .setPeriodTime             = Timer_setPeriodTime,
-    .refresh                   = Timer_rfresh,
+    .refresh                   = Timer_refresh,
     .enableUpdateIT            = Timer_enableUpdateIT,
     .enableCaptureIT           = Timer_enableCaptureIT,
     .disableUpdateIT           = Timer_disableUpdateIT,
@@ -372,7 +372,7 @@ void timer_clock_enable(uint32_t instance)
             temp = RCU_TIMER9;
             break;
 #endif
-#if defined(TIMER10)&& defined(HAS_TIMER_10)
+#if defined(TIMER10)&& defined(HAS_TIMER_10) 
         case TIMER10:
             temp = RCU_TIMER10;
             break;
@@ -746,9 +746,8 @@ void Timer_disableCaptureIT(uint32_t instance, uint8_t channel)
     \param[out] none
     \retval     none
 */
-void PWM_init(pwmDevice_t *pwmDevice, pwmPeriodCycle_t *pwmPeriodCycle)
+void PWM_init(pwmDevice_t *pwmDevice)
 {
-    (void) pwmPeriodCycle;	// TODO: remove parameter from API
     timer_oc_parameter_struct timer_ocintpara;
     timer_parameter_struct timer_initpara;
 
@@ -973,11 +972,11 @@ void PWM_disablePWMIT(pwmDevice_t *pwmDevice)
 */
 uint32_t getTimerClkFrequency(uint32_t instance)
 {
-    rcu_clock_freq_enum timerclkSrc =  NC;
+    rcu_clock_freq_enum timerclkSrc = NC;
     uint32_t APBx_PSC = 0;
     uint32_t clk_src = 0;
 
-    if (instance != (uint32_t) NC) {
+    if (instance != (uint32_t)NC) {
         switch ((uint32_t)instance) {
 #if defined(TIMER0)
             case (uint32_t)TIMER0:

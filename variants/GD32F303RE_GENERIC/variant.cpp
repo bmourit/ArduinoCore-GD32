@@ -26,6 +26,7 @@ OF SUCH DAMAGE.
 */
 
 #include "pins_arduino.h"
+#include "variant.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -105,6 +106,7 @@ const uint32_t analog_pins[] = {
     36,//PC4, //A14
     37//PC5, //A15
 };
+
 #ifdef __cplusplus
 }
 #endif

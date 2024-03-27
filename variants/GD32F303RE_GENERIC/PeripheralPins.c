@@ -17,7 +17,6 @@
  */
 
 #include "PeripheralPins.h"
-//#include "gd32xxyy_gpio.h"
 
 
 /*  void pin_function(PinName pin, int function);
@@ -45,7 +44,7 @@
 
 const int GD_GPIO_REMAP[] = {
     0x00000000,
-#if __has_include("gd32f10x_remap.h")
+#if __has_include("gd32f30x_remap.h")
 #define __REMAP_NAME__(remap) GPIO_ ## remap,
 #include "gd32f30x_remap.h"
 #undef __REMAP_NAME__

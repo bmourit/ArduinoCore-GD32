@@ -34,7 +34,7 @@ PWM *pwmObj[PWMNUMS] = { NULL };
 
 /*!
     \brief      PWM object construct
-    \param[in]  instance: PWMx(x=0..11)
+    \param[in]  pin: pin supporting PWM
     \param[out] none
     \retval     none
 */
@@ -48,7 +48,7 @@ PWM::PWM(uint32_t pin)
     this->index = getPWMIndex(pwmDevice);
     pwmObj[index] = this;
     pinmap_pinout(instance, PinMap_PWM);
-    pwmHandle.init(&pwmDevice, &pwmPeriodCycle);
+    pwmHandle.init(&pwmDevice);
 }
 
 /*!

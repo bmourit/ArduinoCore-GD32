@@ -37,11 +37,11 @@ typedef enum {
 } DACName;
 
 typedef enum {
-    UART_3 = (int)UART3,
-    UART_4 = (int)UART4,
     UART_0 = (int)USART0,
     UART_1 = (int)USART1,
-    UART_2 = (int)USART2
+    UART_2 = (int)USART2,
+    UART_3 = (int)UART3,
+    UART_4 = (int)UART4
 } UARTName;
 
 typedef enum {

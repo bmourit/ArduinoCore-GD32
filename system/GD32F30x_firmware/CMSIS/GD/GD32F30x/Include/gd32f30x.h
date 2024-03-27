@@ -44,7 +44,7 @@ OF SUCH DAMAGE.
 
 /* define GD32F30x */
 #if !defined (GD32F30X_HD) && !defined (GD32F30X_XD) && !defined (GD32F30X_CL)
-  /* #define GD32F30X_HD */
+  #define GD32F30X_HD
   /* #define GD32F30X_XD */
   /* #define GD32F30X_CL */
 #endif /* define GD32F30x */
@@ -108,6 +108,7 @@ OF SUCH DAMAGE.
 #define __NVIC_PRIO_BITS          4        /*!< GD32F30x uses 4 bits for the priority levels             */
 #define __Vendor_SysTickConfig    0        /*!< set to 1 if different sysTick config is used             */
 #define __FPU_PRESENT             1        /*!< FPU present                                              */
+
 /* define interrupt number */
 typedef enum IRQn
 {
@@ -285,15 +286,15 @@ typedef enum IRQn
 #include <stdint.h>
 
 /* enum definitions */
-typedef enum {DISABLE = 0, ENABLE = !DISABLE} EventStatus, ControlStatus;
-typedef enum {RESET = 0, SET = !RESET} FlagStatus;
-typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrStatus;
+typedef enum { DISABLE = 0, ENABLE = !DISABLE } EventStatus, ControlStatus;
+typedef enum { RESET = 0, SET = !RESET } FlagStatus;
+typedef enum { ERROR = 0, SUCCESS = !ERROR } ErrStatus;
 
 /* bit operations */
 #define REG32(addr)                  (*(volatile uint32_t *)(uint32_t)(addr))
 #define REG16(addr)                  (*(volatile uint16_t *)(uint32_t)(addr))
 #define REG8(addr)                   (*(volatile uint8_t *)(uint32_t)(addr))
-#define BIT(x)                       ((uint32_t)((uint32_t)0x01U<<(x)))
+#define BIT(x)                       ((uint32_t)((uint32_t)0x01U << (x)))
 #define BITS(start, end)             ((0xFFFFFFFFUL << (start)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(end))))
 #define GET_BITS(regval, start, end) (((regval) & BITS((start),(end))) >> (start))
 
@@ -342,9 +343,10 @@ typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrStatus;
 #define USBFS_BASE            (AHB1_BUS_BASE + 0x0FFE8000U)  /*!< USBFS base address               */
 
 /* define marco USE_STDPERIPH_DRIVER */
-#if !defined  USE_STDPERIPH_DRIVER
+#if !defined(USE_STDPERIPH_DRIVER)
 #define USE_STDPERIPH_DRIVER
 #endif
+
 #ifdef USE_STDPERIPH_DRIVER
 #include "gd32f30x_libopt.h"
 #endif /* USE_STDPERIPH_DRIVER */

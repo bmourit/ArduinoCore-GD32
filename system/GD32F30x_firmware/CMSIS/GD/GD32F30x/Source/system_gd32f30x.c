@@ -113,19 +113,20 @@ static void system_clock_config(void);
 	\param[out] none
 	\retval     none
 */
-void SystemInit (void)
+void SystemInit(void)
 {
   /* FPU settings */
 #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
-	SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
+	/* set CP10 and CP11 full access */
+	SCB->CPACR |= ((3UL << 10 * 2) | (3UL << 11 * 2));
 #endif
 	/* reset the RCU clock configuration to the default reset state */
 	/* Set IRC8MEN bit */
 	RCU_CTL |= RCU_CTL_IRC8MEN;
-	while(0U == (RCU_CTL & RCU_CTL_IRC8MSTB)){
+	while (0U == (RCU_CTL & RCU_CTL_IRC8MSTB)) {
 	}
 	RCU_MODIFY(0x50);
-	
+
 	RCU_CFG0 &= ~RCU_CFG0_SCS;
 
 #if (defined(GD32F30X_HD) || defined(GD32F30X_XD))
@@ -135,14 +136,14 @@ void SystemInit (void)
 	RCU_INT = 0x009f0000U;
 #elif defined(GD32F30X_CL)
 	/* Reset HXTALEN, CKMEN, PLLEN, PLL1EN and PLL2EN bits */
-	RCU_CTL &= ~(RCU_CTL_PLLEN |RCU_CTL_PLL1EN | RCU_CTL_PLL2EN | RCU_CTL_CKMEN | RCU_CTL_HXTALEN);
+	RCU_CTL &= ~(RCU_CTL_PLLEN | RCU_CTL_PLL1EN | RCU_CTL_PLL2EN | RCU_CTL_CKMEN | RCU_CTL_HXTALEN);
 	/* disable all interrupts */
 	RCU_INT = 0x00ff0000U;
 #endif
 
 	/* reset HXTALBPS bit */
 	RCU_CTL &= ~(RCU_CTL_HXTALBPS);
-	
+
 	/* Reset CFG0 and CFG1 registers */
 	RCU_CFG0 = 0x00000000U;
 	RCU_CFG1 = 0x00000000U;
@@ -828,14 +829,14 @@ static void system_clock_120m_hxtal(void)
 	RCU_CTL |= RCU_CTL_HXTALEN;
 
 	/* wait until HXTAL is stable or the startup time is longer than HXTAL_STARTUP_TIMEOUT */
-	do{
+	do {
 		timeout++;
 		stab_flag = (RCU_CTL & RCU_CTL_HXTALSTB);
-	}while((0U == stab_flag) && (HXTAL_STARTUP_TIMEOUT != timeout));
+	} while ((0U == stab_flag) && (HXTAL_STARTUP_TIMEOUT != timeout));
 
 	/* if fail */
-	if(0U == (RCU_CTL & RCU_CTL_HXTALSTB)){
-		while(1){
+	if (0U == (RCU_CTL & RCU_CTL_HXTALSTB)) {
+		while(1) {
 		}
 	}
 
@@ -851,11 +852,11 @@ static void system_clock_120m_hxtal(void)
 	RCU_CFG0 |= RCU_APB1_CKAHB_DIV2;
 
 #if (defined(GD32F30X_HD) || defined(GD32F30X_XD))
-	/* select HXTAL/2 as clock source */
+	/* select HXTAL / 2 as clock source */
 	RCU_CFG0 &= ~(RCU_CFG0_PLLSEL | RCU_CFG0_PREDV0);
 	RCU_CFG0 |= (RCU_PLLSRC_HXTAL_IRC48M | RCU_CFG0_PREDV0);
 
-	/* CK_PLL = (CK_HXTAL/2) * 30 = 120 MHz */
+	/* CK_PLL = (CK_HXTAL / 2) * 30 = 120 MHz */
 	RCU_CFG0 &= ~(RCU_CFG0_PLLMF | RCU_CFG0_PLLMF_4 | RCU_CFG0_PLLMF_5);
 	RCU_CFG0 |= RCU_PLL_MUL30;
 
@@ -871,7 +872,7 @@ static void system_clock_120m_hxtal(void)
 	/* enable PLL1 */
 	RCU_CTL |= RCU_CTL_PLL1EN;
 	/* wait till PLL1 is ready */
-	while((RCU_CTL & RCU_CTL_PLL1STB) == 0U){
+	while ((RCU_CTL & RCU_CTL_PLL1STB) == 0U) {
 	}
 #endif /* GD32F30X_HD and GD32F30X_XD */
 
@@ -879,17 +880,17 @@ static void system_clock_120m_hxtal(void)
 	RCU_CTL |= RCU_CTL_PLLEN;
 
 	/* wait until PLL is stable */
-	while(0U == (RCU_CTL & RCU_CTL_PLLSTB)){
+	while (0U == (RCU_CTL & RCU_CTL_PLLSTB)) {
 	}
 
 	/* enable the high-drive to extend the clock frequency to 120 MHz */
 	PMU_CTL |= PMU_CTL_HDEN;
-	while(0U == (PMU_CS & PMU_CS_HDRF)){
+	while (0U == (PMU_CS & PMU_CS_HDRF)) {
 	}
 
 	/* select the high-drive mode */
 	PMU_CTL |= PMU_CTL_HDS;
-	while(0U == (PMU_CS & PMU_CS_HDSRF)){
+	while (0U == (PMU_CS & PMU_CS_HDSRF)) {
 	}
 
 	/* select PLL as system clock */
@@ -897,7 +898,7 @@ static void system_clock_120m_hxtal(void)
 	RCU_CFG0 |= RCU_CKSYSSRC_PLL;
 
 	/* wait until PLL is selected as system clock */
-	while(0U == (RCU_CFG0 & RCU_SCSS_PLL)){
+	while (0U == (RCU_CFG0 & RCU_SCSS_PLL)) {
 	}
 }
 #endif /* __SYSTEM_CLOCK_IRC8M */
@@ -912,6 +913,7 @@ void SystemCoreClockUpdate(void)
 {
 	uint32_t sws;
 	uint32_t pllsel, pllpresel, predv0sel, pllmf, ck_src, idx, clk_exp;
+
 	/* exponent of AHB, APB1 and APB2 clock divider */
 	const uint8_t ahb_exp[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
 #ifdef GD32F30X_CL
@@ -919,28 +921,27 @@ void SystemCoreClockUpdate(void)
 #endif /* GD32F30X_CL */
 
 	sws = GET_BITS(RCU_CFG0, 2, 3);
-	switch(sws){
-	/* IRC8M is selected as CK_SYS */
-	case SEL_IRC8M:
+
+	switch(sws) {
+	case SEL_IRC8M:	/* IRC8M is selected as CK_SYS */
 		SystemCoreClock = IRC8M_VALUE;
 		break;
-	/* HXTAL is selected as CK_SYS */
-	case SEL_HXTAL:
+	case SEL_HXTAL:	/* HXTAL is selected as CK_SYS */
 		SystemCoreClock = HXTAL_VALUE;
 		break;
-	/* PLL is selected as CK_SYS */
-	case SEL_PLL:
+	case SEL_PLL:	/* PLL is selected as CK_SYS */
+
 		/* PLL clock source selection, HXTAL, IRC48M or IRC8M/2 */
 		pllsel = (RCU_CFG0 & RCU_CFG0_PLLSEL);
 
-		if(RCU_PLLSRC_HXTAL_IRC48M == pllsel){
+		if (RCU_PLLSRC_HXTAL_IRC48M == pllsel) {
 			/* PLL clock source is HXTAL or IRC48M */
 			pllpresel = (RCU_CFG1 & RCU_CFG1_PLLPRESEL);
 			
-			if(RCU_PLLPRESRC_HXTAL == pllpresel){
+			if (RCU_PLLPRESRC_HXTAL == pllpresel) {
 				/* PLL clock source is HXTAL */
 				ck_src = HXTAL_VALUE;
-			}else{
+			} else {
 				/* PLL clock source is IRC48 */
 				ck_src = IRC48M_VALUE;
 			}
@@ -948,16 +949,16 @@ void SystemCoreClockUpdate(void)
 #if (defined(GD32F30X_HD) || defined(GD32F30X_XD))
 			predv0sel = (RCU_CFG0 & RCU_CFG0_PREDV0);
 			/* PREDV0 input source clock divided by 2 */
-			if(RCU_CFG0_PREDV0 == predv0sel){
+			if (predv0sel == RCU_CFG0_PREDV0) {
 				ck_src /= 2U;
 			}
 #elif defined(GD32F30X_CL)
 			predv0sel = (RCU_CFG1 & RCU_CFG1_PREDV0SEL);
 			/* source clock use PLL1 */
-			if(RCU_PREDV0SRC_CKPLL1 == predv0sel){
+			if (RCU_PREDV0SRC_CKPLL1 == predv0sel) {
 				predv1 = ((RCU_CFG1 & RCU_CFG1_PREDV1) >> 4) + 1U;
 				pll1mf = ((RCU_CFG1 & RCU_CFG1_PLL1MF) >> 8) + 2U;
-				if(17U == pll1mf){
+				if (17U == pll1mf) {
 					pll1mf = 20U;
 				}
 				ck_src = (ck_src / predv1) * pll1mf;
@@ -965,7 +966,7 @@ void SystemCoreClockUpdate(void)
 			predv0 = (RCU_CFG1 & RCU_CFG1_PREDV0) + 1U;
 			ck_src /= predv0;
 #endif /* GD32F30X_HD and GD32F30X_XD */
-		}else{
+		} else {
 			/* PLL clock source is IRC8M/2 */
 			ck_src = IRC8M_VALUE / 2U;
 		}
@@ -973,24 +974,28 @@ void SystemCoreClockUpdate(void)
 		/* PLL multiplication factor */
 		pllmf = GET_BITS(RCU_CFG0, 18, 21);
 
-		if((RCU_CFG0 & RCU_CFG0_PLLMF_4)){
+		if ((RCU_CFG0 & RCU_CFG0_PLLMF_4)) {
 			pllmf |= 0x10U;
 		}
-		if((RCU_CFG0 & RCU_CFG0_PLLMF_5)){
+
+		if ((RCU_CFG0 & RCU_CFG0_PLLMF_5)) {
 			pllmf |= 0x20U;
 		}
 
-		if( pllmf >= 15U){
+		if (pllmf >= 15U) {
 			pllmf += 1U;
-		}else{
+		} else {
 			pllmf += 2U;
 		}
-		if(pllmf > 61U){
+
+		if (pllmf > 61U) {
 			pllmf = 63U;
 		}
+
 		SystemCoreClock = ck_src * pllmf;
+
 	#ifdef GD32F30X_CL
-		if(15U == pllmf){
+		if (15U == pllmf) {
 			SystemCoreClock = (ck_src * 6U) + (ck_src / 2U);
 		}
 	#endif /* GD32F30X_CL */

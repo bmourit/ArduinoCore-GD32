@@ -26,15 +26,15 @@ void attachInterrupt(pin_size_t pin, voidFuncPtr callback, PinStatus mode)
     PinName pinname = DIGITAL_TO_PINNAME(pin);
 
     switch (mode) {
-        case CHANGE :
+        case CHANGE:
             it_mode = EXTI_TRIG_BOTH;
             break;
-        case FALLING :
-        case LOW :
+        case FALLING:
+        case LOW:
             it_mode = EXTI_TRIG_FALLING;
             break;
-        case RISING :
-        case HIGH :
+        case RISING:
+        case HIGH:
             it_mode = EXTI_TRIG_RISING;
             break;
         default:
