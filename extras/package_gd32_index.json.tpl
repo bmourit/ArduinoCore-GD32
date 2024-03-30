@@ -3,7 +3,7 @@
     {
       "email": "",
       "help": {
-        "online": "https://github.com/CommunityGD32Cores/ArduinoCore-GD32"
+        "online": "https://github.com/bmourit/ArduinoCore-GD32"
       },
       "maintainer": "Some random folks",
       "name": "GD32Community",
@@ -206,7 +206,7 @@
           ]
         }
       ],
-      "websiteURL": "https://github.com/CommunityGD32Cores/ArduinoCore-GD32/"
+      "websiteURL": "https://github.com/bmourit/ArduinoCore-GD32/"
     }
   ]
 }

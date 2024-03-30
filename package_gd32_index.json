@@ -1,34 +1,30 @@
 {
   "packages": [
     {
+      "name": "GD32CommunityCores",
+      "websiteURL": "https://github.com/CommunityGD32Cores/ArduinoCore-GD32/",
+      "maintainer": "GD32CommunityCores",
       "email": "",
       "help": {
         "online": "https://github.com/CommunityGD32Cores/ArduinoCore-GD32"
       },
-      "maintainer": "Some random folks",
-      "name": "GD32Community",
       "platforms": [
         {
+          "name": "GigaDevice GD32 MCU based boards",
           "architecture": "gd32",
-          "boards": [
-            {
-              "name": "GD32F303ZE EVAL"
-            },
-            {
-              "name": "GD32F307VG MBED"
-            },
-            {
-              "name": "GD32F303CC Generic"
-            },
-	          {
-	            "name": "GD32F303RE Generic"
-	          }
-          ],
+          "version": "0.0.1",
           "category": "Contributed",
-          "help": {
-            "online": ""
-          },
-          "name": "GigaDevice GD32",
+          "url": "https://github.com/bmourit/ArduinoCore-GD32/archive/refs/heads/GD32_Marlin_Dev.zip",
+          "archiveFilename": "GD32_Marlin_Dev.zip",
+          "checksum": "SHA-256:305177dc3624496f818b8608358694aa674ab98fee32e495623a6f4598327f64",
+          "size": "5467103",
+          "boards": [
+            {"name": "GD32F303ZE EVAL"},
+            {"name": "GD32F307VG MBED"},
+            {"name": "GD32F303CC Generic"},
+	          {"name": "GD32F303RE Generic"},
+            {"name": "Creality 4.2.2 GD32F303RE"}
+          ],
           "toolsDependencies": [
             {
               "packager": "GD32Community",
@@ -46,11 +42,6 @@
               "name": "dfu-util"
             }
           ],
-          "url": "https://github.com/bmourit/ArduinoCore-GD32/archive/v1.0.0.zip",
-          "archiveFilename": "ArduinoCore-GD32-1.0.0.zip",
-          "size": "5467103",
-          "checksum": "SHA-256:305177dc3624496f818b8608358694aa674ab98fee32e495623a6f4598327f64",
-          "version": "0.0.1"
         }
       ],
       "tools": [
@@ -73,18 +64,11 @@
               "size": "265190134"
             },
             {
-              "host": "x86_64-mingw32",
+              "host": "i686-mingw32",
               "url": "https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-win32-x64.zip",
               "archiveFileName": "xpack-arm-none-eabi-gcc-13.2.1-1.1-win32-x64.zip",
               "checksum": "SHA-256:56b18ccb0a50f536332ec5de57799342ff0cd005ca2c54288c74759b51929e4f",
               "size": "306340878"
-            },
-            {
-              "host": "aarch64-apple-darwin",
-              "url": "https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-darwin-arm64.tar.gz",
-              "archiveFileName": "xpack-arm-none-eabi-gcc-13.2.1-1.1-darwin-arm64.tar.gz",
-              "checksum": "SHA-256:d4ce0de062420daab140161086ba017642365977e148d20f55a8807b1eacd703",
-              "size": "258277148"
             },
             {
               "host": "x86_64-apple-darwin",
@@ -155,14 +139,14 @@
           "version": "0.10.0-arduino1",
           "systems": [
             {
-              "host": "i386-apple-darwin11",
+              "host": "i386-apple-darwin",
               "url": "http://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-osx.tar.bz2",
               "archiveFileName": "dfu-util-0.10.0-arduino1-osx.tar.bz2",
               "size": "73921",
               "checksum": "SHA-256:7562d128036759605828d64b8d672d42445a8d95555c4b9ba339f73a1711a640"
             },
             {
-              "host": "x86_64-apple-darwin11",
+              "host": "x86_64-apple-darwin",
               "url": "http://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-osx.tar.bz2",
               "archiveFileName": "dfu-util-0.10.0-arduino1-osx.tar.bz2",
               "size": "73921",
@@ -206,7 +190,6 @@
           ]
         }
       ],
-      "websiteURL": "https://github.com/CommunityGD32Cores/ArduinoCore-GD32/"
     }
   ]
 }

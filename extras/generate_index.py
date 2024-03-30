@@ -8,7 +8,7 @@ import re
 
 def main(): 
     # default fallback URL -- just for testing
-    download_url = "https://github.com/CommunityGD32Cores/ArduinoCore-GD32/archive/9fb26ac.zip"
+    download_url = "https://github.com/bmourit/ArduinoCore-GD32/archive/refs/heads/GD32_Marlin_Dev.zip"
     if len(sys.argv) == 2:
         download_url = sys.argv[1]
     else:

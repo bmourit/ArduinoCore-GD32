@@ -230,7 +230,6 @@ env.Append(
         join(FRAMEWORK_DIR, "system", spl_series + "_firmware", "CMSIS", "GD", spl_series, "Source"),
         join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_standard_peripheral", "Include"),
         join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_standard_peripheral", "Source"),
-        # USB libraries are included conditionally later
         join(FRAMEWORK_DIR, "cores", "arduino"),
     ],
     LINKFLAGS=[
@@ -247,36 +246,34 @@ env.Append(
         "-Wl,--defsym=LD_MAX_DATA_SIZE=%d" % board_config.get("upload.maximum_ram_size"),
     ],
     LIBS=[
-        #get_arm_math_lib(board_config.get("build.cpu")),  #math library not included
         "c",
         "m",
         "gcc",
         "stdc++",
     ],
-#    LIBPATH=[join(CMSIS_DIR, "DSP", "Lib", "GCC")],
 )
 
 # For boards supporting a USB stack include it.
-if not board_config.get("build.spl_series").lower().startswith("gd32e23"):
-    if isdir(join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library")):
-        env.Append(
-            CPPPATH=[
-                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "device", "Include"),
-                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "device", "Source"),
-                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "usbd", "Include"),
-                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "usbd", "Source"),
-            ]
-        )
+#if not board_config.get("build.spl_series").lower().startswith("gd32e23"):
+#    if isdir(join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library")):
+#        env.Append(
+#            CPPPATH=[
+#                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "device", "Include"),
+#                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "device", "Source"),
+#                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "usbd", "Include"),
+#                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "usbd", "Source"),
+#            ]
+#        )
     # never activate USB FS driver, although some have it -- we have no core support for it yet
-    if isdir(join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver")) and False:
-        env.Append(
-            CPPPATH=[
-                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "driver", "Include"),
-                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "driver", "Source"),
-                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "core", "Include"),
-                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "core", "Source"),
-            ]
-        )
+#    if isdir(join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver")) and False:
+#        env.Append(
+#            CPPPATH=[
+#                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "driver", "Include"),
+#                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "driver", "Source"),
+#                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "core", "Include"),
+#                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "core", "Source"),
+#            ]
+#        )
 
 #if board_config.get("build.spl_series").lower().startswith("gd32f30"):
 #if    if isdir(join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_sdio_library")):
@@ -287,36 +284,36 @@ if not board_config.get("build.spl_series").lower().startswith("gd32e23"):
 #            ]
 #        )
 
-def process_usb_configuration(cpp_defines):
+#def process_usb_configuration(cpp_defines):
     # support standard way of enabling CDC
-    if "PIO_FRAMEWORK_ARDUINO_ENABLE_CDC" in cpp_defines:
-        env.Append(CPPDEFINES=["USBD_USE_CDC"])
+#    if "PIO_FRAMEWORK_ARDUINO_ENABLE_CDC" in cpp_defines:
+#        env.Append(CPPDEFINES=["USBD_USE_CDC"])
     # any USB flags enabled? more might be to come 
-    if any(
-        d in cpp_defines
-        for d in (
-            "PIO_FRAMEWORK_ARDUINO_ENABLE_CDC",
-        )
-    ):
+#    if any(
+#        d in cpp_defines
+#        for d in (
+#            "PIO_FRAMEWORK_ARDUINO_ENABLE_CDC",
+#        )
+#    ):
         # then add usb flags
-        usb_vid = int(board_config.get("build.hwids", [["0xdead", "0xbeef"]])[0][0], 16)
-        usb_pid = int(board_config.get("build.hwids", [["0xdead", "0xbeef"]])[0][1], 16)
+#        usb_vid = int(board_config.get("build.hwids", [["0xdead", "0xbeef"]])[0][0], 16)
+#        usb_pid = int(board_config.get("build.hwids", [["0xdead", "0xbeef"]])[0][1], 16)
         # prevent usage of Leaflabs VID/PID, otherwise if people have the DFU
         # driver installed, it will recognize it as "Maple DFU" and not the 
         # actual USB device it is :(
-        if usb_vid == 0x1EAF and usb_pid == 0x0003:
-            (usb_vid, usb_pid) = (0xdead, 0xbeef)
-        env.Append(
-            CPPDEFINES=[
-                "USBCON",
-                ("USB_VID", hex(usb_vid)),
-                ("USB_PID", hex(usb_pid)),
-                ("USB_PRODUCT", '\\"%s\\"' %
-                    board_config.get("build.usb_product", board_config.get("name", "Undefined USB Product")).replace('"', "")),
-                ("USB_MANUFACTURER", '\\"%s\\"' %
-                    board_config.get("build.usb_manufacturer",  board_config.get("vendor", "Undefined Manufacturer")).replace('"', ""))
-            ]
-        )
+ #       if usb_vid == 0x1EAF and usb_pid == 0x0003:
+ #           (usb_vid, usb_pid) = (0xdead, 0xbeef)
+ #       env.Append(
+ #           CPPDEFINES=[
+ #               "USBCON",
+ #               ("USB_VID", hex(usb_vid)),
+ #               ("USB_PID", hex(usb_pid)),
+ #               ("USB_PRODUCT", '\\"%s\\"' %
+ #                   board_config.get("build.usb_product", board_config.get("name", "Undefined USB Product")).replace('"', "")),
+ #               ("USB_MANUFACTURER", '\\"%s\\"' %
+ #                   board_config.get("build.usb_manufacturer",  board_config.get("vendor", "Undefined Manufacturer")).replace('"', ""))
+ #           ]
+ #       )
 
 env.ProcessFlags(board_config.get("build.framework_extra_flags.arduino", ""))
 
@@ -359,7 +356,7 @@ env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
 
 env.Append(
     LIBSOURCE_DIRS=[
-        join(FRAMEWORK_DIR, "libraries"),
+        join(FRAMEWORK_DIR, "libraries", "arduino"),
     ]
 )
 
