@@ -1,34 +1,31 @@
 {
   "packages": [
     {
+      "name": "GD32CommunityCores",
+      "websiteURL": "https://github.com/bmourit/ArduinoCore-GD32.git",
+      "maintainer": "GD32CommunityCores",
       "email": "",
       "help": {
-        "online": "https://github.com/bmourit/ArduinoCore-GD32"
+        "online": "https://github.com/bmourit/ArduinoCore-GD32.git"
       },
       "maintainer": "Some random folks",
       "name": "GD32Community",
       "platforms": [
         {
+          "name": "GigaDevice GD32 MCU based boards",
           "architecture": "gd32",
-          "boards": [
-            {
-              "name": "GD32F303ZE EVAL"
-            },
-            {
-              "name": "GD32F307VG MBED"
-            },
-            {
-              "name": "GD32F303CC Generic"
-            },
-	    {
-	      "name": "GD32F303RE Generic"
-	    }
-          ],
           "category": "Contributed",
-          "help": {
-            "online": ""
-          },
-          "name": "GigaDevice GD32",
+          "url": "$url",
+          "archiveFilename": "$archiveFilename",
+          "size": "$size",
+          "checksum": "$checksum",
+          "boards": [
+            {"name": "GD32F303ZE EVAL"},
+            {"name": "GD32F307VG MBED"},
+            {"name": "GD32F303CC Generic"},
+	    {"name": "GD32F303RE Generic"}
+	    {"name": "CREALITY 422 GD32F303RE"}
+          ],
           "toolsDependencies": [
             {
               "packager": "GD32Community",
@@ -46,11 +43,6 @@
               "name": "dfu-util"
             }
           ],
-          "url": "$url",
-          "archiveFilename": "$archiveFilename",
-          "size": "$size",
-          "checksum": "$checksum",
-          "version": "0.0.1"
         }
       ],
       "tools": [
@@ -73,7 +65,7 @@
               "size": "265190134"
             },
             {
-              "host": "x86_64-mingw32",
+              "host": "i686-mingw32",
               "url": "https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-win32-x64.zip",
               "archiveFileName": "xpack-arm-none-eabi-gcc-13.2.1-1.1-win32-x64.zip",
               "checksum": "SHA-256:56b18ccb0a50f536332ec5de57799342ff0cd005ca2c54288c74759b51929e4f",
@@ -121,7 +113,7 @@
               "size": "2529589"
             },
             {
-              "host": "x86_64-mingw32",
+              "host": "i686-mingw32",
               "url": "https://github.com/xpack-dev-tools/openocd-xpack/releases/download/v0.12.0-2/xpack-openocd-0.12.0-2-win32-x64.zip",
               "archiveFileName": "xpack-openocd-0.12.0-2-win32-x64.zip",
               "checksum": "SHA-256:6cb8a5f9290c59be3e42a6f1066f23ff5a9dbe5b83bdecd0e9d4c7dcc1233517",
@@ -150,55 +142,55 @@
             },
           ]
         },
-	        {
+	{
           "name": "dfu-util",
           "version": "0.10.0-arduino1",
           "systems": [
             {
-              "host": "i386-apple-darwin11",
-              "url": "http://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-osx.tar.bz2",
+              "host": "i386-apple-darwin",
+              "url": "https://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-osx.tar.bz2",
               "archiveFileName": "dfu-util-0.10.0-arduino1-osx.tar.bz2",
               "size": "73921",
               "checksum": "SHA-256:7562d128036759605828d64b8d672d42445a8d95555c4b9ba339f73a1711a640"
             },
             {
-              "host": "x86_64-apple-darwin11",
-              "url": "http://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-osx.tar.bz2",
+              "host": "x86_64-apple-darwin",
+              "url": "https://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-osx.tar.bz2",
               "archiveFileName": "dfu-util-0.10.0-arduino1-osx.tar.bz2",
               "size": "73921",
               "checksum": "SHA-256:7562d128036759605828d64b8d672d42445a8d95555c4b9ba339f73a1711a640"
             },
             {
               "host": "arm-linux-gnueabihf",
-              "url": "http://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-arm.tar.bz2",
+              "url": "https://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-arm.tar.bz2",
               "archiveFileName": "dfu-util-0.10.0-arduino1-arm.tar.bz2",
               "size": "272153",
               "checksum": "SHA-256:f1e550f40c235356b7fde1c59447bfbab28f768915d3c14bd858fe0576bfc5a9"
             },
             {
               "host": "aarch64-linux-gnu",
-              "url": "http://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-arm64.tar.bz2",
+              "url": "https://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-arm64.tar.bz2",
               "archiveFileName": "dfu-util-0.10.0-arduino1-arm64.tar.bz2",
               "size": "277886",
               "checksum": "SHA-256:ebfbd21d3030c500da1f83b9aae5b8c597bee04c3bde1ce0a51b41abeafc9614"
             },
             {
               "host": "x86_64-linux-gnu",
-              "url": "http://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-linux64.tar.bz2",
+              "url": "https://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-linux64.tar.bz2",
               "archiveFileName": "dfu-util-0.10.0-arduino1-linux64.tar.bz2",
               "size": "77184",
               "checksum": "SHA-256:13ef2ec591c1e8b0b7eb0a05da972ecd6695016e7a9607e332c7553899af9b4a"
             },
             {
               "host": "i686-linux-gnu",
-              "url": "http://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-linux32.tar.bz2",
+              "url": "https://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-linux32.tar.bz2",
               "archiveFileName": "dfu-util-0.10.0-arduino1-linux32.tar.bz2",
               "size": "81826",
               "checksum": "SHA-256:43599ec60c000e9ef016970a496d6ab2cbbe5a8b7df9d06ef3114ecf83f9d123"
             },
             {
               "host": "i686-mingw32",
-              "url": "http://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-windows.tar.bz2",
+              "url": "https://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-windows.tar.bz2",
               "archiveFileName": "dfu-util-0.10.0-arduino1-windows.tar.bz2",
               "size": "464314",
               "checksum": "SHA-256:90816b669273ae796d734a2459c46bb340d4790783fd7aa01eb40c0443f1a9b1"
@@ -206,7 +198,6 @@
           ]
         }
       ],
-      "websiteURL": "https://github.com/bmourit/ArduinoCore-GD32/"
     }
   ]
 }

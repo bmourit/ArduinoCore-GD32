@@ -26,9 +26,12 @@ https://github.com/CommunityGD32Cores/ArduinoCore-GD32
 """
 
 import json
+import sys
 from os.path import isfile, isdir, join
 from platformio.util import get_systype
 from SCons.Script import COMMAND_LINE_TARGETS, DefaultEnvironment
+
+IS_WINDOWS = sys.platform.startswith("win")
 
 # get environment
 env = DefaultEnvironment()
@@ -55,7 +58,7 @@ variant_dir = join(variants_dir, variant)
 assert isdir(variant_dir)
 inc_variant_dir = variant_dir
 
-if "windows" not in get_systype().lower() and not (
+if !IS_WINDOWS and not (
     set(["_idedata", "idedata"]) & set(COMMAND_LINE_TARGETS) and " " not in variant_dir
 ):
     inc_variant_dir = variant_dir.replace("(", r"\(").replace(")", r"\)")
