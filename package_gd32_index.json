@@ -17,8 +17,8 @@
           "category": "Contributed",
           "url": "https://github.com/bmourit/ArduinoCore-GD32/archive/refs/heads/GD32_Marlin_Dev.zip",
           "archiveFilename": "GD32_Marlin_Dev.zip",
-          "size": "5517647",
-          "checksum": "SHA-256:5646bbedd7bdd8a227348de5edfaa2e7ba99b245dda75392d5a2f8f427d9ebf2",
+          "size": "5519839",
+          "checksum": "SHA-256:e171738877f295f1b0be0f615e2d793a95213f2d4e28f90f8fb852ff7f297581",
           "boards": [
             {"name": "GD32F303ZE EVAL"},
             {"name": "GD32F307VG MBED"},

@@ -14,7 +14,7 @@
     __REMAP_NAME__(TIMER3_REMAP) /*!< TIMER3 remapping */
     __REMAP_NAME__(PD01_REMAP) /*!< PD01 remapping */
     __REMAP_NAME__(TIMER4CH3_IREMAP)
-#if (defined(GD32F30X_HD) || defined(GD32F30X_XD)
+#if defined(GD32F30X_HD) || defined(GD32F30X_XD)
     __REMAP_NAME__(CAN_PARTIAL_REMAP) /*!< CAN partial remapping(only for GD32F30X_HD devices) and GD32F30X_XD devices) */
     __REMAP_NAME__(CAN_FULL_REMAP) /*!< CAN full remapping(only for GD32F30X_HD devices and GD32F30X_XD devices) */
     __REMAP_NAME__(ADC0_ETRGINS_REMAP)

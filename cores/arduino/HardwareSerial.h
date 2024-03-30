@@ -26,7 +26,6 @@
 
 #include <inttypes.h>
 
-#include "api/HardwareSerial.h"
 #include "api/Stream.h"
 #include "uart.h"
 

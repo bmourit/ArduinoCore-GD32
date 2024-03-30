@@ -49,7 +49,7 @@ typedef enum {
     SPI_1 = (int)SPI1,
     SPI_2 = (int)SPI2
 } SPIName;
-_
+
 typedef enum {
     I2C_0 = (int)I2C0,
     I2C_1 = (int)I2C1

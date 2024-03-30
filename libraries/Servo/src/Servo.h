@@ -56,8 +56,8 @@ class Servo
 {
     public:
         Servo();
-        //uint8_t attach(int pin);
-        uint8_t attach(int pin, int min = MIN_PULSE_WIDTH, int max = MAX_PULSE_WIDTH);
+        uint8_t attach(int pin, int value = DEFAULT_PULSE_WIDTH);
+        uint8_t attach(int pin, int min, int max, int value = DEFAULT_PULSE_WIDTH);
         void detach();
         void write(int value);
         void writeMicroseconds(int value);

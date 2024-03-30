@@ -242,37 +242,37 @@ typedef enum {
 /* pin mode */
 #define PIN_MODE_SHIFT 0,
 #define PIN_MODE_MASK  0x7,
-#define PIN_MODE_BITS (PIN_MODE_MASK << PIN_MODE_SHIFT)
+#define PIN_MODE_BITS (0x7 << 0)
 /* pin remap */
 #define PIN_REMAP_SHIFT 3,
 #define PIN_REMAP_MASK  0x7F,
-#define PIN_REMAP_BITS (PIN_REMAP_MASK << PIN_REMAP_SHIFT)
+#define PIN_REMAP_BITS (0x7f << 3)
 /* pin seed */
 #define PIN_SPEED_SHIFT 10,
 #define PIN_SPEED_MASK  0x3,
-#define PIN_SPEED_BITS (PIN_SPEED_MASK << PIN_SPEED_SHIFT)
+#define PIN_SPEED_BITS (0x3 << 10)
 /* pin output mode */
 #define PIN_OUTPUT_MODE_SHIFT 12,
 #define PIN_OUTPUT_MODE_MASK  0x1,
-#define PIN_OUTPUT_MODE_BITS (PIN_OUTPUT_MODE_MASK << PIN_OUTPUT_MODE_SHIFT)
+#define PIN_OUTPUT_MODE_BITS (0x1 << 12)
 /* pin pull_up_down */
 #define PIN_PULL_STATE_SHIFT 13,
 #define PIN_PULL_STATE_MASK  0x3,
-#define PIN_PULL_STATE_BITS (PIN_PULL_STATE_MASK << PIN_PULL_STATE_SHIFT)
-#define PIN_INPUT_PU_BITS	(0x1 << PIN_PULL_STATE_SHIFT)
+#define PIN_PULL_STATE_BITS (0x3 << 13)
+#define PIN_INPUT_PU_BITS	(0x1 << 13)
 #define PIN_INPUT_PD_BITS	(0x1 << 14)
 /* pin af */
 #define PIN_AF_SHIFT 15,
 #define PIN_AF_MASK  0xF,
-#define PIN_AF_BITS (PIN_AF_MASK << PIN_AF_SHIFT)
+#define PIN_AF_BITS (0xf << 15)
 /* pin channel */
 #define PIN_CHANNEL_SHIFT 19,
 #define PIN_CHANNEL_MASK  0x1F,
-#define PIN_CHANNEL_BITS (PIN_CHANNEL_MASK << PIN_CHANNEL_SHIFT)
+#define PIN_CHANNEL_BITS (0x1f << 19)
 /* pin PWM channel-ON state */
 #define PIN_CHON_SHIFT 24,
 #define PIN_CHON_MASK  0x1,
-#define PIN_CHON_BITS (PIN_CHON_MASK << PIN_CHON_SHIFT)
+#define PIN_CHON_BITS (0x1 << 24)
 
 
 /*
@@ -283,14 +283,14 @@ typedef enum {
 #define GD_PIN_GET(X)  (((uint32_t)(X) & 0xF))
 
 /* get mode, speed, remap, output, pull state, af function, channel, and channel-ON of GPIO pin */
-#define GD_PIN_MODE_GET(X)			((X >> PIN_MODE_SHIFT) & PIN_MODE_MASK)
-#define GD_PIN_SPEED_GET(X)			((X >> PIN_SPEED_SHIFT) & PIN_SPEED_MASK)
-#define GD_PIN_REMAP_GET(X)			((X >> PIN_REMAP_SHIFT) & PIN_REMAP_MASK)
-#define GD_PIN_OUTPUT_MODE_GET(X)	((X >> PIN_OUTPUT_MODE_SHIFT) & PIN_OUTPUT_MODE_MASK)
-#define GD_PIN_PULL_STATE_GET(X)	((X >> PIN_PULL_STATE_SHIFT) & PIN_PULL_STATE_MASK)
-#define GD_PIN_AF_GET(X)			((X >> PIN_AF_SHIFT) & PIN_AF_MASK)
-#define GD_PIN_CHANNEL_GET(X)		((X >> PIN_CHANNEL_SHIFT) & PIN_CHANNEL_MASK)
-#define GD_PIN_CHON_GET(X)			((X >> PIN_CHON_SHIFT) & PIN_CHON_MASK)
+#define GD_PIN_MODE_GET(X)			((X >> 0) & 0x7)
+#define GD_PIN_SPEED_GET(X)			((X >> 10) & 0x3)
+#define GD_PIN_REMAP_GET(X)			((X >> 3) & 0x7f)
+#define GD_PIN_OUTPUT_MODE_GET(X)	((X >> 12) & 0x1)
+#define GD_PIN_PULL_STATE_GET(X)	((X >> 13) & 0x3)
+#define GD_PIN_AF_GET(X)			((X >> 15) & 0xf)
+#define GD_PIN_CHANNEL_GET(X)		((X >> 19) & 0x1f)
+#define GD_PIN_CHON_GET(X)			((X >> 24) & 0x1)
 
 /*
 /* This typedef is used to extend the PinMode typedef enum
@@ -321,42 +321,10 @@ enum {
 	PIN_SPEED_50MHZ		= 3,
 };
 
-//#define GD_PIN_FUNCTION1(MODE, REMAP) ((int)(MODE & PIN_MODE_MASK) | ((REMAP & PIN_REMAP_MASK) << PIN_REMAP_SHIFT))
-//#define GD_PIN_FUNCTION2(MODE, REMAP, CHN, CHON) ((int)(MODE & PIN_MODE_MASK) | ((REMAP & PIN_REMAP_MASK) << PIN_REMAP_SHIFT) |\
-												  ((CHN & PIN_CHANNEL_MASK) << PIN_CHANNEL_SHIFT) | ((CHON & PIN_CHON_MASK) << PIN_CHON_SHIFT))
-//#define GD_PIN_FUNCTION3(MODE, ODPP, AFN) ((int)(MODE & PIN_MODE_MASK) | ((ODPP & PIN_OUTPUT_MODE_MASK) << PIN_OUTPUT_MODE_SHIFT) | ((AFN & PIN_AF_MASK) << PIN_AF_SHIFT))
-//#define GD_PIN_FUNCTION4(MODE, ODPP, PUPD, AFN) ((int)(MODE & PIN_MODE_MASK) | ((ODPP & PIN_OUTPUT_MODE_MASK) << PIN_OUTPUT_MODE_SHIFT) | ((PUPD & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT )  | ((AFN & PIN_AF_MASK) << PIN_AF_SHIFT))
-//#define GD_PIN_FUNCTION5(MODE, ODPP, PUPD, REMAP) ((int)(MODE & PIN_MODE_MASK) | ((ODPP & PIN_OUTPUT_MODE_MASK) << PIN_OUTPUT_MODE_SHIFT) | ((PUPD & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT )  | ((REMAP & PIN_REMAP_MASK) << PIN_REMAP_SHIFT))
-#define GD_PIN_FUNC_ANALOG_CH(CHAN) ((int)(PIN_MODE_ANALOG & PIN_MODE_MASK) | \
-								((CHAN & PIN_CHANNEL_MASK) << PIN_CHANNEL_SHIFT) | \
-								(((int)PIN_MODE_INPUT_FLOATING & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT))
-//#define GD_PIN_FUNC_PWM(CHN, AFN) ((PIN_MODE_AF & PIN_MODE_MASK) | \
-								((PIN_OTYPE_PP & PIN_OUTPUT_MODE_MASK) << PIN_OUTPUT_MODE_SHIFT) | \
-								((PIN_SPEED_50MHZ & PIN_SPEED_MASK) << PIN_SPEED_SHIFT) | \
-								((CHN & PIN_CHANNEL_MASK) << PIN_CHANNEL_SHIFT) | \
-								((AFN & PIN_AF_MASK) << PIN_AF_SHIFT) | \
-								((PIN_PUPD_NONE & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT))
-
-#define GD_PIN_DATA(MODE, PUPD, AFN)	((int)(MODE) | ((PUPD & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT) | ((AFN & PIN_AF_MASK) << PIN_AF_SHIFT))
-#define GD_PIN_DATA_EXT(MODE, PUPD, AFN, CHAN, CHON) \
-								((int)(MODE) | ((PUPD & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT) | \
-									((AFN & PIN_AF_MASK) << PIN_AF_SHIFT) | \
-									((CHAN & PIN_CHANNEL_MASK) << PIN_CHANNEL_SHIFT) | \
-									((CHON & PIN_CHON_MASK) << PIN_CHON_SHIFT))
-#define GD_PIN_DATA_REMAP(MODE, PUPD, REMAP)	((int)(MODE & PIN_MODE_MASK) | \
-								    ((PUPD & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT ) | \
-									((REMAP & PIN_REMAP_MASK) << PIN_REMAP_SHIFT))
-#define GD_PIN_DATA_EXT_REMAP(MODE, PUPD, REMAP, CHAN, CHON) \
-								((int)(MODE) | ((PUPD & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT) | \
-									((REMAP & PIN_REMAP_MASK) << PIN_REMAP_SHIFT) | \
-									((CHAN & PIN_CHANNEL_MASK) << PIN_CHANNEL_SHIFT) | \
-									((CHON & PIN_CHON_MASK) << PIN_CHON_SHIFT))
-typedef enum {
-	PIN_MODE_INPUT = 0,
-	PIN_MODE_OUTPUT = 1,
-	PIN_MODE_AF = 2,
-	PIN_MODE_ANALOG = 3,
-} GDPinModeFunction;
+#define PIN_MODE_INPUT 0
+#define PIN_MODE_OUTPUT 1
+#define PIN_MODE_AF 2
+#define PIN_MODE_ANALOG 3
 
 /*
  * We need a way to insure we cleanly encode these bits
@@ -364,15 +332,32 @@ typedef enum {
  * are encoded the same way. This cleans up a lot of code.
  * Decoding happens later in a different function
  */
-#define PIN_MODE_INPUT 			(PIN_MODE_INPUT)
-#define PIN_MODE_INPUT_FLOATING		(PIN_MODE_INPUT)
+//#define PIN_MODE_INPUT 			(PIN_MODE_INPUT)
+#define PIN_MODE_INPUT_FLOATING	(PIN_MODE_INPUT)
 #define PIN_MODE_INPUT_PU		(PIN_MODE_INPUT | PIN_INPUT_PU_BITS)
 #define PIN_MODE_INPUT_PD		(PIN_MODE_INPUT | PIN_INPUT_PD_BITS)
 #define PIN_MODE_OUT_OD			(PIN_MODE_OUTPUT | PIN_OUTPUT_MODE_BITS)
 #define PIN_MODE_OUT_PP 		(PIN_MODE_OUTPUT)
 #define PIN_MODE_AF_OD 			(PIN_MODE_AF | PIN_OUTPUT_MODE_BITS)
 #define PIN_MODE_AF_PP 			(PIN_MODE_AF)
-#define PIN_MODE_ANALOG			(PIN_MODE_ANALOG)
+//#define PIN_MODE_ANALOG			(PIN_MODE_ANALOG)
+
+#define GD_PIN_FUNC_ANALOG_CH(CHAN)	((int)(0x3 & 0x7) | ((CHAN & 0x1f) << 19) | (((int)0x0 & 0x3) << 13))
+
+#define GD_PIN_DATA(MODE, PUPD, AFN)	((int)(MODE) | ((PUPD & 0x3) << 13) | ((AFN & 0xf) << 15))
+#define GD_PIN_DATA_EXT(MODE, PUPD, AFN, CHAN, CHON) \
+								((int)(MODE) | ((PUPD & 0x3) << 13) | \
+									((AFN & 0xf) << 15) | \
+									((CHAN & 0x1f) << 19) | \
+									((CHON & 0x1) << 24))
+#define GD_PIN_DATA_REMAP(MODE, PUPD, REMAP)	((int)(MODE & 0x7) | \
+								    ((PUPD & 0x3) << 13 ) | \
+									((REMAP & 0x7f) << 3))
+#define GD_PIN_DATA_EXT_REMAP(MODE, PUPD, REMAP, CHAN, CHON) \
+								((int)(MODE) | ((PUPD & 0x3) << 13) | \
+									((REMAP & 0x7f) << 3) | \
+									((CHAN & 0x1f) << 19) | \
+									((CHON & 0x1) << 24))
 
 #ifdef __cplusplus
 }

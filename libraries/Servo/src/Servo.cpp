@@ -19,7 +19,7 @@
 
 #include <Arduino.h>
 #include <Servo.h>
-#include "HardwareTimer.h"
+#include <HardwareTimer.h>
 
 static servo_t servos[MAX_SERVOS];          // static array of servo structures
 // counter for the servo being pulsed for each timer (or -1 if refresh interval)
@@ -31,6 +31,7 @@ uint8_t ServoCount = 0;         // the total number of attached servos
 #define SERVO_MIN() (MIN_PULSE_WIDTH - this->min * 4)   // minimum value in uS for this servo
 #define SERVO_MAX() (MAX_PULSE_WIDTH - this->max * 4)   // maximum value in uS for this servo
 
+#define TIMER_ID(_timer) ((timer_id_e)(_timer))
 #define SERVO_TIMER(_timer_id)  ((timer16_Sequence_t)(_timer_id))
 
 /************ static functions common to all instances ***********************/
@@ -68,8 +69,8 @@ static void Servo_PeriodElapsedCallback()
 /* Servo Timer init */
 static void TimerServoInit()
 {
-    uint32_t fre = TimerServo.getTimerClkFre();
-    TimerServo.setPrescaler(fre / 1000000 - 1);
+    uint32_t freq = TimerServo.getTimerClkFreq();
+    TimerServo.setPrescaler(freq / 1000000 - 1);
     TimerServo.setReloadValue(20000);
     TimerServo.attachInterrupt(Servo_PeriodElapsedCallback);
     TimerServo.start();

@@ -49,16 +49,14 @@ mcu_type = mcu[:-2]
 variant = board_config.get("build.variant", board_config.get("build.arduino.variant", "generic"))
 series = mcu_type[:7].upper() + "x"
 variants_dir = (join("$PROJECT_DIR", board_config.get("build.variants_dir"))
-    if board_config.get("build.variants_dir", ""):
-        print("Warning! build.variant is not set")
-    else:
-        join(FRAMEWORK_DIR, "variants"))
+    if board_config.get("build.variants_dir", "")
+    else join(FRAMEWORK_DIR, "variants"))
 
 variant_dir = join(variants_dir, variant)
 assert isdir(variant_dir)
 inc_variant_dir = variant_dir
 
-if !IS_WINDOWS and not (
+if not IS_WINDOWS and not (
     set(["_idedata", "idedata"]) & set(COMMAND_LINE_TARGETS) and " " not in variant_dir
 ):
     inc_variant_dir = variant_dir.replace("(", r"\(").replace(")", r"\)")
@@ -219,7 +217,6 @@ env.Append(
         "ARDUINO_ARCH_GD32",
         "ARDUINO_%s" % board_id,
         ("BOARD_NAME", '\\"%s\\"' % board_id),
-        ("VARIANT_H", '\\"%s\\"' % board_config.get("build.arduino.variant_h", "variant.h"))
         ("ARDUINO_UPLOAD_MAXIMUM_SIZE", board_config.get("upload.maximum_size")),
     ],
     CPPPATH=[
@@ -352,14 +349,15 @@ process_standard_library_configuration(cpp_defines)
 add_upload_protocol_defines(board_name, upload_protocol)
 # defining HAL_UART_MODULE_ENABLED causes build failure 'uart_debug_write' was not declared in this scope
 #process_usart_configuration(cpp_defines)
-process_usb_configuration(cpp_defines)
+#process_usb_configuration(cpp_defines)
 
 # copy CCFLAGS to ASFLAGS (-x assembler-with-cpp mode)
 env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
 
 env.Append(
     LIBSOURCE_DIRS=[
-        join(FRAMEWORK_DIR, "libraries", "arduino"),
+        join(FRAMEWORK_DIR, "libraries", "__cores__" "arduino"),
+        join(FRAMEWORK_DIR, "libraries"),
     ]
 )
 
