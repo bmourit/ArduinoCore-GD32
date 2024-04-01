@@ -138,18 +138,6 @@ def configure_application_offset(mcu, upload_protocol):
     # LD_FLASH_OFFSET is mandatory even if there is no offset
     env.Append(LINKFLAGS=["-Wl,--defsym=LD_FLASH_OFFSET=%s" % hex(offset)])
 
-if any(mcu in board_config.get("build.cpu") for mcu in ("cortex-m4", "cortex-m7")):
-    env.Append(
-        CCFLAGS=["-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"],
-        LINKFLAGS=["-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"],
-    )
-if board_config.get("build.cpu") == "cortex-m33":
-    env.Append(
-        CCFLAGS=["-mfpu=fp-armv8", "-mfloat-abi=softfp"],
-        LINKFLAGS=["-mfpu=fp-armv8", "-mfloat-abi=softfp"],
-    )
-
-
 def load_boards_remap():
     remap_file = join(FRAMEWORK_DIR, "tools", "platformio", "boards_remap.json")
     if not isfile(remap_file):
@@ -188,9 +176,20 @@ def get_arduino_board_id(board_config, mcu):
 
 board_id = get_arduino_board_id(board_config, mcu)
 spl_series = board_config.get("build.spl_series", "")
+machine_flags = [
+    "-mcpu=%s" % board_config.get("build.cpu"),
+    "-mthumb",
+]
+
+if (any(cpu in board_config.get("build.cpu") for cpu in ("cortex-m4", "cortex-m7"))):
+    machine_flags.extend(["-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"])
+
+if board_config.get("build.cpu") == "cortex-m33":
+    machine_flags.extend(["-mfpu=fp-armv8", "-mfloat-abi=softfp"])
 
 env.Append(
-    ASFLAGS=["-x", "assembler-with-cpp"],
+    ASFLAGS=machine_flags,
+    ASPPFLAGS=["-x", "assembler-with-cpp"],
     CFLAGS=["-std=gnu17"],
     CXXFLAGS=[
         "-std=gnu++17",
@@ -199,10 +198,9 @@ env.Append(
         "-fno-exceptions",
         "-fno-use-cxa-atexit",
     ],
-    CCFLAGS=[
+    CCFLAGS=machine_flags
+    + [
         "-Os",  # optimize for size
-        "-mcpu=%s" % board_config.get("build.cpu"),
-        "-mthumb",
         "-ffunction-sections",  # place each function in its own section
         "-fdata-sections",
         "-nostdlib",
@@ -220,6 +218,7 @@ env.Append(
         ("ARDUINO_UPLOAD_MAXIMUM_SIZE", board_config.get("upload.maximum_size")),
     ],
     CPPPATH=[
+        join(FRAMEWORK_DIR, "cores", "arduino", "api"),
         join(FRAMEWORK_DIR, "cores", "arduino", "api", "deprecated"),
         join(FRAMEWORK_DIR, "cores", "arduino", "api", "deprecated-avr-comp"),
         join(FRAMEWORK_DIR, "cores", "arduino", "gd32"),
@@ -232,10 +231,9 @@ env.Append(
         join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_standard_peripheral", "Source"),
         join(FRAMEWORK_DIR, "cores", "arduino"),
     ],
-    LINKFLAGS=[
+    LINKFLAGS=machine_flags
+    + [
         "-Os",
-        "-mthumb",
-        "-mcpu=%s" % board_config.get("build.cpu"),
         "--specs=nano.specs",
         "-Wl,--gc-sections,--relax",
         "-Wl,--check-sections",
@@ -244,6 +242,7 @@ env.Append(
         "-Wl,--warn-common",
         "-Wl,--defsym=LD_MAX_SIZE=%d" % board_config.get("upload.maximum_size"),
         "-Wl,--defsym=LD_MAX_DATA_SIZE=%d" % board_config.get("upload.maximum_ram_size"),
+        '-Wl,-Map="%s"' % join("${BUILD_DIR}", "${PROGNAME}.map"),
     ],
     LIBS=[
         "c",
@@ -368,10 +367,7 @@ env.Append(
 libs = []
 
 if "build.variant" in board_config:
-    env.Append(
-        CPPPATH=[inc_variant_dir],
-        LIBPATH=[inc_variant_dir]
-    )
+    env.Append(CPPPATH=[inc_variant_dir], LIBPATH=[inc_variant_dir])
     env.BuildSources(join("$BUILD_DIR", "FrameworkArduinoVariant"), variant_dir)
 
 libs.append(env.BuildLibrary(
