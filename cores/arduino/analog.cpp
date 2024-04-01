@@ -126,7 +126,7 @@ void set_dac_value(PinName pinname, uint16_t value)
 void set_pwm_value(pin_size_t ulPin, uint32_t value)
 {
     uint16_t ulvalue = 1000 * value / 65535;
-    PWM pwm(ulPin);
+    HardwarePWM pwm(ulPin);
     pwm.setPeriodCycle(1000, ulvalue, FORMAT_US);
     pwm.start();
 }
@@ -135,7 +135,7 @@ void set_pwm_value(pin_size_t ulPin, uint32_t value)
 void set_pwm_value_with_base_period(pin_size_t ulPin, uint32_t base_period_us, uint32_t ulValue)
 {
     uint16_t value = base_period_us * ulValue / 65535;
-    PWM pwm(ulPin);
+    HardwarePWM pwm(ulPin);
     pwm.setPeriodCycle(base_period_us, value, FORMAT_US);
     pwm.start();
 }
@@ -143,7 +143,7 @@ void set_pwm_value_with_base_period(pin_size_t ulPin, uint32_t base_period_us, u
 /* pwm stop */
 void stop_pwm(pin_size_t ulPin)
 {
-    PWM pwm(ulPin);
+    HardwarePWM pwm(ulPin);
     pwm.stop();
 }
 

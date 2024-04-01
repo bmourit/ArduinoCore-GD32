@@ -180,9 +180,9 @@ void HardwareSerial::begin(unsigned long baud, uint8_t config)
 
 void HardwareSerial::end()
 {
-    //clear any received data
+    // clear any received data
     _serial.rx_head  = _serial.rx_tail;
-    //wait for any outstanding data to be sent
+    // wait for any outstanding data to be sent
     flush();
     //disable the USART
     serial_free(&_serial);

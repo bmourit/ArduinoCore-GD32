@@ -334,11 +334,11 @@ PinName analog_pin_to_PinName(uint32_t pin);
 #endif
 
 #if defined(GD32F30x)
-#define PORT_CTL_REG(p)			(GPIO_CTL0(P))
+#define PORT_CTL_REG(p)			(GPIO_CTL0(p))
 #else
-#define PORT_CTL_REG(p)			(GPIO_CTL(P))
+#define PORT_CTL_REG(p)			(GPIO_CTL(p))
 #endif
-#define PORT_CFG_REG(p)			(PORT_CTL_REG(P))
+#define PORT_CFG_REG(p)			(PORT_CTL_REG(p))
 
 /* some pins could be duplicated in digital_pins[] */
 /* return first occurence of linked PinName (PYx) */

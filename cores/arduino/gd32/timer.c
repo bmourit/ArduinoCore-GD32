@@ -27,6 +27,10 @@ OF SUCH DAMAGE.
 
 #include "timer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined(GD32F1x0) || defined(GD32F3x0) || defined(GD32E50X) || defined(GD32EPRT)
 #define TIMER5_IRQ_Name TIMER5_DAC_IRQn
 #else
@@ -101,17 +105,16 @@ OF SUCH DAMAGE.
 /* e.g., for a GD32F303CC, the macro TIMER8 is defined, although */
 /* TIMER8_IRQn is not defined since the timer is not actually available */ 
 /* we have to work around this. */
-#if defined(GD32F30x)
-#if !defined(GD32F30X_HD)
-#define HAS_TIMER_8
-#define HAS_TIMER_9
-#define HAS_TIMER_9
-#define HAS_TIMER_10
-#define HAS_TIMER_11
-#define HAS_TIMER_12
-#define HAS_TIMER_13
-#endif
-#else
+//#if defined(GD32F30x)
+//#if !defined(GD32F30X_HD)
+//#define HAS_TIMER_8
+//#define HAS_TIMER_9
+//#define HAS_TIMER_10
+//#define HAS_TIMER_11
+//#define HAS_TIMER_12
+//#define HAS_TIMER_13
+//#endif
+//#else
 #ifndef NO_TIMER_8
 #define HAS_TIMER_8
 #endif
@@ -130,7 +133,7 @@ OF SUCH DAMAGE.
 #ifndef NO_TIMER_13
 #define HAS_TIMER_13
 #endif
-#endif
+//#endif
 
 #if defined(GD32F3x0) && !defined(GD32F350)
 #define NO_TIMER_5
@@ -150,6 +153,7 @@ timerhandle_t timerHandle = {
     .disableUpdateIT           = Timer_disableUpdateIT,
     .disableCaptureIT          = Timer_disableCaptureIT,
     .interruptHandle           = Timer_updateHandle,
+    .setIntPriority            = Timer_setIntPriority,
     .captureInterruptHandle[0] = Timer_captureHandle,
     .captureInterruptHandle[1] = Timer_captureHandle,
     .captureInterruptHandle[2] = Timer_captureHandle,
@@ -739,6 +743,19 @@ void Timer_disableCaptureIT(uint32_t instance, uint8_t channel)
     timer_interrupt_flag_clear(instance, interrupt_flag);
     timer_interrupt_disable(instance, interrupt);
 }
+
+void Timer_setIntPriority(uint32_t instance, uint32_t prempt, uint32_t subPrio)
+{
+    #if defined(GD32E23x)
+    /* no subpriority */
+    nvic_irq_enable(getTimerUpIrq(instance), prempt);
+    nvic_irq_enable(getTimerCCIrq(instance), prempt);
+#else
+    nvic_irq_enable(getTimerUpIrq(instance), prempt, subPrio);
+    nvic_irq_enable(getTimerCCIrq(instance), prempt, subPrio);
+#endif
+}
+
 /*!
     \brief      initialize pwm
     \param[in]  pwmDevice: pwm device
@@ -1465,5 +1482,9 @@ void TIMER15_IRQHandler(void)
 void TIMER16_IRQHandler(void)
 {
     timerinterrupthandle(TIMER16);
+}
+#endif
+
+#ifdef __cplusplus
 }
 #endif

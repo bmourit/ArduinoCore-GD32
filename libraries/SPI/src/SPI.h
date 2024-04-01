@@ -24,51 +24,114 @@
 #ifndef _SPI_H_INCLUDED
 #define _SPI_H_INCLUDED
 
-#include <Arduino.h>
-#include <api/HardwareSPI>
+#include "Arduino.h"
 #include <stdio.h>
-
 extern "C" {
-  #include "utility/drv_spi.h"
+#include "utility/drv_spi.h"
 }
 
-class SPIClassGD32 : public arduino::HardwareSPI 
+/*
+ * SPI_HAS_TRANSACTION means SPI has
+ *  - beginTransaction()
+ *  - endTransaction()
+ *  - SPISetting(clock, bitorder, datamode)
+ */
+#define SPI_HAS_TRANSACTION 1
+
+class SPISettings
 {
-	public:
-		SPIClassGD32();
-		SPIClassGD32(PinName mosi, PinName miso, PinName sclk, PinName ssel);
-		SPIClassGD32(PinName mosi, PinName miso, PinName sclk);
+    public:
+        SPISettings(uint32_t speedMax, BitOrder bitOrder, uint8_t dataMode)
+        {
+            this->speed = speedMax;
+            this->bitorder = bitOrder;
+            this->datamode = dataMode;
+        }
 
-		void begin();
-		void end();
+        /* Set speed to default, SPI mode set to MODE 0 and Bit order set to MSB first. */
+        SPISettings()
+        {
+            this->speed = SPI_SPEED_DEFAULT;
+            this->bitorder = MSBFIRST;
+            this->datamode = SPI_MODE0;
+        }
 
-		void beginTransaction(SPISettings settings) override;
-		void endTransaction(void) override;
+    private:
+        uint32_t speed;
+        uint8_t datamode;
+        BitOrder bitorder;
 
-		uint8_t transfer(uint8_t data);
-		uint16_t transfer16(uint16_t data);
-		void transfer(void *buf, size_t count);
-		void transfer(void *bufout, void *bufin, size_t count);
-
-		void setBitOrder(BitOrder order);
-		void setDataMode(uint8_t mode);
-		void setClockDivider(uint32_t divider);
-
-		/* not implemented */
-		void usingInterrupt(int interruptNumber);
-		void notUsingInterrupt(int interruptNumber);
-		void attachInterrupt();
-		void detatchInterrupt();
-
-	private:
-		void config(SPISettings settings);
-
-		SPISettings spisettings;
-
-		bool initialized;
-		spi_t _spi;
+        friend class SPIClass;
 };
 
-extern SPIClassGD32 SPI;
+const SPISettings DEFAULT_SPI_SETTINGS = SPISettings();
 
-#endif /*_SPI_H_INCLUDED */
+class SPIClass
+{
+    public:
+        SPIClass();
+        SPIClass(PinName mosi, PinName miso, PinName sclk, PinName ssel);
+        SPIClass(PinName mosi, PinName miso, PinName sclk);
+
+        // setMISO/MOSI/SCLK/SSEL have to be called before begin()
+        void setMISO(uint32_t miso)
+        {
+          _spi.pin_miso = DIGITAL_TO_PINNAME(miso);
+        };
+        void setMOSI(uint32_t mosi)
+        {
+          _spi.pin_mosi = DIGITAL_TO_PINNAME(mosi);
+        };
+        void setSCLK(uint32_t sclk)
+        {
+          _spi.pin_sclk = DIGITAL_TO_PINNAME(sclk);
+        };
+        void setSSEL(uint32_t ssel)
+        {
+          _spi.pin_ssel = DIGITAL_TO_PINNAME(ssel);
+        };
+
+        void setMISO(PinName miso)
+        {
+          _spi.pin_miso = (miso);
+        };
+        void setMOSI(PinName mosi)
+        {
+          _spi.pin_mosi = (mosi);
+        };
+        void setSCLK(PinName sclk)
+        {
+          _spi.pin_sclk = (sclk);
+        };
+        void setSSEL(PinName ssel)
+        {
+          _spi.pin_ssel = (ssel);
+        };
+
+        void begin();
+        void end();
+
+        void beginTransaction(SPISettings settings);
+        void endTransaction(void);
+
+        uint8_t transfer(uint8_t val8);
+        uint16_t transfer16(uint16_t val16);
+        void transfer(void *buf, size_t count);
+        void transfer(void *bufout, void *bufin, size_t count);
+
+        void setBitOrder(BitOrder order);
+        void setDataMode(uint8_t mode);
+        void setClockDivider(uint32_t divider);
+
+    private:
+        void config(SPISettings settings);
+
+        SPISettings spisettings;
+        bool initialized;
+        spi_t _spi;
+
+};
+
+extern SPIClass SPI;
+
+#endif

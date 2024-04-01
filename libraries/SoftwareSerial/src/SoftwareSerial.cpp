@@ -110,7 +110,7 @@ void SoftwareSerial::setSpeed(uint32_t speed)
             // Disable the timer
             uint32_t clock_rate, cmp_value;
             // Get timer clock
-            clock_rate = timer.getTimerClkFre();
+            clock_rate = timer.getTimerClkFreq();
             int pre = 1;
             // Calculate prescale an compare value
             do {

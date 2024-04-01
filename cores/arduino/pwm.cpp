@@ -30,7 +30,7 @@ OF SUCH DAMAGE.
 
 #define PWMNUMS		56
 
-PWM *pwmObj[PWMNUMS] = { NULL };
+HardwarePWM *pwmObj[PWMNUMS] = { NULL };
 
 /*!
     \brief      PWM object construct
@@ -38,7 +38,7 @@ PWM *pwmObj[PWMNUMS] = { NULL };
     \param[out] none
     \retval     none
 */
-PWM::PWM(uint32_t pin)
+HardwarePWM::HardwarePWM(uint32_t pin)
 {
     PinName instance = DIGITAL_TO_PINNAME(pin);
     this->pwmCallback = NULL;
@@ -57,7 +57,7 @@ PWM::PWM(uint32_t pin)
     \param[out] none
     \retval     none
 */
-void PWM::start(void)
+void HardwarePWM::start(void)
 {
     pwmHandle.start(&pwmDevice);
     this->ispwmActive = true;
@@ -69,7 +69,7 @@ void PWM::start(void)
     \param[out] none
     \retval     none
 */
-void PWM::stop(void)
+void HardwarePWM::stop(void)
 {
     pwmHandle.stop(&pwmDevice);
     this->ispwmActive = false;
@@ -83,7 +83,7 @@ void PWM::stop(void)
     \param[out] none
     \retval     none
 */
-void PWM::setPeriodCycle(uint32_t time, uint16_t cycle, enum timeFormat format)
+void HardwarePWM::setPeriodCycle(uint32_t time, uint16_t cycle, enum timeFormat format)
 {
     this->pwmPeriodCycle.period = time;
     this->pwmPeriodCycle.cycle = cycle;
@@ -97,7 +97,7 @@ void PWM::setPeriodCycle(uint32_t time, uint16_t cycle, enum timeFormat format)
     \param[out] none
     \retval     none
 */
-void PWM::writeCycleValue(uint32_t cycle, enum timeFormat format)
+void HardwarePWM::writeCycleValue(uint32_t cycle, enum timeFormat format)
 {
     this->pwmPeriodCycle.cycle = cycle;
     this->pwmPeriodCycle.format = format;
@@ -110,7 +110,7 @@ void PWM::writeCycleValue(uint32_t cycle, enum timeFormat format)
     \param[out] none
     \retval     none
 */
-void PWM::attachInterrupt(pwmCallback_t callback)
+void HardwarePWM::attachInterrupt(pwmCallback_t callback)
 {
     this->pwmCallback = callback;
     pwmHandle.enablePWMIT(&pwmDevice);
@@ -122,7 +122,7 @@ void PWM::attachInterrupt(pwmCallback_t callback)
     \param[out] none
     \retval     none
 */
-void PWM::detachInterrupt(void)
+void HardwarePWM::detachInterrupt(void)
 {
     this->pwmCallback = NULL;
     pwmHandle.disablePWMIT(&pwmDevice);
@@ -134,7 +134,7 @@ void PWM::detachInterrupt(void)
     \param[out] none
     \retval     none
 */
-void PWM::captureCompareCallback(void)
+void HardwarePWM::captureCompareCallback(void)
 {
     if (NULL != this->pwmCallback) {
         this->pwmCallback();

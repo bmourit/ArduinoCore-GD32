@@ -96,13 +96,10 @@ typedef enum {
     OP_STATE_ERROR             = 0x04U,
     OP_STATE_ABORT             = 0x05U,
     OP_STATE_LISTEN            = 0x06U,
-
     OP_STATE_BUSY_TX           = 0x21U, /* (OP_STATE_BUSY << 4) + 1 */
     OP_STATE_BUSY_RX           = 0x22U, /* (OP_STATE_BUSY << 4) + 2 */
-
     OP_STATE_BUSY_TX_LISTEN    = 0x61U, /* (OP_STATE_LISTEN << 4) + 1 */
     OP_STATE_BUSY_RX_LISTEN    = 0x62U, /* (OP_STATE_LISTEN << 4) + 2 */
-
     OP_STATE_BUTT
 } operation_state_enum;
 
@@ -191,9 +188,9 @@ uint8_t serial_tx_active(serial_t *obj);
 /* Attempts to determine if the serial peripheral is already in use for RX. */
 uint8_t serial_rx_active(serial_t *obj);
 /* Attach UART transmit callback */
-void uart_attach_tx_callback(serial_t *obj, void (*callback)(serial_t *));
+void uart_attach_tx_callback(serial_t *obj, void(*callback)(serial_t *));
 /* Attach UART receive callback */
-void uart_attach_rx_callback(serial_t *obj, void (*callback)(serial_t *));
+void uart_attach_rx_callback(serial_t *obj, void(*callback)(serial_t *));
 /* Begin asynchronous TX transfer. */
 int serial_transmit(serial_t *obj, const void *tx, size_t tx_length);
 /* Begin asynchronous RX transfer (enable interrupt for data collecting). */

@@ -32,10 +32,10 @@ OF SUCH DAMAGE.
 
 typedef void(*pwmCallback_t)(void);
 
-class PWM
+class HardwarePWM
 {
 	public:
-		PWM(uint32_t pin);																								// pwm object construct
+		HardwarePWM(uint32_t pin);																						// HardwarePWM object construct
 		void start(void);																									// start pwm output
 		void stop(void);																									// stop pwm output
 		void setPeriodCycle(uint32_t time, uint16_t cycle, enum timeFormat format = FORMAT_US);	// set pwm period and cycle

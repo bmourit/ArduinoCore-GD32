@@ -253,6 +253,27 @@ uint32_t pinmap_function(PinName pin, const PinMap *map)
 		return function;
 }
 
+PinName pinmap_find_pin(uint32_t peripheral, const PinMap *map)
+{
+  while (map->peripheral != (uint32_t)NC) {
+    if (map->peripheral == peripheral) {
+      return map->pin;
+    }
+    map++;
+  }
+  return (uint32_t)NC;
+}
+
+PinName pinmap_pin(uint32_t peripheral, const PinMap *map)
+{
+  PinName pin = (PinName)NC;
+
+  if (peripheral != (uint32_t)NC) {
+    pin = pinmap_find_pin(peripheral, map);
+  }
+  return pin;
+}
+
 /** Enable GPIO clock
  *
  * @param gpio_periph gpio port name

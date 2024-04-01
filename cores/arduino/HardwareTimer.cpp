@@ -96,6 +96,11 @@ void HardwareTimer::setCounter(uint16_t count)
     timer_counter_value_config(timerDevice, count - 1);
 }
 
+uint32_t HardwareTimer::getCounter(void)
+{
+    return timer_counter_read(timerDevice);
+}
+
 /*!
     \brief      set repetition value
     \param[in]  repetition: repetition value
@@ -141,6 +146,11 @@ void HardwareTimer::setReloadValue(uint32_t value)
 void HardwareTimer::refresh(void)
 {
     timerHandle.refresh(timerDevice);
+}
+
+void HardwareTimer::setInterruptPriority(uint32_t preemptPriority, uint32_t subPriority)
+{
+    timerHandle.setIntPriority(timerDevice, preemptPriority, subPriority);
 }
 
 /*!
@@ -251,6 +261,83 @@ void HardwareTimer::captureCallback(uint8_t channel)
     if (NULL != this->captureCallbacks[channel]) {
         this->captureCallbacks[channel]();
     }
+}
+
+timer_index_t get_timer_index(uint32_t instance)
+{
+    timer_index_t index = UNKNOWN_TIMER;
+#if defined(TIMER0)
+  if (instance == TIMER0) {
+    index = TIMER0_INDEX;
+  }
+#endif
+#if defined(TIMER1)
+  if (instance == TIMER1) {
+    index = TIMER1_INDEX;
+  }
+#endif
+#if defined(TIMER2)
+  if (instance == TIMER2) {
+    index = TIMER2_INDEX;
+  }
+#endif
+#if defined(TIMER3)
+  if (instance == TIMER3) {
+    index = TIMER3_INDEX;
+  }
+#endif
+#if defined(TIMER4)
+  if (instance == TIMER4) {
+    index = TIMER4_INDEX;
+  }
+#endif
+#if defined(TIMER5)
+  if (instance == TIMER5) {
+    index = TIMER5_INDEX;
+  }
+#endif
+#if defined(TIMER6)
+  if (instance == TIMER6) {
+    index = TIMER6_INDEX;
+  }
+#endif
+#if defined(TIMER7)
+  if (instance == TIMER7) {
+    index = TIMER7_INDEX;
+  }
+#endif
+#if defined(TIMER8)
+  if (instance == TIMER8) {
+    index = TIMER8_INDEX;
+  }
+#endif
+#if defined(TIMER9)
+  if (instance == TIMER9) {
+    index = TIMER9_INDEX;
+  }
+#endif
+#if defined(TIMER10)
+  if (instance == TIMER10) {
+    index = TIMER10_INDEX;
+  }
+#endif
+#if defined(TIMER11)
+  if (instance == TIMER11) {
+    index = TIMER11_INDEX;
+  }
+#endif
+#if defined(TIMER12)
+  if (instance == TIMER12) {
+    index = TIMER12_INDEX;
+  }
+#endif
+#if defined(TIMER13)
+  if (instance == TIMER12) {
+    index = TIMER13_INDEX;
+  }
+#endif
+
+  return index;
 }
 
 extern "C"

@@ -32,6 +32,10 @@ OF SUCH DAMAGE.
 #include "PinNames.h"
 #include "PeripheralPins.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* timer interrupts */
 #ifndef TIMER_IRQ_PRIORITY
 	#define TIMER_IRQ_PRIORITY	14
@@ -78,11 +82,11 @@ OF SUCH DAMAGE.
 #define TIMER8_IRQHandler	TIMER0_BRK_TIMER8_IRQHandler
 #endif
 #endif
+#endif
 
 #if defined(TIMER9) && !defined(TIMER9_IRQn)
 #if defined(GD32F30x)
 #define TIMER9_IRQn		TIMER0_UP_TIMER9_IRQn
-//#define TIMER9_IRQHandler TIMER0_UP_TIMER9_IRQHandler
 //TIMER9_IRQHandler is mapped on TIMER0_IRQHandler when TIMER9_IRQn is not defined
 #endif
 #endif
@@ -104,7 +108,6 @@ OF SUCH DAMAGE.
 #if defined(TIMER12) && !defined(TIMER12_IRQn)
 #if defined(GD32F30x)
 #define TIMER12_IRQn		TIMER7_UP_TIMER12_IRQn
-//#define TIMER12_IRQHandler	TIMER7_UP_TIMER12_IRQHandler
 #endif
 #endif
 
@@ -115,35 +118,27 @@ OF SUCH DAMAGE.
 #endif
 #endif
 
-#if defined(TIMER14) && !defined(TIMER14_IRQn)
-#if defined(GD32F30x)
-#define TIMER14_IRQn		TIMER0_BRK_TIMER14_IRQn
-#define TIMER14_IRQHandler	TIMER0_BRK_TIMER14_IRQHandler
-#endif
-#endif
-
-#if defined(TIMER15) && !defined(TIMER16_IRQn)
-#if defined(GD32F30x)
-#define TIMER15_IRQn		TIMER0_UP_TIMER15_IRQn
-//#define TIMER15_IRQHandler	TIMER0_BRK_TIMER15_IRQHandler
-//TIMER15_IRQHandler is mapped on TIMER0_IRQHandler when TIMER15_IRQn is not defined
-#endif
-#endif
-
-#if defined(TIMER16) && !defined(TIMER16_IRQn)
-#if defined(GD32F30x)
-#define TIMER16_IRQn		TIMER0_TRG_CMT_TIMER16_IRQn
-#define TIMER16_IRQHandler	TIMER0_TRG_CMT_TIMER16_IRQHandler
-#endif
-#endif
-#endif
-
 typedef enum {
 #if defined(TIMER0)
 	TIMER0_INDEX,
 #endif
 #if defined(TIMER1)
 	TIMER1_INDEX,
+#endif
+#if defined(TIMER2)
+	TIMER2_INDEX,
+#endif
+#if defined(TIMER3)
+	TIMER3_INDEX,
+#endif
+#if defined(TIMER4)
+	TIMER4_INDEX,
+#endif
+#if defined(TIMER5)
+	TIMER5_INDEX,
+#endif
+#if defined(TIMER6)
+	TIMER6_INDEX,
 #endif
 #if defined(TIMER7)
 	TIMER7_INDEX,
@@ -165,15 +160,6 @@ typedef enum {
 #endif
 #if defined(TIMER13)
 	TIMER13_INDEX,
-#endif
-#if defined(TIMER14)
-	TIMER14_INDEX,
-#endif
-#if defined(TIMER15)
-	TIMER15_INDEX,
-#endif
-#if defined(TIMER16)
-	TIMER16_INDEX,
 #endif
 	TIMER_NUM,
 	UNKNOWN_TIMER = 0xFFFF
@@ -222,6 +208,7 @@ typedef struct timerhandle {
 	void (*disableUpdateIT)(uint32_t instance);
 	void (*disableCaptureIT)(uint32_t instance, uint8_t channel);
 	void (*interruptHandle)(uint32_t instance);
+	void (*setIntPriority)(uint32_t instance, uint32_t prempt, uint32_t subPrio);
 	callBack_t captureInterruptHandle[4];
 } timerhandle_t;
 
@@ -235,11 +222,6 @@ typedef struct pwmhandle {
 	void (*disablePWMIT)(pwmDevice_t *pwmDevice);
 	void (*interruptHandle)(uint32_t instance, uint8_t channel);
 } pwmhandle_t;
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 pwmDevice_t getTimerDeviceFromPinname(PinName instance);	// get timer device from pinname
 uint32_t getPWMIndex(pwmDevice_t instance);					// get pwm index
@@ -259,6 +241,7 @@ void Timer_updateHandle(uint32_t instance);								// timer update interrupt han
 void Timer_enableCaptureIT(uint32_t instance, uint8_t channel);	// enable timer channel capture interrupt
 void Timer_disableCaptureIT(uint32_t instance, uint8_t channel);	// disable timer channel capture interrupt
 void Timer_captureHandle(uint32_t timer, uint8_t channel);			// timer capture interrupt handler
+void Timer_setIntPriority(uint32_t instance, uint32_t prempt, uint32_t subPrio);
 
 void PWM_init(pwmDevice_t *pwmDevice);		// initialize pwm
 void PWM_start(pwmDevice_t *pwmDevice);	// start pwm output

@@ -50,6 +50,7 @@ class HardwareTimer
         void refresh(void);                                                       //update some registers to restart counters
         void setPrescaler(uint16_t prescaler);                                    //set prescaler
         void setCounter(uint16_t count);                                          //set counter
+        uint32_t getCounter(void);                                                //get counter
         void setRepetitionValue(uint16_t repetition);                             //set repetition value
         void setPeriodTime(uint32_t time, enum timeFormat format = FORMAT_MS);    //set timer period with the inital format
         void setReloadValue(uint32_t value);                                      //set reload value (overflow)
@@ -60,6 +61,7 @@ class HardwareTimer
         void setCaptureMode(uint32_t ulpin, uint8_t channel, captureMode mode);   //set timer capture mode
         uint32_t getCaptureValue(uint8_t channel);                                //get timer channel capture value
         uint32_t getTimerClkFreq(void);                                           //get timer clock frequency
+        void setInterruptPriority(uint32_t preemptPriority, uint32_t subPriority);
     private:
         uint32_t timerDevice;
         bool isTimerActive;
@@ -69,5 +71,6 @@ class HardwareTimer
 };
 
 extern timerhandle_t timerHandle;
+extern timer_index_t get_timer_index(uint32_t htimer);
 
 #endif /* HARDWARETIMER_H */

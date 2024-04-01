@@ -51,7 +51,7 @@ static void timerTonePinInit(PinName p, uint32_t frequency, uint32_t duration)
                 TimerTone_pinInfo.count = -1;
             }
 
-            pin_function(TimerTone_pinInfo.pin, GD_PIN_DATA(PIN_MODE_OUT_PP, 0));
+            pin_function(TimerTone_pinInfo.pin, GD_PIN_DATA(PIN_MODE_OUT_PP, PIN_MODE_INPUT_FLOATING, 0));
 
             TimerTone.setPeriodTime(timFreq, FORMAT_HZ);
             TimerTone.attachInterrupt(tonePeriodElapsedCallback);

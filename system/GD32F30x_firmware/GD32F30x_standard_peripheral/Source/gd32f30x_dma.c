@@ -429,7 +429,7 @@ void dma_memory_width_config(uint32_t dma_periph, dma_channel_enum channelx, uin
     \param[out] none
     \retval     none
 */
-void dma_periph_width_config (uint32_t dma_periph, dma_channel_enum channelx, uint32_t pwidth)
+void dma_periph_width_config(uint32_t dma_periph, dma_channel_enum channelx, uint32_t pwidth)
 {
     uint32_t ctl;
 

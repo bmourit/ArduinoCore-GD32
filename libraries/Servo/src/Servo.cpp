@@ -104,12 +104,12 @@ Servo::Servo()
 // }
 
 // Servo attach a digital pin
-uint8_t Servo::attach(int pin, int min, int max)
+uint8_t Servo::attach(int pin, int min, int max, int value)
 {
     if (this->servoIndex < MAX_SERVOS) {
         pinMode(pin, OUTPUT);                      // set servo pin to output
         servos[this->servoIndex].Pin.nbr = pin;
-        servos[this->servoIndex].ticks = DEFAULT_PULSE_WIDTH;
+        servos[this->servoIndex].ticks = value;
         /* TODO: min/max check abs(min - MIN_PULSE_WIDTH) / 4 < 128 */
         this->min  = (MIN_PULSE_WIDTH - min) / 4; //resolution of min/max is 4 uS
         this->max  = (MAX_PULSE_WIDTH - max) / 4;
