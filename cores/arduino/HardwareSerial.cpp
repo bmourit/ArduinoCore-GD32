@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include "Arduino.h"
 #include "HardwareSerial.h"
-//#if defined(HAVE_HWSERIAL) || defined(HAVE_HWSERIAL1) || defined(HAVE_HWSERIAL2) || defined(HAVE_HWSERIAL3)
+//#if defined(HAVE_HWSERIAL1) || defined(HAVE_HWSERIAL2) || defined(HAVE_HWSERIAL3) || defined(HAVE_HWSERIAL4)
 
 // SerialEvent functions are weak, so when the user doesn't define them,
 // the linker just sets their address to 0 (which is checked below).
@@ -122,6 +122,8 @@ void serialEventRun(void)
 
 HardwareSerial::HardwareSerial(uint8_t rx, uint8_t tx, int uart_index)
 {
+    // If Serial i defined in variant with SERIALx_RX/SERIALx_TX,
+    // set the defined pins for the com port
     _serial.pin_rx = DIGITAL_TO_PINNAME(rx);
     _serial.pin_tx =  DIGITAL_TO_PINNAME(tx);
     _serial.rx_buff = _rx_buffer;

@@ -27,15 +27,11 @@ OF SUCH DAMAGE.
 
 #include "timer.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #if defined(GD32F1x0) || defined(GD32F3x0) || defined(GD32E50X) || defined(GD32EPRT)
 #define TIMER5_IRQ_Name TIMER5_DAC_IRQn
 #else
 #define TIMER5_IRQ_Name TIMER5_IRQn
-#endif 
+#endif
 
 #if defined(GD32E23x) || defined(GD32F1x0) || defined(GD32F3x0) || defined(GD32E50X)
 #define TIMER0_IRQ_Name TIMER0_Channel_IRQn
@@ -45,18 +41,24 @@ extern "C" {
 
 #if defined(GD32F30x)
 #if defined(GD32F30X_HD)
-#define  TIMER0_Update_IRQ_Name TIMER0_UP_IRQn
+#define NO_TIMER_8
+#define NO_TIMER_9
+#define NO_TIMER_10
+#define NO_TIMER_11
+#define NO_TIMER_12
+#define NO_TIMER_13
+#define TIMER0_Update_IRQ_Name TIMER0_UP_IRQn
 #else
-#define  TIMER0_Update_IRQ_Name TIMER0_UP_TIMER9_IRQn
+#define TIMER0_Update_IRQ_Name TIMER0_UP_TIMER9_IRQn
 #endif
 #elif defined(GD32E23x) || defined(GD32F3x0) || defined(GD32F1x0)
-#define  TIMER0_Update_IRQ_Name TIMER0_BRK_UP_TRG_COM_IRQn
+#define TIMER0_Update_IRQ_Name TIMER0_BRK_UP_TRG_COM_IRQn
 #elif defined(GD32E50X)
 #if defined(GD32E50X_HD) || defined(GD32EPRT)
-#define  TIMER0_Update_IRQ_Name TIMER0_UP_IRQn
+#define TIMER0_Update_IRQ_Name TIMER0_UP_IRQn
 #define NO_TIMER_9
 #else
-#define  TIMER0_Update_IRQ_Name TIMER0_UP_TIMER9_IRQn
+#define TIMER0_Update_IRQ_Name TIMER0_UP_TIMER9_IRQn
 #define TIMER9_IRQ_NAME TIMER0_UP_TIMER9_IRQn
 #endif
 #elif defined(GD32F10x)
@@ -105,16 +107,16 @@ extern "C" {
 /* e.g., for a GD32F303CC, the macro TIMER8 is defined, although */
 /* TIMER8_IRQn is not defined since the timer is not actually available */ 
 /* we have to work around this. */
-//#if defined(GD32F30x)
-//#if !defined(GD32F30X_HD)
-//#define HAS_TIMER_8
-//#define HAS_TIMER_9
-//#define HAS_TIMER_10
-//#define HAS_TIMER_11
-//#define HAS_TIMER_12
-//#define HAS_TIMER_13
-//#endif
-//#else
+#if defined(GD32F30x)
+#if !defined(GD32F30X_HD)
+#define HAS_TIMER_8
+#define HAS_TIMER_9
+#define HAS_TIMER_10
+#define HAS_TIMER_11
+#define HAS_TIMER_12
+#define HAS_TIMER_13
+#endif
+#else
 #ifndef NO_TIMER_8
 #define HAS_TIMER_8
 #endif
@@ -133,7 +135,7 @@ extern "C" {
 #ifndef NO_TIMER_13
 #define HAS_TIMER_13
 #endif
-//#endif
+#endif
 
 #if defined(GD32F3x0) && !defined(GD32F350)
 #define NO_TIMER_5
@@ -643,7 +645,7 @@ void Timer_setPeriodTime(uint32_t instance, timerPeriod_t *timerPeriod)
     \param[out] none
     \retval     none
 */
-void Timer_rfresh(uint32_t instance)
+void Timer_refresh(uint32_t instance)
 {
     timer_event_software_generate(instance, TIMER_EVENT_SRC_UPG);
 }
@@ -989,11 +991,11 @@ void PWM_disablePWMIT(pwmDevice_t *pwmDevice)
 */
 uint32_t getTimerClkFrequency(uint32_t instance)
 {
-    rcu_clock_freq_enum timerclkSrc = NC;
+    rcu_clock_freq_enum timerclkSrc = 0xf;
     uint32_t APBx_PSC = 0;
     uint32_t clk_src = 0;
 
-    if (instance != (uint32_t)NC) {
+    if (instance != 0xf) {
         switch ((uint32_t)instance) {
 #if defined(TIMER0)
             case (uint32_t)TIMER0:
@@ -1149,21 +1151,6 @@ IRQn_Type getTimerUpIrq(uint32_t tim)
 #if defined(TIMER13) && defined(HAS_TIMER_13)
             case (uint32_t)TIMER13:
                 IRQn = TIMER13_IRQn;
-                break;
-#endif
-#if defined(TIMER14)
-            case (uint32_t)TIMER14:
-                IRQn = TIMER14_IRQn;
-                break;
-#endif
-#if defined(TIMER15)
-            case (uint32_t)TIMER15:
-                IRQn = TIMER15_IRQn;
-                break;
-#endif
-#if defined(TIMER16)
-            case (uint32_t)TIMER16:
-                IRQn = TIMER16_IRQn;
                 break;
 #endif
             default:
@@ -1429,7 +1416,7 @@ void TIMER8_IRQHandler(void)
 }
 #endif /* TIMER8 handler */
 
-#if defined(TIMER9) && !defined (TIMER0)
+#if defined(TIMER9) && !defined(TIMER0)
 void TIMER9_IRQHandler(void)
 {
     timerinterrupthandle(TIMER9);
@@ -1482,9 +1469,5 @@ void TIMER15_IRQHandler(void)
 void TIMER16_IRQHandler(void)
 {
     timerinterrupthandle(TIMER16);
-}
-#endif
-
-#ifdef __cplusplus
 }
 #endif

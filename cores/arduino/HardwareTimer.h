@@ -54,8 +54,10 @@ class HardwareTimer
         void setRepetitionValue(uint16_t repetition);                             //set repetition value
         void setPeriodTime(uint32_t time, enum timeFormat format = FORMAT_MS);    //set timer period with the inital format
         void setReloadValue(uint32_t value);                                      //set reload value (overflow)
+        uint32_t getReloadValue(void);                                            //get reload value (overflow)
         void attachInterrupt(timerCallback_t callback, uint8_t channel = 0xff);   //attach callback for period/capture interrupt
         void detachInterrupt(uint8_t channel = 0xff);                             //detach callback for period/capture interrupt
+        bool hasInterrupt();                                                      //returns true if a timer rollover interrupt has already been set
         void periodCallback(void);                                                //period callback handler
         void captureCallback(uint8_t channel);                                    //capture callback handler
         void setCaptureMode(uint32_t ulpin, uint8_t channel, captureMode mode);   //set timer capture mode

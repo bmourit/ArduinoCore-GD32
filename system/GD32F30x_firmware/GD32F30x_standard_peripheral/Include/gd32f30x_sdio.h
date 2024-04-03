@@ -40,6 +40,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* SDIO definitions */
 #define SDIO                            SDIO_BASE
 
@@ -430,5 +434,9 @@ void sdio_ceata_interrupt_disable(void);
 void sdio_ceata_command_completion_enable(void);
 /* disable the CE-ATA command completion signal(CE-ATA only) */
 void sdio_ceata_command_completion_disable(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* GD32F30X_SDIO_H */

@@ -40,6 +40,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* BKP definitions */
 #define BKP                           BKP_BASE                 /*!< BKP base address */
 
@@ -240,5 +244,9 @@ void bkp_flag_clear(uint16_t flag);
 FlagStatus bkp_interrupt_flag_get(uint16_t flag);
 /* clear BKP interrupt flag state */
 void bkp_interrupt_flag_clear(uint16_t flag);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* GD32F30X_BKP_H */

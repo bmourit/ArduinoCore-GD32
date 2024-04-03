@@ -34,7 +34,7 @@ extern "C" {
 
 #define ALTMASK		0x700
 
-#define PIN_NAME_INT_ANALOG_BASE	0x1000
+//#define PIN_NAME_INT_ANALOG_BASE	0x1000
 
 typedef enum {
 #if defined GPIOA
@@ -199,7 +199,7 @@ typedef enum {
 	PORTI_14 = 0x8E,
 	PORTI_15 = 0x8F,
 #endif
-	INT_ADC_BASE = PIN_NAME_INT_ANALOG_BASE,
+	//INT_ADC_BASE = PIN_NAME_INT_ANALOG_BASE,
 	/* ADC internal channels */
 	ADC_TEMP,
 	ADC_VREF,
@@ -209,7 +209,7 @@ typedef enum {
 #include "PinNamesVar.h"
 #endif
 
-	NC = (int)0xFFFFFFFF
+	NC = 0xFFFFFFFF
 } PinName;
 
 /* NOTE: Is this used anywhere? Do we plan to? Should we remove? */

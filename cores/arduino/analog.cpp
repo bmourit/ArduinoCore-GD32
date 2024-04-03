@@ -32,6 +32,10 @@ OF SUCH DAMAGE.
 #include "pwm.h"
 #include "fatal.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined(DAC0) && defined(DAC1)
 #define DAC_NUMS  2
 #elif defined(DAC) || defined(DAC0)
@@ -400,3 +404,7 @@ void adc_clock_enable(uint32_t instance)
     }
     rcu_periph_clock_enable(temp);
 }
+
+#ifdef __cplusplus
+}
+#endif

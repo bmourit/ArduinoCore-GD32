@@ -76,16 +76,16 @@ void pin_function(PinName pin, int function)
 	uint32_t af = GD_PIN_AF_GET(function);
 
 	switch (mode) {
-	case GD_PIN_ANALOG:
+	case PIN_MODE_ANALOG:
 		spl_mode = GPIO_MODE_ANALOG;
 		break;
-	case GD_PIN_INPUT:
+	case PIN_MODE_INPUT:
 		spl_mode = GPIO_MODE_INPUT;
 		break;
-	case GD_PIN_AF:
+	case PIN_MODE_AF:
 		spl_mode = GPIO_MODE_AF;
 		break;
-	case GD_PIN_OUTPUT:
+	case PIN_MODE_OUTPUT:
 		spl_mode = GPIO_MODE_OUTPUT;
 		break;l
 	default:
@@ -117,13 +117,13 @@ void pin_function(PinName pin, int function)
 		break;
 	}
 
-#elif defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
+#elif defined(GD32F30x) || defined(GD32F10x) || defined(GD32E50X)
 
 	switch (mode) {
-	case GD_PIN_ANALOG:
-		spl_mode = GPIO_MODE_AIN; {
+	case PIN_MODE_ANALOG:
+		spl_mode = GPIO_MODE_AIN;
 		break;
-	case GD_PIN_INPUT:
+	case PIN_MODE_INPUT:
 		if (pull == PIN_PUPD_NONE) {
 			spl_mode = GPIO_MODE_IN_FLOATING;
 		} else if (pull == PIN_PUPD_PULLUP) {
@@ -132,14 +132,14 @@ void pin_function(PinName pin, int function)
 			spl_mode = GPIO_MODE_IPD;
 		}
 		break;
-	case GD_PIN_AF:
+	case PIN_MODE_AF:
 		if (output == PIN_OTYPE_OD) {
 			spl_mode = GPIO_MODE_AF_OD;
 		} else {
 			spl_mode = GPIO_MODE_AF_PP;
 		}
 		break;
-	case GD_PIN_OUTPUT:
+	case PIN_MODE_OUTPUT:
 		if (output == PIN_OTYPE_OD) {
 			spl_mode = GPIO_MODE_OUT_OD;
 		} else {
@@ -195,14 +195,14 @@ uint32_t pinmap_merge(uint32_t a, uint32_t b)
 		return a;
 	}
 	// one (or both) is not connected
-	if (a == (uint32_t)NC) {
+	if (a == NC) {
 		return b;
 	}
-	if (b == (uint32_t)NC) {
+	if (b == NC) {
 		return a;
 	}
 	// mis-match error case
-	return (uint32_t)NC;
+	return NC;
 }
 
 uint32_t pinmap_find_peripheral(PinName pin, const PinMap *map)
@@ -213,18 +213,18 @@ uint32_t pinmap_find_peripheral(PinName pin, const PinMap *map)
 		}
 		map++;
 	}
-	return (uint32_t)NC;
+	return NC;
 }
 
 uint32_t pinmap_peripheral(PinName pin, const PinMap *map)
 {
-	uint32_t peripheral = (uint32_t)NC;
+	uint32_t peripheral = NC;
 
 	if (pin == (PinName)NC) {
-		return (uint32_t)NC;
+		return NC;
 	}
 	peripheral = pinmap_find_peripheral(pin, map);
-	if ((uint32_t)NC == peripheral) { // no mapping available
+	if (NC == peripheral) { // no mapping available
 	}
 	return peripheral;
 }
@@ -237,38 +237,38 @@ uint32_t pinmap_find_function(PinName pin, const PinMap *map)
 		}
 		map++;
 	}
-	return (uint32_t)NC;
+	return NC;
 }
 
 uint32_t pinmap_function(PinName pin, const PinMap *map)
 {
-		uint32_t function = (uint32_t)NC;
+		uint32_t function = NC;
 
 		if (pin == (PinName)NC) {
-				return (uint32_t)NC;
+				return NC;
 		}
 		function = pinmap_find_function(pin, map);
-		if ((uint32_t)NC == function) { // no mapping available
+		if (NC == function) { // no mapping available
 		}
 		return function;
 }
 
 PinName pinmap_find_pin(uint32_t peripheral, const PinMap *map)
 {
-  while (map->peripheral != (uint32_t)NC) {
+  while (map->peripheral != NC) {
     if (map->peripheral == peripheral) {
       return map->pin;
     }
     map++;
   }
-  return (uint32_t)NC;
+  return NC;
 }
 
 PinName pinmap_pin(uint32_t peripheral, const PinMap *map)
 {
   PinName pin = (PinName)NC;
 
-  if (peripheral != (uint32_t)NC) {
+  if (peripheral != NC) {
     pin = pinmap_find_pin(peripheral, map);
   }
   return pin;

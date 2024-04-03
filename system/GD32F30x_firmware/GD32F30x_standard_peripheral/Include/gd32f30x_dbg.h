@@ -40,6 +40,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* DBG definitions */
 #define DBG                      DBG_BASE
 
@@ -145,5 +149,9 @@ void dbg_periph_disable(dbg_periph_enum dbg_periph);
 void dbg_trace_pin_enable(void);
 /* disable trace pin assignment */
 void dbg_trace_pin_disable(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* GD32F30X_DBG_H */

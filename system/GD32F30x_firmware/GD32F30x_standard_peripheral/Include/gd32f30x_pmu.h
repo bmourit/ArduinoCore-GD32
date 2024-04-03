@@ -41,6 +41,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* PMU definitions */
 #define PMU                           PMU_BASE                      /*!< PMU base address */
 
@@ -188,5 +192,9 @@ void pmu_backup_write_disable(void);
 FlagStatus pmu_flag_get(uint32_t flag);
 /* clear flag bit */
 void pmu_flag_clear(uint32_t flag);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* GD32F30X_PMU_H */

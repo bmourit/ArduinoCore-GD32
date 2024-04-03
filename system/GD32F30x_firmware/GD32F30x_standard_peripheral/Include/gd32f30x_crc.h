@@ -40,6 +40,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* CRC definitions */
 #define CRC                            CRC_BASE
 
@@ -77,5 +81,9 @@ void crc_free_data_register_write(uint8_t free_data);
 uint32_t crc_single_data_calculate(uint32_t sdata);
 /* calculate the CRC value of an array of 32-bit values */
 uint32_t crc_block_data_calculate(const uint32_t *array, uint32_t size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* GD32F30X_CRC_H */

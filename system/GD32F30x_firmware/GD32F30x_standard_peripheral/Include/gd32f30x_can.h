@@ -41,6 +41,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* CAN definitions */
 #define CAN0                               CAN_BASE                      /*!< CAN0 base address */
 #define CAN1                               (CAN0 + 0x00000400U)          /*!< CAN1 base address */
@@ -745,5 +749,9 @@ void can_interrupt_disable(uint32_t can_periph, uint32_t interrupt);
 FlagStatus can_interrupt_flag_get(uint32_t can_periph, can_interrupt_flag_enum flag);
 /* CAN clear interrupt flag state */
 void can_interrupt_flag_clear(uint32_t can_periph, can_interrupt_flag_enum flag);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* GD32F30X_CAN_H */

@@ -40,6 +40,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* DACx(x=0,1) definitions */
 #define DAC                          DAC_BASE
 #define DAC0                         0U
@@ -246,5 +250,9 @@ void dac_concurrent_output_buffer_enable(void);
 void dac_concurrent_output_buffer_disable(void);
 /* set DAC concurrent mode data holding register value */
 void dac_concurrent_data_set(uint32_t dac_align, uint16_t data0, uint16_t data1);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* GD32F30X_DAC_H */

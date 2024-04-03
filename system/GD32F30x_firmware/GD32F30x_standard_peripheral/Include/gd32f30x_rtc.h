@@ -41,6 +41,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* RTC definitions */
 #define RTC                          RTC_BASE
 
@@ -134,5 +138,9 @@ uint32_t rtc_divider_get(void);
 FlagStatus rtc_flag_get(uint32_t flag);
 /* clear RTC flag status */
 void rtc_flag_clear(uint32_t flag);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* GD32F30X_RTC_H */

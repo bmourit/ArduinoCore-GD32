@@ -155,7 +155,7 @@ static const uint8_t TX5 = SERIAL5_TX;
 #define ANALOG_INTERNAL_START      (ANALOG_PIN_NUM_BASE + ANALOG_PINS_NUM)
 
 /* ADC internal channels */
-/* used for analogRead() */
+/* uonly sed for analogRead() */
 #if defined(ADC_CHANNEL_TEMPSENSOR) || defined(ADC_CHANNEL_TEMPSENSOR_ADC1)
 #define ATEMP        (ANALOG_INTERNAL_START)
 #endif
@@ -270,7 +270,7 @@ extern const uint32_t analog_pins[];
 extern const uint32_t gpio_port[];
 extern const uint32_t gpio_pin[];
 
-#define NOT_INTERRUPT	NC
+#define NOT_INTERRUPT	(uint32_t)NC
 
 /* Convert a digital pin to a PinName */
 #if ANALOG_PINS_NUM > 0

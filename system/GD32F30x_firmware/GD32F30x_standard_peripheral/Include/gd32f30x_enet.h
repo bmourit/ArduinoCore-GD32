@@ -41,6 +41,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define IF_USE_EXTERNPHY_LIB             0
 #if (1 == IF_USE_EXTERNPHY_LIB)
 #include "phy.h"
@@ -1697,6 +1701,10 @@ void enet_initpara_reset(void);
 #else
 /* default _ENET_DELAY_ function with less precise timing */
 #define _ENET_DELAY_                              enet_delay
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* GD32F30X_ENET_H */

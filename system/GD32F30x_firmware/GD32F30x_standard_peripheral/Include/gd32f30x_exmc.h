@@ -40,6 +40,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* EXMC definitions */
 #define EXMC                              (EXMC_BASE)                   /*!< EXMC register base address */
 
@@ -442,5 +446,9 @@ void exmc_flag_clear(uint32_t exmc_bank,uint32_t flag);
 FlagStatus exmc_interrupt_flag_get(uint32_t exmc_bank,uint32_t interrupt);
 /* clear EXMC interrupt flag */
 void exmc_interrupt_flag_clear(uint32_t exmc_bank,uint32_t interrupt);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* GD32F30X_EXMC_H */

@@ -29,24 +29,24 @@ void pinMode(pin_size_t ulPin, PinMode ulMode)
     PinName p = DIGITAL_TO_PINNAME(ulPin);
     switch (ulMode) {
         case INPUT:
-            pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT, 0));
+            pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT, PIN_MODE_INPUT_FLOATING, 0));
             break;
         case INPUT_PULLUP:
-            pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT_PU, 0));
+            pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT, PIN_MODE_INPUT_PU, 0));
             break;
         case INPUT_PULLDOWN:
-            pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT_PD, 0));
+            pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT, PIN_MODE_INPUT_PD, 0));
             break;
         case OUTPUT:
-            pin_function(p, GD_PIN_DATA(PIN_MODE_OUT_PP, 0));
+            pin_function(p, GD_PIN_DATA(PIN_MODE_OUTPUT, PIN_MODE_OUT_PP, 0));
             break;
 #pragma GCC diagnostic ignored "-Wswitch"
         case INPUT_ANALOG: // From PinModeExtension
-            pin_function(p, GD_PIN_DATA(PIN_MODE_ANALOG, 0));
+            pin_function(p, GD_PIN_DATA(PIN_MODE_ANALOG, PIN_MODE_INPUT_FLOATING, 0));
         break;
 #pragma GCC diagnostic ignored "-Wswitch"
         case OUTPUT_OPEN_DRAIN: // From PinModeExtension
-            pin_function(p, GD_PIN_DATA(PIN_MODE_OUT_OD, 0));
+            pin_function(p, GD_PIN_DATA(PIN_MODE_OUTPUT, PIN_MODE_OUT_OD, 0));
             break;
         default:
             break;
