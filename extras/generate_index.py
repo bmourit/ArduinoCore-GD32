@@ -48,8 +48,8 @@ def main():
         exit(-1)
     print("SHA256 of \"%s\": %s" % (file_name, sha256_hash))
     # Generate index JSON file
-    template_file = "package_gd32_index.json.tpl"
-    index_out_file = "package_gd32_index.json"
+    template_file = "package_gdcores_index.json.tpl"
+    index_out_file = "package_gdcores_index.json"
     content = ""
     try:
         with open(template_file) as fp:

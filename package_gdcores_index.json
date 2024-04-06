@@ -1,7 +1,7 @@
 {
   "packages": [
     {
-      "name": "GD32CommunityCores",
+      "name": "gdcores",
       "websiteURL": "https://github.com/bmourit/ArduinoCore-GD32",
       "maintainer": "GD32CommunityCores",
       "email": "",
@@ -13,10 +13,10 @@
           "name": "GigaDevice GD32 MCU based boards",
           "architecture": "gd32",
           "category": "Contributed",
-          "url": "https://github.com/bmourit/ArduinoCore-GD32/archive/refs/heads/GD32_Marlin_Dev.zip",
-          "archiveFilename": "ArduinoCore-GD32-GD32_Marlin_Dev.zip",
-          "checksum": "SHA-256:d3173fcb4bd2a744713dd4564830aff619a439b1f302a9b0131b99ef25fad19b",
-          "size": "5530690",
+          "url": "https://github.com/bmourit/ArduinoCore-GD32/archive/refs/tags/v1.0.1.tar.gz",
+          "archiveFilename": "ArduinoCore-GD32-1.0.1.tar.gz",
+          "checksum": "SHA-256:89d70451deb0d096a0c502965caf2e9efe09ab7959f0915f5e5baa23518e975e",
+          "size": "3652650",
           "boards": [
             {"name": "GD32F303ZE EVAL"},
             {"name": "GD32F307VG MBED"},
