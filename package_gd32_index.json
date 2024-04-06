@@ -14,7 +14,7 @@
           "architecture": "gd32",
           "category": "Contributed",
           "url": "https://github.com/bmourit/ArduinoCore-GD32/archive/refs/heads/GD32_Marlin_Dev.zip",
-          "archiveFilename": "GD32_Marlin_Dev.zip",
+          "archiveFilename": "ArduinoCore-GD32-GD32_Marlin_Dev.zip",
           "checksum": "SHA-256:d3173fcb4bd2a744713dd4564830aff619a439b1f302a9b0131b99ef25fad19b",
           "size": "5530690",
           "boards": [
