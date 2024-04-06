@@ -6,5 +6,5 @@
 // otherwise we pay the RAM for *all* serial objects.
 
 #if defined(HAVE_HWSERIAL5)
-HardwareSerial Serial5(RX5, TX5, 5);
+HardwareSerial Serial5(RX4, TX4, 4);
 #endif

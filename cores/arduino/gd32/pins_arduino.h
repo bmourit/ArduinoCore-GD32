@@ -70,24 +70,32 @@ static const uint8_t SCL2 = PIN_WIRE2_SCL;
 
 /* the PIN_SERIAL_TX/RX definitions point to the default Serial's pins */
 #if DEFAULT_HWSERIAL_INSTANCE == 1
+#define PIN_SERIAL_RX       SERIAL0_RX
+#define PIN_SERIAL_TX       SERIAL0_TX
+#elif DEFAULT_HWSERIAL_INSTANCE == 2
 #define PIN_SERIAL_RX       SERIAL1_RX
 #define PIN_SERIAL_TX       SERIAL1_TX
-#elif DEFAULT_HWSERIAL_INSTANCE == 2
+#elif DEFAULT_HWSERIAL_INSTANCE == 3
 #define PIN_SERIAL_RX       SERIAL2_RX
 #define PIN_SERIAL_TX       SERIAL2_TX
-#elif DEFAULT_HWSERIAL_INSTANCE == 3
+#elif DEFAULT_HWSERIAL_INSTANCE == 4
 #define PIN_SERIAL_RX       SERIAL3_RX
 #define PIN_SERIAL_TX       SERIAL3_TX
-#elif DEFAULT_HWSERIAL_INSTANCE == 4
+#elif DEFAULT_HWSERIAL_INSTANCE == 5
 #define PIN_SERIAL_RX       SERIAL4_RX
 #define PIN_SERIAL_TX       SERIAL4_TX
-#elif DEFAULT_HWSERIAL_INSTANCE == 5
-#define PIN_SERIAL_RX       SERIAL5_RX
-#define PIN_SERIAL_TX       SERIAL5_TX
 #endif
 
 static const uint8_t TX = PIN_SERIAL_TX;
 static const uint8_t RX = PIN_SERIAL_RX;
+
+#if defined(SERIAL0_RX)
+static const uint8_t RX0 = SERIAL0_RX;
+#endif
+
+#if defined(SERIAL0_TX)
+static const uint8_t TX0 = SERIAL0_TX;
+#endif
 
 #if defined(SERIAL1_RX)
 static const uint8_t RX1 = SERIAL1_RX;
@@ -119,14 +127,6 @@ static const uint8_t RX4 = SERIAL4_RX;
 
 #if defined(SERIAL4_TX)
 static const uint8_t TX4 = SERIAL4_TX;
-#endif
-
-#if defined(SERIAL5_RX)
-static const uint8_t RX5 = SERIAL5_RX;
-#endif
-
-#if defined(SERIAL5_TX)
-static const uint8_t TX5 = SERIAL5_TX;
 #endif
 
 /* configure analog pins */
@@ -165,7 +165,6 @@ static const uint8_t TX5 = SERIAL5_TX;
 
 #if ANALOG_PINS_NUM > 0
 static const uint8_t A0 = ANALOG_PIN_NUM_BASE;
-#endif
 #if ANALOG_PINS_NUM > 1
 static const uint8_t A1 = ANALOG_PIN_NUM_BASE + 1;
 #endif
@@ -259,6 +258,11 @@ static const uint8_t A30 = ANALOG_PIN_NUM_BASE + 20;
 #if ANALOG_PINS_NUM > 31
 static const uint8_t A31 = ANALOG_PIN_NUM_BASE + 31;
 #endif
+
+#define ANALOG_PINS_MAX 32
+#else
+#define ANALOG_PINS_MAX 0
+#endif /* ANALOG_PINS_NUM > 0 */
 
 #ifdef __cplusplus
 extern "C" {

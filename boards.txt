@@ -1,9 +1,12 @@
-# See: https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
+# See: https://arduino.github.io/arduino-cli/latest/platform-specification/
 
 menu.pnum=Board part number
-menu.upload_method=Upload method
+
+menu.usb=USB support (if available)
+
 menu.opt=Optimize
-menu.usb=USB support
+menu.rtlib=C Runtime Library
+menu.upload_method=Upload method
 
 ##################################################
 # Generic GD32E23x

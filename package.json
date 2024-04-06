@@ -1,6 +1,6 @@
 {
   "name": "framework-arduinogd32",
-  "version": "4.3",
   "description": "Arduino Wiring-based Framework for GD32 microcontrollers",
+  "version": "4.3",
   "url": "https://github.com/bmourit/ArduinoCore-GD32"
 }
