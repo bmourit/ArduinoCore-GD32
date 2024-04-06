@@ -36,10 +36,11 @@ extern "C" {
 #define SPI_S(obj)    ((struct spi_s *)(obj))
 #define SPI_PINS_FREE_MODE   0x00000001
 
-/** Initialize the SPI structure
+/**
+ * Initialize the SPI structure
  *
  * Configures the pins used by SPI, sets a default format and frequency, and enables the peripheral
- * @param[out] obj  The SPI object to initialize
+ * @param[in] obj  The SPI object to initialize
  */
 static void dev_spi_struct_init(spi_t *obj)
 {
@@ -50,7 +51,8 @@ static void dev_spi_struct_init(spi_t *obj)
     spi_enable(spiobj->spi);
 }
 
-/** Get the frequency of SPI clock source
+/**
+ * Get the frequency of SPI clock source
  *
  * Configures the pins used by SPI, sets a default format and frequency, and enables the peripheral
  * @param[out] spi_freq  The SPI clock source frequency
@@ -137,26 +139,31 @@ void spi_begin(spi_t *obj, uint32_t speed, uint8_t mode, uint8_t endian)
     }
 
     spi_freq = dev_spi_clock_source_frequency_get(obj);
+    /**
+     * Max SPI clock is 30MHz
+     * SPI0 is 120MHz, SPI1/SPI2 is 60MHz
+     * Min for SPI0 is DIV4, SPI1/SPI2 is DIV2
+     */
     if (speed >= (spi_freq / SPI_CLOCK_DIV2)) {
-        spiobj->spi_struct.prescale             = SPI_PSC_2;
+        spiobj->spi_struct.prescale = SPI_PSC_2;
     } else if (speed >= (spi_freq / SPI_CLOCK_DIV4)) {
-        spiobj->spi_struct.prescale             = SPI_PSC_4;
+        spiobj->spi_struct.prescale = SPI_PSC_4;
     } else if (speed >= (spi_freq / SPI_CLOCK_DIV8)) {
-        spiobj->spi_struct.prescale             = SPI_PSC_8;
+        spiobj->spi_struct.prescale = SPI_PSC_8;
     } else if (speed >= (spi_freq / SPI_CLOCK_DIV16)) {
-        spiobj->spi_struct.prescale             = SPI_PSC_16;
+        spiobj->spi_struct.prescale = SPI_PSC_16;
     } else if (speed >= (spi_freq / SPI_CLOCK_DIV32)) {
-        spiobj->spi_struct.prescale             = SPI_PSC_32;
+        spiobj->spi_struct.prescale = SPI_PSC_32;
     } else if (speed >= (spi_freq / SPI_CLOCK_DIV64)) {
-        spiobj->spi_struct.prescale             = SPI_PSC_64;
+        spiobj->spi_struct.prescale = SPI_PSC_64;
     } else if (speed >= (spi_freq / SPI_CLOCK_DIV128)) {
-        spiobj->spi_struct.prescale             = SPI_PSC_128;
+        spiobj->spi_struct.prescale = SPI_PSC_128;
     } else {
         /*
-         * As it is not possible to go below (spi_freq / SPI_SPEED_CLOCK_DIV256_MHZ).
-         * Set prescaler at max value so get the lowest frequency possible.
+         * As it is not possible to go below (spi_freq / SPI_CLOCK_DIV256).
+         * Set prescaler at max value to get the lowest frequency possible.
          */
-        spiobj->spi_struct.prescale             = SPI_PSC_256;
+        spiobj->spi_struct.prescale = SPI_PSC_256;
     }
 
     if (mode == SPI_MODE0) {
@@ -164,7 +171,7 @@ void spi_begin(spi_t *obj, uint32_t speed, uint8_t mode, uint8_t endian)
     } else if (mode == SPI_MODE1) {
         spiobj->spi_struct.clock_polarity_phase = SPI_CK_PL_LOW_PH_2EDGE;
     } else if (mode == SPI_MODE2) {
-        spiobj->spi_struct.clock_polarity_phase =  SPI_CK_PL_HIGH_PH_1EDGE;
+        spiobj->spi_struct.clock_polarity_phase = SPI_CK_PL_HIGH_PH_1EDGE;
     } else if (mode == SPI_MODE3) {
         spiobj->spi_struct.clock_polarity_phase = SPI_CK_PL_HIGH_PH_2EDGE;
     } else {
@@ -172,15 +179,15 @@ void spi_begin(spi_t *obj, uint32_t speed, uint8_t mode, uint8_t endian)
     }
 
     if (endian == 0) {
-        spiobj->spi_struct.endian               = SPI_ENDIAN_LSB;
+        spiobj->spi_struct.endian = SPI_ENDIAN_LSB;
     } else {
-        spiobj->spi_struct.endian               = SPI_ENDIAN_MSB;
+        spiobj->spi_struct.endian = SPI_ENDIAN_MSB;
     }
 
-    /* Default values */
-    spiobj->spi_struct.trans_mode           = SPI_TRANSMODE_FULLDUPLEX;
-    spiobj->spi_struct.device_mode          = SPI_MASTER;
-    spiobj->spi_struct.frame_size           = SPI_FRAMESIZE_8BIT;
+    /* default values */
+    spiobj->spi_struct.trans_mode = SPI_TRANSMODE_FULLDUPLEX;
+    spiobj->spi_struct.device_mode = SPI_MASTER;
+    spiobj->spi_struct.frame_size = SPI_FRAMESIZE_8BIT;
 
     dev_spi_struct_init(obj);
 }
@@ -201,20 +208,24 @@ void spi_free(spi_t *obj)
         spi_i2s_deinit(SPI0);
         rcu_periph_clock_disable(RCU_SPI0);
     }
+
     if (spiobj->spi == SPI1) {
         spi_i2s_deinit(SPI1);
         rcu_periph_clock_disable(RCU_SPI1);
     }
+
 #ifdef SPI2
     if (spiobj->spi == SPI2) {
         spi_i2s_deinit(SPI2);
         rcu_periph_clock_disable(RCU_SPI2);
     }
 #endif
-    /* Deinit GPIO mode of SPI pins */
+
+    /* deinit GPIO mode of SPI pins */
     pin_function(spiobj->pin_miso, SPI_PINS_FREE_MODE);
     pin_function(spiobj->pin_mosi, SPI_PINS_FREE_MODE);
     pin_function(spiobj->pin_sclk, SPI_PINS_FREE_MODE);
+
     if (spiobj->spi_struct.nss != SPI_NSS_SOFT) {
         pin_function(spiobj->pin_ssel, SPI_PINS_FREE_MODE);
         spi_nss_output_disable(spiobj->spi);
@@ -232,7 +243,7 @@ uint32_t spi_master_write(spi_t *obj, uint8_t value)
     int count = 0;
     struct spi_s *spiobj = SPI_S(obj);
 
-    /* wait the SPI transmit buffer is empty */
+    /* wait until the SPI transmit buffer is empty */
     while ((RESET == spi_i2s_flag_get(spiobj->spi, SPI_FLAG_TBE)) && (count++ < 1000));
     if (count >= 1000) {
         return -1;
@@ -241,7 +252,7 @@ uint32_t spi_master_write(spi_t *obj, uint8_t value)
     }
 
     count = 0;
-    /* wait the SPI receive buffer is not empty */
+    /* wait until the SPI receive buffer isn't empty */
     while ((RESET == spi_i2s_flag_get(spiobj->spi, SPI_FLAG_RBNE)) && (count++ < 1000));
     if (count >= 1000) {
         return -1;

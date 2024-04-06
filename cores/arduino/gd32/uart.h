@@ -161,7 +161,7 @@ typedef enum {
     UART4_INDEX,
 #endif
     UART_NUM
-} int_uart_indexes_t;
+} uart_index_t;
 
 /* Initialize the serial peripheral. It sets the default parameters for serial peripheral, and configures its specifieds pins. */
 void serial_init(serial_t *obj, PinName tx, PinName rx);

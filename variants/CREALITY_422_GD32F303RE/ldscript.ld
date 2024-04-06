@@ -1,3 +1,9 @@
+/* Entry Point */
+ENTRY(Reset_Handler)
+
+_Min_Heap_Size = 0x200;      /* required amount of heap  */
+_Min_Stack_Size = 0x400;     /* required amount of stack */
+
 /* memory map */
 MEMORY
 {
@@ -5,12 +11,10 @@ MEMORY
   RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 64K
 }
 
-ENTRY(Reset_Handler)
-
 SECTIONS
 {
-  __stack_size = DEFINED(__stack_size) ? __stack_size : 2K;
-  
+  __stack_size = DEFINED(__stack_size) ? __stack_size : _Min_Heap_Size + _Min_Stack_Size;
+
   /* ISR vectors */
   /* The startup code into "FLASH" Rom type memory */
   .vectors :
@@ -47,42 +51,50 @@ SECTIONS
   } >FLASH
 
   .ARM.extab :
-  { 
-     *(.ARM.extab* .gnu.linkonce.armextab.*) 
+  {
+    . = ALIGN(4);
+    *(.ARM.extab* .gnu.linkonce.armextab.*)
+    . = ALIGN(4);
   } >FLASH
   
   .ARM : {
+    . = ALIGN(4);
     __exidx_start = .;
     *(.ARM.exidx*)
     __exidx_end = .;
+    . = ALIGN(4);
   } >FLASH
 
   .ARM.attributes : { *(.ARM.attributes) } > FLASH
 
   .preinit_array :
   {
+    . = ALIGN(4);
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
     PROVIDE_HIDDEN (__preinit_array_end = .);
+    . = ALIGN(4);
   } >FLASH
 
   .init_array :
   {
+    . = ALIGN(4);
     PROVIDE_HIDDEN (__init_array_start = .);
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array*))
     PROVIDE_HIDDEN (__init_array_end = .);
+    . = ALIGN(4);
   } >FLASH
 
   .fini_array :
   {
+    . = ALIGN(4);
     PROVIDE_HIDDEN (__fini_array_start = .);
     KEEP (*(.fini_array*))
     KEEP (*(SORT(.fini_array.*)))
     PROVIDE_HIDDEN (__fini_array_end = .);
+    . = ALIGN(4);
   } >FLASH
-
-
 
   /* Used by the startup to initialize data */
   _sidata = LOADADDR(.data);
@@ -125,5 +137,5 @@ SECTIONS
   } >RAM AT>RAM
 }
 
- /* input sections */
-GROUP(libgcc.a libc.a libm.a libnosys.a)
+  /* input sections */
+  GROUP(libgcc.a libc.a libm.a libnosys.a)

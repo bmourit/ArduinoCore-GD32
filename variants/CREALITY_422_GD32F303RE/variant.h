@@ -149,15 +149,15 @@ extern "C" {
 #define PIN_SPI_SCK           PA5
 
 // I2C Definitions
-#define PIN_WIRE_SDA            PB7
-#define PIN_WIRE_SCL            PB6
+#define PIN_WIRE_SDA          PB7
+#define PIN_WIRE_SCL          PB6
 
 // Timer Definitions
 #ifndef TIMER_TONE
-  #define TIMER_TONE            TIMER3  // TIMER_TONE must be defined in this file
+  #define TIMER_TONE          TIMER3  // TIMER_TONE must be defined in this file
 #endif
 #ifndef TIMER_SERVO
-  #define TIMER_SERVO           TIMER2  // TIMER_SERVO must be defined in this file
+  #define TIMER_SERVO         TIMER2  // TIMER_SERVO must be defined in this file
 #endif
 
 // UART Definitions
@@ -165,8 +165,8 @@ extern "C" {
 #define DEFAULT_HWSERIAL_INSTANCE    1
 
 // Default pin used for 'Serial1' instance
-#define SERIAL1_RX    PA10
-#define SERIAL1_TX    PA9
+#define SERIAL1_RX          PA10
+#define SERIAL1_TX          PA9
 
 #ifdef __cplusplus
 } // extern "C"
