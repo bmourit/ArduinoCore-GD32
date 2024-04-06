@@ -24,7 +24,7 @@ def main():
     try:
         _, msg = request.urlretrieve(download_url, file_name)
         print("Extracting GitHub returned filename from Content-Disposition header.")
-        content_disp = msg.get("content-disposition") 
+        content_disp = msg.get("content-disposition")
         github_wanted_filename = re.findall("filename=(.+)", content_disp)[0]
         print("Extracted: %s" % github_wanted_filename)
     except Exception as exc:

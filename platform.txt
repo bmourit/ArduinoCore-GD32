@@ -17,7 +17,7 @@ compiler.warning_flags.more=-Wall
 compiler.warning_flags.all=-Wall -Wextra
 
 # compile path/command
-compiler.path={runtime.tools.xpack-arm-none-eabi-gcc-12.2.1-1.2.path}/bin/
+compiler.path={runtime.tools.xpack-arm-none-eabi-gcc-13.2.1-1.1.path}/bin/
 compiler.S.cmd=arm-none-eabi-gcc
 compiler.c.cmd=arm-none-eabi-gcc
 compiler.cpp.cmd=arm-none-eabi-g++
@@ -52,7 +52,7 @@ compiler.ar.extra_flags=
 compiler.elf2bin.extra_flags=
 compiler.elf2hex.extra_flags=
 
-# These can be overriden in boards.txt
+# These can be overridden in boards.txt
 build.extra_flags=
 build.enable_usb=
 build.flash_offset=0

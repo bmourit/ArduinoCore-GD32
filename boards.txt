@@ -634,7 +634,7 @@ gd_generic_gd32f30x.menu.pnum.GD32F303CC_GENERIC.build.product_line=GD32F30X_HD
 gd_generic_gd32f30x.menu.pnum.GD32F303CC_GENERIC.build.variant=GD32F303CC_GENERIC
 gd_generic_gd32f30x.menu.pnum.GD32F303CC_GENERIC.upload.openocd_script=target/stm32f1x.cfg
 
-# Generic GD32F303RE
+# Creality GD32F303RE
 gd_generic_gd32f30x.menu.pnum.GD32F303RE_GENERIC=Creality GD32F303RE
 gd_generic_gd32f30x.menu.pnum.GD32F303RE_GENERIC.upload.maximum_size=524288
 gd_generic_gd32f30x.menu.pnum.GD32F303RE_GENERIC.upload.maximum_data_size=65536

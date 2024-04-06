@@ -2,14 +2,12 @@
   "packages": [
     {
       "name": "GD32CommunityCores",
-      "websiteURL": "https://github.com/bmourit/ArduinoCore-GD32.git",
+      "websiteURL": "https://github.com/bmourit/ArduinoCore-GD32",
       "maintainer": "GD32CommunityCores",
       "email": "",
       "help": {
-        "online": "https://github.com/bmourit/ArduinoCore-GD32.git"
+        "online": "https://github.com/bmourit/ArduinoCore-GD32"
       },
-      "maintainer": "Some random folks",
-      "name": "GD32Community",
       "platforms": [
         {
           "name": "GigaDevice GD32 MCU based boards",
@@ -17,14 +15,14 @@
           "category": "Contributed",
           "url": "$url",
           "archiveFilename": "$archiveFilename",
-          "size": "$size",
           "checksum": "$checksum",
+          "size": "$size",
           "boards": [
             {"name": "GD32F303ZE EVAL"},
             {"name": "GD32F307VG MBED"},
             {"name": "GD32F303CC Generic"},
-	    {"name": "GD32F303RE Generic"}
-	    {"name": "CREALITY 422 GD32F303RE"}
+	          {"name": "GD32F303RE Generic"},
+	          {"name": "Creality GD32F303RE"}
           ],
           "toolsDependencies": [
             {
@@ -42,14 +40,15 @@
               "version": "0.10.0-arduino1",
               "name": "dfu-util"
             }
-          ],
+          ]
         }
       ],
       "tools": [
         {
           "name": "xpack-arm-none-eabi-gcc",
           "version": "13.2.1-1.1",
-          "systems": [
+          "systems":
+          [
             {
               "host": "arm-linux-gnueabihf",
               "url": "https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-linux-arm.tar.gz",
@@ -72,13 +71,6 @@
               "size": "306340878"
             },
             {
-              "host": "aarch64-apple-darwin",
-              "url": "https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-darwin-arm64.tar.gz",
-              "archiveFileName": "xpack-arm-none-eabi-gcc-13.2.1-1.1-darwin-arm64.tar.gz",
-              "checksum": "SHA-256:d4ce0de062420daab140161086ba017642365977e148d20f55a8807b1eacd703",
-              "size": "258277148"
-            },
-            {
               "host": "x86_64-apple-darwin",
               "url": "https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-darwin-x64.tar.gz",
               "archiveFileName": "xpack-arm-none-eabi-gcc-13.2.1-1.1-darwin-x64.tar.gz",
@@ -91,13 +83,14 @@
               "archiveFileName": "xpack-arm-none-eabi-gcc-13.2.1-1.1-linux-x64.tar.gz",
               "checksum": "SHA-256:1252a8cafe9237de27a765376697230368eec21db44dc3f1edeb8d838dabd530",
               "size": "268158135"
-            },
+            }
           ]
         },
         {
           "name": "xpack-openocd",
           "version": "0.12.0-2",
-          "systems": [
+          "systems":
+          [
             {
               "host": "arm-linux-gnueabihf",
               "url": "https://github.com/xpack-dev-tools/openocd-xpack/releases/download/v0.12.0-2/xpack-openocd-0.12.0-2-linux-arm.tar.gz",
@@ -120,13 +113,6 @@
               "size": "2990739"
             },
             {
-              "host": "aarch64-apple-darwin",
-              "url": "https://github.com/xpack-dev-tools/openocd-xpack/releases/download/v0.12.0-2/xpack-openocd-0.12.0-2-darwin-arm64.tar.gz",
-              "archiveFileName": "xpack-openocd-0.12.0-2-darwin-arm64.tar.gz",
-              "checksum": "SHA-256:7b35c4a01dc8e74fbf3a217f78bd01d61112a09be2f2e2ba9e8e737b12c84562",
-              "size": "2213119"
-            },
-            {
               "host": "x86_64-apple-darwin",
               "url": "https://github.com/xpack-dev-tools/openocd-xpack/releases/download/v0.12.0-2/xpack-openocd-0.12.0-2-darwin-x64.tar.gz",
               "archiveFileName": "xpack-openocd-0.12.0-2-darwin-x64.tar.gz",
@@ -139,13 +125,14 @@
               "archiveFileName": "xpack-openocd-0.12.0-2-linux-x64.tar.gz",
               "checksum": "SHA-256:1dc8e63694204b73107fe5b23267238af2c6ce14726e4aa244a2123a98805335",
               "size": "2581203"
-            },
+            }
           ]
         },
-	{
+	      {
           "name": "dfu-util",
           "version": "0.10.0-arduino1",
-          "systems": [
+          "systems":
+          [
             {
               "host": "i386-apple-darwin",
               "url": "https://downloads.arduino.cc/tools/dfu-util-0.10.0-arduino1-osx.tar.bz2",
@@ -197,7 +184,7 @@
             }
           ]
         }
-      ],
+      ]
     }
   ]
 }
