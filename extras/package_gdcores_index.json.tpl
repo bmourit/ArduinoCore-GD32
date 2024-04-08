@@ -1,9 +1,9 @@
 {
   "packages": [
     {
-      "name": "GD32CommunityCores",
+      "name": "GDCores",
       "websiteURL": "https://github.com/bmourit/ArduinoCore-GD32",
-      "maintainer": "GD32CommunityCores",
+      "maintainer": "GDCores",
       "email": "",
       "help": {
         "online": "https://github.com/bmourit/ArduinoCore-GD32"
@@ -12,6 +12,7 @@
         {
           "name": "GigaDevice GD32 MCU based boards",
           "architecture": "gd32",
+          "version": "1.0.1",
           "category": "Contributed",
           "url": "$url",
           "archiveFilename": "$archiveFilename",
@@ -26,17 +27,17 @@
           ],
           "toolsDependencies": [
             {
-              "packager": "GD32Community",
+              "packager": "GDCores",
               "name": "xpack-arm-none-eabi-gcc",
               "version": "13.2.1-1.1"
             },
             {
-              "packager": "GD32Community",
+              "packager": "GDCores",
               "name": "xpack-openocd",
               "version": "0.12.0-2"
             },
             {
-              "packager": "GD32Community",
+              "packager": "GDCores",
               "version": "0.10.0-arduino1",
               "name": "dfu-util"
             }

@@ -4,7 +4,7 @@
       "name": "GDCores",
       "websiteURL": "https://github.com/bmourit/ArduinoCore-GD32",
       "maintainer": "GDCores",
-      "email": "bnnmguy@gmail.com",
+      "email": "",
       "help": {
         "online": "https://github.com/bmourit/ArduinoCore-GD32"
       },
@@ -12,12 +12,12 @@
         {
           "name": "GigaDevice GD32 MCU based boards",
           "architecture": "gd32",
-          "category": "Contributed",
           "version": "1.0.1",
+          "category": "Contributed",
           "url": "https://github.com/bmourit/ArduinoCore-GD32/archive/refs/heads/GD32_Marlin_Dev.zip",
           "archiveFilename": "GD32_Marlin_Dev.zip",
-          "checksum": "SHA-256:d0832ab38bb51028c15d32ab0bb7a48ea361a9a2452416c46ba3e13af962e481",
-          "size": "5536609",
+          "checksum": "SHA-256:a6f67a48637339038cbdad6c024e39b90f027a31010e28f9eb27211e9efcb93f",
+          "size": "5542164",
           "boards": [
             {"name": "GD32F303ZE EVAL"},
             {"name": "GD32F307VG MBED"},
@@ -38,8 +38,8 @@
             },
             {
               "packager": "GDCores",
-              "name": "dfu-util",
-              "version": "0.10.0-arduino1"
+              "version": "0.10.0-arduino1",
+              "name": "dfu-util"
             }
           ]
         }
@@ -65,7 +65,7 @@
               "size": "265190134"
             },
             {
-              "host": "x86_64-mingw32",
+              "host": "i686-mingw32",
               "url": "https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-win32-x64.zip",
               "archiveFileName": "xpack-arm-none-eabi-gcc-13.2.1-1.1-win32-x64.zip",
               "checksum": "SHA-256:56b18ccb0a50f536332ec5de57799342ff0cd005ca2c54288c74759b51929e4f",

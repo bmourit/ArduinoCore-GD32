@@ -12,21 +12,22 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
-
-/* this file is adapted from https://github.com/stm32duino/Arduino_Core_STM32/blob/master/libraries/Servo/src/stm32/Servo.cpp
+/*
+ * this file is adapted from https://github.com/stm32duino/Arduino_Core_STM32/blob/master/libraries/Servo/src/stm32/Servo.cpp
  * for GigaDevice devices.
-*/
+ */
 
 #include <Arduino.h>
 #include <Servo.h>
 #include <HardwareTimer.h>
 
-static servo_t servos[MAX_SERVOS];          // static array of servo structures
-// counter for the servo being pulsed for each timer (or -1 if refresh interval)
+/* static array of servo structures */
+static servo_t servos[MAX_SERVOS];
+/* counter for the servo being pulsed for each timer (or -1 if refresh interval) */
 static volatile int8_t timerChannel[_Nbr_16timers] = {-1};
 static HardwareTimer TimerServo(TIMER_SERVO);
-
-uint8_t ServoCount = 0;         // the total number of attached servos
+/* total number of attached servos */
+uint8_t ServoCount = 0;
 
 #define SERVO_MIN() (MIN_PULSE_WIDTH - this->min * 4)   // minimum value in uS for this servo
 #define SERVO_MAX() (MAX_PULSE_WIDTH - this->max * 4)   // maximum value in uS for this servo
@@ -34,7 +35,7 @@ uint8_t ServoCount = 0;         // the total number of attached servos
 #define TIMER_ID(_timer) ((timer_id_e)(_timer))
 #define SERVO_TIMER(_timer_id)  ((timer16_Sequence_t)(_timer_id))
 
-/************ static functions common to all instances ***********************/
+/* static functions common to all instances */
 volatile uint32_t CumulativeCountSinceRefresh = 0;
 
 /* Servo period callback handle */
@@ -50,6 +51,7 @@ static void Servo_PeriodElapsedCallback()
         }
     }
     timerChannel[timer_id]++;
+
     if (timerChannel[timer_id] < ServoCount && timerChannel[timer_id] < SERVOS_PER_TIMER) {
         TimerServo.setReloadValue(servos[timerChannel[timer_id]].ticks);
         CumulativeCountSinceRefresh += servos[timerChannel[timer_id]].ticks;
@@ -70,6 +72,7 @@ static void Servo_PeriodElapsedCallback()
 static void TimerServoInit()
 {
     uint32_t freq = TimerServo.getTimerClkFreq();
+
     TimerServo.setPrescaler(freq / 1000000 - 1);
     TimerServo.setReloadValue(20000);
     TimerServo.attachInterrupt(Servo_PeriodElapsedCallback);
@@ -84,10 +87,11 @@ static bool isTimerActive()
             return true;
         }
     }
+
     return false;
 }
 
-/********************** class servo function *******************************/
+/* class servo function */
 Servo::Servo()
 {
     if (ServoCount < MAX_SERVOS) {
@@ -97,21 +101,22 @@ Servo::Servo()
         this->servoIndex = INVALID_SERVO;
     }
 }
+
 // Servo attach a digital pin
 // uint8_t Servo::attach(int pin)
 // {
 //   return this->attach(pin, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
 // }
 
-// Servo attach a digital pin
+/* Servo attach a digital pin */
 uint8_t Servo::attach(int pin, int min, int max, int value)
 {
     if (this->servoIndex < MAX_SERVOS) {
-        pinMode(pin, OUTPUT);                      // set servo pin to output
+        pinMode(pin, OUTPUT);
         servos[this->servoIndex].Pin.nbr = pin;
         servos[this->servoIndex].ticks = value;
         /* TODO: min/max check abs(min - MIN_PULSE_WIDTH) / 4 < 128 */
-        this->min  = (MIN_PULSE_WIDTH - min) / 4; //resolution of min/max is 4 uS
+        this->min  = (MIN_PULSE_WIDTH - min) / 4;   // resolution of min/max is 4 uS
         this->max  = (MAX_PULSE_WIDTH - max) / 4;
         /* initialize the timer if it has not already been initialized */
         if (isTimerActive() == false) {
@@ -119,6 +124,7 @@ uint8_t Servo::attach(int pin, int min, int max, int value)
         }
         servos[this->servoIndex].Pin.isActive = true;  // this must be set after the check for isTimerActive
     }
+
     return this->servoIndex;
 }
 
@@ -170,11 +176,13 @@ int Servo::read()
 int Servo::readMicroseconds()
 {
     unsigned int pulsewidth;
+
     if (this->servoIndex != INVALID_SERVO) {
         pulsewidth = servos[this->servoIndex].ticks;
     } else {
         pulsewidth  = 0;
     }
+
     return pulsewidth;
 }
 

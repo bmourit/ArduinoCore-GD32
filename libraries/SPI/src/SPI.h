@@ -127,9 +127,8 @@ class SPIClass
         void config(SPISettings settings);
 
         SPISettings spisettings;
-        bool initialized;
-        spi_t _spi;
 
+        spi_t _spi;
 };
 
 extern SPIClass SPI;

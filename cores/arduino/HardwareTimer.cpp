@@ -1,19 +1,19 @@
 /*
-    Copyright (c) 2020, GigaDevice Semiconductor Inc.
+  Copyright (c) 2020, GigaDevice Semiconductor Inc.
 
-    Redistribution and use in source and binary forms, with or without modification,
+  Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
 
-    1. Redistributions of source code must retain the above copyright notice, this
-       list of conditions and the following disclaimer.
-    2. Redistributions in binary form must reproduce the above copyright notice,
-       this list of conditions and the following disclaimer in the documentation
-       and/or other materials provided with the distribution.
-    3. Neither the name of the copyright holder nor the names of its contributors
-       may be used to endorse or promote products derived from this software without
-       specific prior written permission.
+  1. Redistributions of source code must retain the above copyright notice, this
+     list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright notice,
+     this list of conditions and the following disclaimer in the documentation
+     and/or other materials provided with the distribution.
+  3. Neither the name of the copyright holder nor the names of its contributors
+     may be used to endorse or promote products derived from this software without
+     specific prior written permission.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -33,239 +33,340 @@ OF SUCH DAMAGE.
 HardwareTimer *hardwaretimerObj[TIMERNUMS] = {NULL};
 
 /*!
-    \brief      HardwareTimer object construct
-    \param[in]  instance: TIMERx(x=0..13)
-    \param[out] none
-    \retval     none
+  \brief      HardwareTimer object construct
+  \param[in]  instance: TIMERx(x=0..13)
+  \param[out] none
+  \retval     none
 */
 HardwareTimer::HardwareTimer(uint32_t instance)
 {
-    uint32_t index = getTimerIndex(instance);
-    hardwaretimerObj[index] = this;
-    this->timerDevice = instance;
-    this->updateCallback = NULL;
-    this->isTimerActive = false;
-    this->timerPeriod.time = 1;
-    this->timerPeriod.format = FORMAT_MS;
-    timerHandle.init(timerDevice, &timerPeriod);
+  uint32_t index = getTimerIndex(instance);
+  hardwaretimerObj[index] = this;
+  this->timerDevice = instance;
+  this->updateCallback = NULL;
+  this->isTimerActive = false;
+  this->timerPeriod.time = 1;
+  this->timerPeriod.format = FORMAT_MS;
+  timerHandle.init(timerDevice, &timerPeriod);
 }
 
 /*!
-    \brief      start timer
-    \param[in]  none
-    \param[out] none
-    \retval     none
+  \brief      start timer
+  \param[in]  none
+  \param[out] none
+  \retval     none
 */
 void HardwareTimer::start(void)
 {
-    timerHandle.start(timerDevice);
-    this->isTimerActive = true;
+  timerHandle.start(timerDevice);
+  this->isTimerActive = true;
 }
 
 /*!
-    \brief      stop timer
-    \param[in]  none
-    \param[out] none
-    \retval     none
+  \brief      stop timer
+  \param[in]  none
+  \param[out] none
+  \retval     none
 */
 void HardwareTimer::stop(void)
 {
-    timerHandle.stop(timerDevice);
-    this->isTimerActive = false;
+  timerHandle.stop(timerDevice);
+  this->isTimerActive = false;
 }
 
 /*!
-    \brief      set prescaler
-    \param[in]  prescaler: prescaler value
-    \param[out] none
-    \retval     none
+  \brief      set prescaler
+  \param[in]  prescaler: prescaler value
+  \param[out] none
+  \retval     none
 */
 void HardwareTimer::setPrescaler(uint16_t prescaler)
 {
-    timer_prescaler_config(timerDevice, prescaler - 1, TIMER_PSC_RELOAD_NOW);
+  timer_prescaler_config(timerDevice, prescaler - 1, TIMER_PSC_RELOAD_NOW);
 }
 
 /*!
-    \brief      set counter
-    \param[in]  count: counter value
-    \param[out] none
-    \retval     none
+  \brief      set counter
+  \param[in]  count: counter value
+  \param[out] none
+  \retval     none
 */
 void HardwareTimer::setCounter(uint16_t count)
 {
-    timer_counter_value_config(timerDevice, count - 1);
-}
-
-uint32_t HardwareTimer::getCounter(void)
-{
-    return timer_counter_read(timerDevice);
+  timer_counter_value_config(timerDevice, count - 1);
 }
 
 /*!
-    \brief      set repetition value
-    \param[in]  repetition: repetition value
-    \param[out] none
-    \retval     none
+  \brief      retrieve timer counter value
+  \param[in]  none
+  \param[out] none
+  \retval     returns counter value
+*/
+uint32_t HardwareTimer::getCounter(void)
+{
+  return timer_counter_read(timerDevice);
+}
+
+/*!
+  \brief      set repetition value
+  \param[in]  repetition: repetition value
+  \param[out] none
+  \retval     none
 */
 void HardwareTimer::setRepetitionValue(uint16_t repetition)
 {
-    timer_repetition_value_config(timerDevice, repetition - 1);
+  timer_repetition_value_config(timerDevice, repetition - 1);
 }
 
 /*!
-    \brief      set timer period
-    \param[in]  time: period time
-    \param[in]  format: time format
-    \param[out] none
-    \retval     none
+  \brief      set timer period
+  \param[in]  time: period time
+  \param[in]  format: time format
+  \param[out] none
+  \retval     none
 */
 void HardwareTimer::setPeriodTime(uint32_t time, enum timeFormat format)
 {
-    this->timerPeriod.time = time;
-    this->timerPeriod.format = format;
-    timerHandle.setPeriodTime(timerDevice, &timerPeriod);
+  this->timerPeriod.time = time;
+  this->timerPeriod.format = format;
+  timerHandle.setPeriodTime(timerDevice, &timerPeriod);
 }
 
 /*!
-    \brief      set timer period with the inital format
-    \param[in]  value: period time
-    \param[out] none
-    \retval     none
+  \brief      set timer period with the inital format
+  \param[in]  value: period time
+  \param[out] none
+  \retval     none
 */
 void HardwareTimer::setReloadValue(uint32_t value)
 {
-    timer_autoreload_value_config(timerDevice, value - 1);
+  timer_autoreload_value_config(timerDevice, value - 1);
 }
 
 /*!
-    \brief      update some registers to restart counters
-    \param[in]  none
-    \param[out] none
-    \retval     none
+  \brief      update some registers to restart counters
+  \param[in]  none
+  \param[out] none
+  \retval     none
 */
 void HardwareTimer::refresh(void)
 {
-    timerHandle.refresh(timerDevice);
-}
-
-void HardwareTimer::setInterruptPriority(uint32_t preemptPriority, uint32_t subPriority)
-{
-    timerHandle.setIntPriority(timerDevice, preemptPriority, subPriority);
+  timerHandle.refresh(timerDevice);
 }
 
 /*!
-    \brief      attach callback for period interrupt
-    \param[in]  callback: callback function
-    \param[out] none
-    \retval     none
+  \brief      Set the priority of the interrupt
+  \note       Must be call before start()
+  \param[in]  preemptPriority: the pre-emption priority for the IRQn channel
+  \param[in]  subPriority: the subpriority level for the IRQ channel.
+  \param[out] none
+  \retval     none
+*/
+void HardwareTimer::setInterruptPriority(uint32_t preemptPriority, uint32_t subPriority)
+{
+  timerHandle.setIntPriority(timerDevice, preemptPriority, subPriority);
+}
+
+/*!
+  \brief      attach callback for period interrupt
+  \param[in]  callback: callback function
+  \param[in]  channel: timer channel
+  \param[out] none
+  \retval     none
 */
 void HardwareTimer::attachInterrupt(timerCallback_t callback, uint8_t channel)
 {
-    if (channel < 4) {
-        this->captureCallbacks[channel] = callback;
-        timerHandle.enableCaptureIT(timerDevice, channel);
-    } else if (0xFF == channel) {
-        this->updateCallback = callback;
-        timerHandle.enableUpdateIT(timerDevice);
-    }
+  if (channel < TIMER_NUM_CHANNELS + 1) {
+    this->captureCallbacks[channel] = callback;
+    timerHandle.enableCaptureIT(timerDevice, channel);
+  } else if (0xFF == channel) {
+    this->updateCallback = callback;
+    timerHandle.enableUpdateIT(timerDevice);
+  }
 }
 
 /*!
-    \brief      detach callback for period interrupt
-    \param[in]  none
-    \param[out] none
-    \retval     none
+  \brief      detach callback for period interrupt
+  \param[in]  channel: timer channel
+  \param[out] none
+  \retval     none
 */
 void HardwareTimer::detachInterrupt(uint8_t channel)
 {
-    if (channel < 4) {
-        this->captureCallbacks[channel] = NULL;
-        timerHandle.disableCaptureIT(timerDevice, channel);
-    } else if (0xFF == channel) {
-        this->updateCallback = NULL;
-        timerHandle.disableUpdateIT(timerDevice);
-    }
+  if (channel < TIMER_NUM_CHANNELS + 1) {
+    this->captureCallbacks[channel] = NULL;
+    timerHandle.disableCaptureIT(timerDevice, channel);
+  } else if (0xFF == channel) {
+    this->updateCallback = NULL;
+    timerHandle.disableUpdateIT(timerDevice);
+  }
 }
 
+/*!
+  \brief      checks if there's an interrupt callback attached on update (rollover) event
+  \param[in]  none
+  \param[out] none
+  \retval     returns true if a timer update (rollover) interrupt has already been set
+*/
+bool HardwareTimer::hasInterrupt()
+{
+  return updateCallback != NULL;
+}
+
+/*!
+  \brief      checks if there's an interrupt callback attached on Capture/Compare event
+  \param[in]  channel
+  \param[out] none
+  \retval     returns true if a channel compare match interrupt has already been set
+*/
+bool HardwareTimer::hasInterrupt(uint8_t channel)
+{
+  return captureCallbacks[channel] != NULL;
+}
+
+/*!
+  \brief      set channel mode
+  \param[in]  pin: pin number
+  \param[in]  channel: timer channel
+  \param[in]  mode: mode configuration for the channel (see captureMode)
+  \param[out] none
+  \retval     none
+*/
 void HardwareTimer::setCaptureMode(uint32_t ulpin, uint8_t channel, captureMode mode)
 {
-    timer_ic_parameter_struct timer_icinitpara;
+  timer_ic_parameter_struct timer_icinitpara;
 
-    PinName pinname = DIGITAL_TO_PINNAME(ulpin);
-    uint32_t function = pinmap_find_function(pinname, PinMap_PWM);
-    uint32_t remap  = GD_PIN_REMAP_GET(function);
-    uint32_t port = gpio_port[GD_PORT_GET(pinname)];
-    uint32_t pin = gpio_pin[GD_PIN_GET(pinname)];
-    gpio_clock_enable(GD_PORT_GET(pinname));
+  PinName pinname = DIGITAL_TO_PINNAME(ulpin);
+  uint32_t function = pinmap_find_function(pinname, PinMap_PWM);
+  uint32_t remap  = GD_PIN_REMAP_GET(function);
+  uint32_t port = gpio_port[GD_PORT_GET(pinname)];
+  uint32_t pin = gpio_pin[GD_PIN_GET(pinname)];
+  gpio_clock_enable(GD_PORT_GET(pinname));
 #if defined(GD32F30x)
-    rcu_periph_clock_enable(RCU_AF);
-    gpio_init(port, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, pin);
-    if (0 != remap) {
-        gpio_pin_remap_config(GD_GPIO_REMAP[remap], ENABLE);
-    }
+  rcu_periph_clock_enable(RCU_AF);
+  gpio_init(port, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, pin);
+  if (0 != remap) {
+    gpio_pin_remap_config(GD_GPIO_REMAP[remap], ENABLE);
+  }
 #elif defined(GD32F3x0) || defined(GD32F1x0)
-    /* !!TODO!! */
+  /* !!TODO!! */
 #endif
 
-    switch (mode) {
-        case RISING_EDGE:
-            timer_icinitpara.icpolarity = TIMER_IC_POLARITY_RISING;
-            break;
-        case FALLING_EDGE:
-            timer_icinitpara.icpolarity = TIMER_IC_POLARITY_FALLING;
-            break;
-        case BOTH_EDGE:
-            timer_icinitpara.icpolarity = TIMER_IC_POLARITY_BOTH_EDGE;
-            break;
-        default:
-            timer_icinitpara.icpolarity = TIMER_IC_POLARITY_RISING;
-            break;
-    }
-    timer_icinitpara.icselection = TIMER_IC_SELECTION_DIRECTTI;
-    timer_icinitpara.icprescaler = TIMER_IC_PSC_DIV1;
-    timer_icinitpara.icfilter    = 0x0;
-    timer_input_capture_config(timerDevice, channel, &timer_icinitpara);
-    timer_auto_reload_shadow_enable(timerDevice);
+  switch (mode) {
+    case RISING_EDGE:
+      timer_icinitpara.icpolarity = TIMER_IC_POLARITY_RISING;
+      break;
+    case FALLING_EDGE:
+      timer_icinitpara.icpolarity = TIMER_IC_POLARITY_FALLING;
+      break;
+    case BOTH_EDGE:
+      timer_icinitpara.icpolarity = TIMER_IC_POLARITY_BOTH_EDGE;
+      break;
+    default:
+      timer_icinitpara.icpolarity = TIMER_IC_POLARITY_RISING;
+      break;
+  }
+  timer_icinitpara.icselection = TIMER_IC_SELECTION_DIRECTTI;
+  timer_icinitpara.icprescaler = TIMER_IC_PSC_DIV1;
+  timer_icinitpara.icfilter = 0x0;
+  timer_input_capture_config(timerDevice, channel, &timer_icinitpara);
+
+  /* save the selected channel mode to object attribute */
+  _ChannelMode[channel - 1] = mode;
 }
 
+/*!
+  \brief      retrieves the configured channel mode
+  \param[in]  channel
+  \param[out] none
+  \retval     returns configured mode
+*/
+captureMode HardwareTimer::getCaptureMode(uint8_t channel)
+{
+  if ((0 <= channel) && (channel <= TIMER_NUM_CHANNELS)) {
+    return _ChannelMode[channel - 1];
+  } else {
+  return DISABLED;
+  }
+}
+
+/*!
+  /brief      enable or disable preloading (auto reload shadow enable)
+              for overflow value
+              when disabled, changes to the overflow value take effect
+              immediately. When enabled (the default), the value takes
+              effect only at the next update event (typically the next
+              overflow).
+  \param[in]  value: true to enable preloading (ARSE bit), false to disable
+  \param[out] none
+  \retval     none
+*/
+void setPreloadARSEnable(bool val)
+{
+  if (val) {
+    timer_auto_reload_shadow_enable(timerDevice);
+  } else {
+    timer_auto_reload_shadow_disable(timerDevice);
+  }
+}
+
+/*!
+  \brief      retrieve the capture/compare value
+  \param[in]  channel: timer channel
+  \param[out] none
+  \retval     returns the capture/compare value
+*/
 uint32_t HardwareTimer::getCaptureValue(uint8_t channel)
 {
-    return timer_channel_capture_value_register_read(timerDevice, channel);
+  return timer_channel_capture_value_register_read(timerDevice, channel);
 }
+
 /*!
-    \brief      get timer clock frequency
-    \param[in]  none
-    \param[out] none
-    \retval     none
+  \brief      get timer clock frequency
+  \param[in]  none
+  \param[out] none
+  \retval     returns the timer clock frequency
 */
 uint32_t HardwareTimer::getTimerClkFreq(void)
 {
-    return getTimerClkFrequency(timerDevice);
+  return getTimerClkFrequency(timerDevice);
 }
 
 /*!
-    \brief      period callback handler
-    \param[in]  none
-    \param[out] none
-    \retval     none
+  \brief      period callback handler
+  \param[in]  none
+  \param[out] none
+  \retval     none
 */
 void HardwareTimer::periodCallback(void)
 {
-    if (NULL != this->updateCallback) {
-        this->updateCallback();
-    }
+  if (NULL != this->updateCallback) {
+    this->updateCallback();
+  }
 }
 
+/*!
+  \brief      capture/compare callback handler
+  \param[in]  channel: timer channel
+  \param[out] none
+  \retval     none
+*/
 void HardwareTimer::captureCallback(uint8_t channel)
 {
-    if (NULL != this->captureCallbacks[channel]) {
-        this->captureCallbacks[channel]();
-    }
+  if (NULL != this->captureCallbacks[channel]) {
+  this->captureCallbacks[channel]();
+  }
 }
 
+/*!
+  \brief      get timer index from timer instance
+  \param[in]  instance: timer instancew
+  \param[out] none
+  \retval     returns the timer index
+*/
 timer_index_t get_timer_index(uint32_t instance)
 {
-    timer_index_t index = UNKNOWN_TIMER;
+  timer_index_t index = UNKNOWN_TIMER;
 #if defined(TIMER0)
   if (instance == TIMER0) {
     index = TIMER0_INDEX;
@@ -342,32 +443,31 @@ timer_index_t get_timer_index(uint32_t instance)
 
 extern "C"
 {
-    /*!
-        \brief      timer update interrupt handler
-        \param[in]  timer: TIMERx(x=0..13)
-        \param[out] none
-        \retval     none
-    */
-    void Timer_updateHandle(uint32_t timer)
-    {
-        uint32_t index = getTimerIndex(timer);
-        if (hardwaretimerObj[index]) {
-            hardwaretimerObj[index]->periodCallback();
-        }
+  /*!
+    \brief      timer update interrupt handler
+    \param[in]  timer: TIMERx(x=0..13)
+    \param[out] none
+    \retval     none
+  */
+  void Timer_updateHandle(uint32_t timer)
+  {
+    uint32_t index = getTimerIndex(timer);
+    if (hardwaretimerObj[index]) {
+      hardwaretimerObj[index]->periodCallback();
     }
-    /*!
-        \brief      timer capture interrupt handler
-        \param[in]  timer: TIMERx(x=0..13)
-        \param[in]  channel: TIMERx(x=0..3)
-        \param[out] none
-        \retval     none
-    */
-    void Timer_captureHandle(uint32_t timer, uint8_t channel)
-    {
-        uint32_t index =  getTimerIndex(timer);
-        if (hardwaretimerObj[index]) {
-            hardwaretimerObj[index]->captureCallback(channel);
-        }
+  }
+  /*!
+    \brief      timer capture interrupt handler
+    \param[in]  timer: TIMERx(x=0..13)
+    \param[in]  channel: TIMERx(x=0..3)
+    \param[out] none
+    \retval     none
+  */
+  void Timer_captureHandle(uint32_t timer, uint8_t channel)
+  {
+    uint32_t index =  getTimerIndex(timer);
+    if (hardwaretimerObj[index]) {
+      hardwaretimerObj[index]->captureCallback(channel);
     }
+  }
 }
-

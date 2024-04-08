@@ -35,7 +35,7 @@ SPIClass::SPIClass(void)
     _spi.pin_sclk = DIGITAL_TO_PINNAME(SCK);
     _spi.pin_ssel = NC;
 
-    initialized = false;
+    _spi.initialized = false;
 }
 
 SPIClass::SPIClass(PinName mosi, PinName miso, PinName sclk, PinName ssel)
@@ -45,7 +45,7 @@ SPIClass::SPIClass(PinName mosi, PinName miso, PinName sclk, PinName ssel)
     _spi.pin_sclk = sclk;
     _spi.pin_ssel = ssel;
 
-    initialized = false;
+    _spi.initialized = false;
 }
 
 SPIClass::SPIClass(PinName mosi, PinName miso, PinName sclk)
@@ -55,43 +55,45 @@ SPIClass::SPIClass(PinName mosi, PinName miso, PinName sclk)
     _spi.pin_sclk = sclk;
     _spi.pin_ssel = NC;
 
-    initialized = false;
+    _spi.initialized = false;
 }
 
 void SPIClass::begin()
 {
     uint32_t test = 0;
-    if (initialized) {
+    if (_spi.initialized) {
         return;
     }
 
     spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
 
-    initialized = true;
+    _spi.initialized = true;
 }
 
 void SPIClass::end()
 {
-    if (initialized) {
+    if (_spi.initialized) {
         spi_free(&_spi);
-        initialized = false;
+        _spi.initialized = false;
     }
 }
 
 void SPIClass::beginTransaction(SPISettings settings)
 {
-    config(settings);
+    if (spiSettings != settings) {
+         config(settings);
+    }
 
     spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
 
-    initialized = true;
+    _spi.initialized = true;
 }
 
 void SPIClass::endTransaction(void)
 {
-    if (initialized) {
+    if (_spi.initialized) {
         spi_free(&_spi);
-        initialized = false;
+        _spi.initialized = false;
     }
 }
 

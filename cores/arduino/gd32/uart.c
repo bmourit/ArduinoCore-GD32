@@ -112,8 +112,9 @@ void serial_enable(struct serial_s *obj_s) {
     usart_transmit_config(obj_s->uart, USART_TRANSMIT_ENABLE);
 }
 
-/** Initialize the serial peripheral. It sets the default parameters for serial
- *  peripheral, and configures its specifieds pins.
+/**
+ * Initialize the serial peripheral. It sets the default parameters for serial
+ * peripheral, and configures its specifieds pins.
  *
  * @param obj The serial object
  * @param tx  The TX pin name
@@ -128,49 +129,37 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
 
     p_obj->uart = (UARTName)pinmap_merge(uart_tx, uart_rx);
 
-    /* enable UART peripheral clock */
-    /*
-    /* TODO: This code makes no sense. It checks p_obj->index to set p_obj->index to its exact same value as before
-    /* however, since p_obj->index was already previously set, this is no problem.
-    /* This could be simplified as the following:
-    /* rcu_periph_clock_enable(usart_clk[p_obj->index])
-    /* and get rid of the switch case
-     */
-//    switch (p_obj->index) {
-//#if defined(USART0)
-//        case UART0_INDEX:
-//            p_obj->index = UART0_INDEX;
-//            rcu_periph_clock_enable(usart_clk[p_obj->index]);
-//            break;
-//#endif
-//#if defined(USART1)
-//        case UART1_INDEX:
-//            p_obj->index = UART1_INDEX;
-//            rcu_periph_clock_enable(usart_clk[p_obj->index]);
-//            break;
-//#endif
-//#if defined(USART2)
-//        case UART2_INDEX:
-//            p_obj->index = UART2_INDEX;
-//            rcu_periph_clock_enable(usart_clk[p_obj->index]);
-//            break;
-//#endif
-//#if defined(UART3)
-//        case UART3_INDEX:
-//            p_obj->index = UART3_INDEX;
-//            rcu_periph_clock_enable(usart_clk[p_obj->index]);
-//            break;
-//#endif
-//#if defined(UART4)
-//        case UART4_INDEX:
-//            p_obj->index = UART4_INDEX;
-//            rcu_periph_clock_enable(usart_clk[p_obj->index]);
-//            break;
-//#endif
-//    }
+    /* set uart index */
+    switch (p_obj->uart) {
+#if defined(USART0)
+        case UART0:
+            p_obj->index = UART0_INDEX;
+            break;
+#endif
+#if defined(USART1)
+        case UART1:
+            p_obj->index = UART1_INDEX;
+            break;
+#endif
+#if defined(USART2)
+        case UART2:
+            p_obj->index = UART2_INDEX;
+            break;
+#endif
+#if defined(UART3)
+        case UART3:
+            p_obj->index = UART3_INDEX;
+            break;
+#endif
+#if defined(UART4)
+        case UART4:
+            p_obj->index = UART4_INDEX;
+            break;
+#endif
+    }
 
-    rcu_periph_enum rcu_periph = usart_clk[p_obj->index];
-    rcu_periph_clock_enable(rcu_periph);
+    /* enable UART peripheral clock */
+    rcu_periph_clock_enable(usart_clk[p_obj->index]);
 
     /* configure the pins */
     pinmap_pinout(tx, PinMap_UART_TX);
@@ -275,6 +264,7 @@ void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_b
             usart_parity_config(p_obj->uart, USART_PM_EVEN);
             break;
 
+        case ParityNone:
         case ParityForced0:
         case ParityForced1:
         default:
@@ -628,7 +618,8 @@ int serial_transmit(serial_t *obj, const void *tx, size_t tx_length)
     return tx_length;
 }
 
-/** Begin asynchronous RX transfer (enable interrupt for data collecting).
+/**
+ * Begin asynchronous RX transfer (enable interrupt for data collecting).
  *
  * @param obj        The serial object
  * @param rx         The receive buffer

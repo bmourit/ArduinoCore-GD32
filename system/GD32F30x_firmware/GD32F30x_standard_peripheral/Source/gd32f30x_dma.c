@@ -130,7 +130,7 @@ void dma_init(uint32_t dma_periph, dma_channel_enum channelx, dma_parameter_stru
     /* configure the number of remaining data to be transferred */
     DMA_CHCNT(dma_periph, channelx) = (init_struct->number & DMA_CHANNEL_CNT_MASK);
 
-    /* configure peripheral transfer width,memory transfer width and priority */
+    /* configure peripheral transfer width, memory transfer width and priority */
     ctl = DMA_CHCTL(dma_periph, channelx);
     ctl &= ~(DMA_CHXCTL_PWIDTH | DMA_CHXCTL_MWIDTH | DMA_CHXCTL_PRIO);
     ctl |= (init_struct->periph_width | init_struct->memory_width | init_struct->priority);

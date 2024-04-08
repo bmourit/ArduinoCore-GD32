@@ -92,7 +92,7 @@ extern "C" {
 #define TIMER_CTL0_SPM                   BIT(3)              /*!< single pulse mode */
 #define TIMER_CTL0_DIR                   BIT(4)              /*!< timer counter direction */
 #define TIMER_CTL0_CAM                   BITS(5,6)           /*!< center-aligned mode selection */
-#define TIMER_CTL0_ARSE                  BIT(7)              /*!< auto-reload shadow enable */
+#define TIMER_CTL0_ARSE                  BIT(7)              /*!< auto-reload shadow enable (preload) */
 #define TIMER_CTL0_CKDIV                 BITS(8,9)           /*!< clock division */
 
 /* TIMER_CTL1 */

@@ -62,6 +62,7 @@ struct spi_s {
     PinName pin_mosi;
     PinName pin_sclk;
     PinName pin_ssel;
+    bool initialized;
 };
 
 typedef struct spi_s spi_t;

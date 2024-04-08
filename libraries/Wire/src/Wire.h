@@ -40,26 +40,7 @@ typedef struct {
 
 class TwoWire : public Stream
 {
-    private:
-        uint8_t txAddress = 0;
-
-
-        uint8_t transmitting;
-
-        uint8_t ownAddress;
-        i2c_t _i2c;
-
-        static void onRequestService(void* pWireObj);
-        static void onReceiveService(void* pWireObj, uint8_t *, int);
-
-    protected:
-        ring_buffer _rx_buffer = {{0}, 0, 0};;
-        ring_buffer _tx_buffer = {{0}, 0, 0};;
-        void (*user_onRequest)(void);
-        void (*user_onReceive)(int);
-
     public:
-
         TwoWire(uint8_t sda, uint8_t scl, int i2c_index);
 
         void begin();
@@ -71,17 +52,21 @@ class TwoWire : public Stream
         void beginTransmission(int);
         uint8_t endTransmission(void);
         uint8_t endTransmission(uint8_t);
+
         uint8_t requestFrom(uint8_t, uint8_t);
         uint8_t requestFrom(uint8_t, uint8_t, uint8_t);
         uint8_t requestFrom(uint8_t, uint8_t, uint32_t, uint8_t, uint8_t);
         uint8_t requestFrom(int, int);
         uint8_t requestFrom(int, int, int);
+
         virtual size_t write(uint8_t);
         virtual size_t write(const uint8_t *, size_t);
+
         virtual int available(void);
         virtual int read(void);
         virtual int peek(void);
         virtual void flush(void);
+
         void onReceive(void (*)(int));
         void onRequest(void (*)(void));
 
@@ -102,6 +87,21 @@ class TwoWire : public Stream
             return write((uint8_t)n);
         }
         using Print::write;
+
+    private:
+        uint8_t txAddress = 0;
+        uint8_t transmitting;
+        uint8_t ownAddress;
+        i2c_t _i2c;
+
+        static void onRequestService(void* pWireObj);
+        static void onReceiveService(void* pWireObj, uint8_t *, int);
+
+    protected:
+        ring_buffer _rx_buffer = {{0}, 0, 0};;
+        ring_buffer _tx_buffer = {{0}, 0, 0};;
+        void (*user_onRequest)(void);
+        void (*user_onReceive)(int);
 };
 
 #if defined(HAVE_I2C)

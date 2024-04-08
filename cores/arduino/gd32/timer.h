@@ -173,7 +173,8 @@ typedef void(*callBack_t)(uint32_t instance, uint8_t channel);
 enum captureMode {
 	RISING_EDGE,
 	FALLING_EDGE,
-	BOTH_EDGE
+	BOTH_EDGE,
+	DISABLED
 };
 
 enum timeFormat {

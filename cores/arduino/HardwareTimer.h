@@ -38,6 +38,8 @@ OF SUCH DAMAGE.
 #define TIMER_IC_POLARITY_BOTH_EDGE         ((uint16_t)0x000AU)                     /*!< input capture both edge(not for timer1..6) */
 #endif
 
+#define TIMER_NUM_CHANNELS  4
+
 typedef void(*timerCallback_t)(void);
 
 class HardwareTimer
@@ -57,19 +59,23 @@ class HardwareTimer
         uint32_t getReloadValue(void);                                            //get reload value (overflow)
         void attachInterrupt(timerCallback_t callback, uint8_t channel = 0xff);   //attach callback for period/capture interrupt
         void detachInterrupt(uint8_t channel = 0xff);                             //detach callback for period/capture interrupt
-        bool hasInterrupt();                                                      //returns true if a timer rollover interrupt has already been set
+        bool hasInterrupt(uint8_t channel);                                       //returns true if a timer rollover interrupt has already been set
         void periodCallback(void);                                                //period callback handler
         void captureCallback(uint8_t channel);                                    //capture callback handler
-        void setCaptureMode(uint32_t ulpin, uint8_t channel, captureMode mode);   //set timer capture mode
+        void setCaptureMode(uint32_t ulpin, uint8_t channel, captureMode mode);   //set mode
+        captureMode getCaptureMode(uint8_t channel);                              //get mode
+        void setPreloadARSEnable(bool val);                                       //set preload enable (ARSE) 
         uint32_t getCaptureValue(uint8_t channel);                                //get timer channel capture value
         uint32_t getTimerClkFreq(void);                                           //get timer clock frequency
-        void setInterruptPriority(uint32_t preemptPriority, uint32_t subPriority);
+        void setInterruptPriority(uint32_t prePriority, uint32_t subPriority);    //set timer priority
+
     private:
         uint32_t timerDevice;
         bool isTimerActive;
         timerPeriod_t timerPeriod;
         timerCallback_t updateCallback;
-        timerCallback_t captureCallbacks[4] = {0};
+        timerCallback_t captureCallbacks[1 + TIMER_NUM_CHANNELS] = {0};
+        captureMode _ChannelMode[TIMER_NUM_CHANNELS];
 };
 
 extern timerhandle_t timerHandle;

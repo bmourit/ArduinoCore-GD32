@@ -64,6 +64,7 @@ class Servo
         int read();
         int readMicroseconds();
         bool attached();
+
     private:
         uint8_t servoIndex;
         int8_t min;

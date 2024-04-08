@@ -1,20 +1,21 @@
 /* Entry Point */
 ENTRY(Reset_Handler)
 
+/* Highest address of the user mode stack */
+_sp = ORIGIN(RAM) + LENGTH(RAM);  /* end of "RAM" Ram type memory */
+
 _Min_Heap_Size = 0x200;      /* required amount of heap  */
 _Min_Stack_Size = 0x400;     /* required amount of stack */
 
 /* memory map */
 MEMORY
 {
-  FLASH (rx)      : ORIGIN = 0x08000000 + (DEFINED(LD_FLASH_OFFSET) ? LD_FLASH_OFFSET : 0), LENGTH = 512K - (DEFINED(LD_FLASH_OFFSET) ? LD_FLASH_OFFSET : 0)
+  FLASH (rx)      : ORIGIN = 0x8000000 + (DEFINED(LD_FLASH_OFFSET) ? LD_FLASH_OFFSET : 0), LENGTH = 512K - (DEFINED(LD_FLASH_OFFSET) ? LD_FLASH_OFFSET : 0)
   RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 64K
 }
 
 SECTIONS
 {
-  __stack_size = DEFINED(__stack_size) ? __stack_size : _Min_Heap_Size + _Min_Stack_Size;
-
   /* ISR vectors */
   /* The startup code into "FLASH" Rom type memory */
   .vectors :
@@ -64,8 +65,6 @@ SECTIONS
     __exidx_end = .;
     . = ALIGN(4);
   } >FLASH
-
-  .ARM.attributes : { *(.ARM.attributes) } > FLASH
 
   .preinit_array :
   {
@@ -126,16 +125,23 @@ SECTIONS
   } >RAM
 
   /* User_heap_stack section, used to check that there is enough "RAM" Ram  type memory left */
- . = ALIGN(8);
-  PROVIDE ( end = _ebss );
-  PROVIDE ( _end = _ebss );
-  .stack ORIGIN(RAM) + LENGTH(RAM) - __stack_size :
+  ._user_heap_stack :
   {
-    PROVIDE( _heap_end = . );
-    . = __stack_size;
-    PROVIDE( _sp = . );
-  } >RAM AT>RAM
-}
+    . = ALIGN(8);
+    PROVIDE ( end = . );
+    PROVIDE ( _end = . );
+    . = . + _Min_Heap_Size;
+    . = . + _Min_Stack_Size;
+    . = ALIGN(8);
+  } >RAM
 
-  /* input sections */
-  GROUP(libgcc.a libc.a libm.a libnosys.a)
+  /* Remove information from the compiler libraries */
+  /DISCARD/ :
+  {
+    libc.a ( * )
+    libm.a ( * )
+    libgcc.a ( * )
+  }
+
+  .ARM.attributes 0 : { *(.ARM.attributes) }
+}
