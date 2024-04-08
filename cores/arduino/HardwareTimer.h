@@ -60,6 +60,7 @@ class HardwareTimer
         void attachInterrupt(timerCallback_t callback, uint8_t channel = 0xff);   //attach callback for period/capture interrupt
         void detachInterrupt(uint8_t channel = 0xff);                             //detach callback for period/capture interrupt
         bool hasInterrupt(uint8_t channel);                                       //returns true if a timer rollover interrupt has already been set
+        bool hasInterrupt(void);                                                  //returns true if a timer rollover interrupt has already been set
         void periodCallback(void);                                                //period callback handler
         void captureCallback(uint8_t channel);                                    //capture callback handler
         void setCaptureMode(uint32_t ulpin, uint8_t channel, captureMode mode);   //set mode

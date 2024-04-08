@@ -77,7 +77,7 @@ void dma_deinit(uint32_t dma_periph, dma_channel_enum channelx)
 */
 void dma_struct_para_init(dma_parameter_struct *init_struct)
 {
-    if(NULL == init_struct){
+    if (NULL == init_struct) {
         DMA_WRONG_HANDLE
     }
 
@@ -117,7 +117,7 @@ void dma_init(uint32_t dma_periph, dma_channel_enum channelx, dma_parameter_stru
 {
     uint32_t ctl;
 
-    if(ERROR == dma_periph_and_channel_check(dma_periph, channelx)){
+    if (ERROR == dma_periph_and_channel_check(dma_periph, channelx)){
         DMA_WRONG_HANDLE
     }
 

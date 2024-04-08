@@ -154,10 +154,10 @@ extern "C" {
 
 // Timer Definitions
 #ifndef TIMER_TONE
-  #define TIMER_TONE          TIMER3  // TIMER_TONE must be defined in this file
+  #define TIMER_TONE          TIMER2  // TIMER_TONE must be defined in this file
 #endif
 #ifndef TIMER_SERVO
-  #define TIMER_SERVO         TIMER2  // TIMER_SERVO must be defined in this file
+  #define TIMER_SERVO         TIMER1  // TIMER_SERVO must be defined in this file
 #endif
 
 // UART Definitions
