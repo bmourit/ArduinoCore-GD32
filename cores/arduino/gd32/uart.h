@@ -1,19 +1,19 @@
 /*
-    Copyright (c) 2020, GigaDevice Semiconductor Inc.
+	Copyright (c) 2020, GigaDevice Semiconductor Inc.
 
-    Redistribution and use in source and binary forms, with or without modification,
+	Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
 
-    1. Redistributions of source code must retain the above copyright notice, this
-       list of conditions and the following disclaimer.
-    2. Redistributions in binary form must reproduce the above copyright notice,
-       this list of conditions and the following disclaimer in the documentation
-       and/or other materials provided with the distribution.
-    3. Neither the name of the copyright holder nor the names of its contributors
-       may be used to endorse or promote products derived from this software without
-       specific prior written permission.
+	1. Redistributions of source code must retain the above copyright notice, this
+	   list of conditions and the following disclaimer.
+	2. Redistributions in binary form must reproduce the above copyright notice,
+	   this list of conditions and the following disclaimer in the documentation
+	   and/or other materials provided with the distribution.
+	3. Neither the name of the copyright holder nor the names of its contributors
+	   may be used to endorse or promote products derived from this software without
+	   specific prior written permission.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -24,7 +24,7 @@ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWIS
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 
-    Based on mbed-os/hal/include/hal/serial_api.h
+	Based on mbed-os/hal/include/hal/serial_api.h
 */
 
 #ifndef UART_H
@@ -70,8 +70,8 @@ extern "C" {
 #define SERIAL_EVENT_RX_OVERFLOW        (1 << (SERIAL_EVENT_RX_SHIFT + 4))
 #define SERIAL_EVENT_RX_CHARACTER_MATCH (1 << (SERIAL_EVENT_RX_SHIFT + 5))
 #define SERIAL_EVENT_RX_ALL             (SERIAL_EVENT_RX_OVERFLOW | SERIAL_EVENT_RX_PARITY_ERROR | \
-                                         SERIAL_EVENT_RX_FRAMING_ERROR | SERIAL_EVENT_RX_OVERRUN_ERROR | \
-                                         SERIAL_EVENT_RX_COMPLETE | SERIAL_EVENT_RX_CHARACTER_MATCH)
+										 SERIAL_EVENT_RX_FRAMING_ERROR | SERIAL_EVENT_RX_OVERRUN_ERROR | \
+										 SERIAL_EVENT_RX_COMPLETE | SERIAL_EVENT_RX_CHARACTER_MATCH)
 /**@}*/
 
 #define SERIAL_RESERVED_CHAR_MATCH (255)
@@ -82,88 +82,88 @@ extern "C" {
 // gd32f30x.h by some porter. -bjc (2021-Aug-20)
 
 typedef enum {
-    GD_OK       = 0x00U,
-    GD_ERROR    = 0x01U,
-    GD_BUSY     = 0x02U,
-    GD_TIMEOUT  = 0x03U
+	GD_OK       = 0x00U,
+	GD_ERROR    = 0x01U,
+	GD_BUSY     = 0x02U,
+	GD_TIMEOUT  = 0x03U
 } gd_status_enum;
 
 typedef enum {
-    OP_STATE_RESET             = 0x00U,
-    OP_STATE_READY             = 0x01U,
-    OP_STATE_BUSY              = 0x02U,
-    OP_STATE_TIMEOUT           = 0x03U,
-    OP_STATE_ERROR             = 0x04U,
-    OP_STATE_ABORT             = 0x05U,
-    OP_STATE_LISTEN            = 0x06U,
-    OP_STATE_BUSY_TX           = 0x21U, /* (OP_STATE_BUSY << 4) + 1 */
-    OP_STATE_BUSY_RX           = 0x22U, /* (OP_STATE_BUSY << 4) + 2 */
-    OP_STATE_BUSY_TX_LISTEN    = 0x61U, /* (OP_STATE_LISTEN << 4) + 1 */
-    OP_STATE_BUSY_RX_LISTEN    = 0x62U, /* (OP_STATE_LISTEN << 4) + 2 */
-    OP_STATE_BUTT
+	OP_STATE_RESET             = 0x00U,
+	OP_STATE_READY             = 0x01U,
+	OP_STATE_BUSY              = 0x02U,
+	OP_STATE_TIMEOUT           = 0x03U,
+	OP_STATE_ERROR             = 0x04U,
+	OP_STATE_ABORT             = 0x05U,
+	OP_STATE_LISTEN            = 0x06U,
+	OP_STATE_BUSY_TX           = 0x21U, /* (OP_STATE_BUSY << 4) + 1 */
+	OP_STATE_BUSY_RX           = 0x22U, /* (OP_STATE_BUSY << 4) + 2 */
+	OP_STATE_BUSY_TX_LISTEN    = 0x61U, /* (OP_STATE_LISTEN << 4) + 1 */
+	OP_STATE_BUSY_RX_LISTEN    = 0x62U, /* (OP_STATE_LISTEN << 4) + 2 */
+	OP_STATE_BUTT
 } operation_state_enum;
 
 typedef enum {
-    ParityNone = 0,
-    ParityOdd = 1,
-    ParityEven = 2,
-    ParityForced1 = 3,
-    ParityForced0 = 4
+	ParityNone = 0,
+	ParityOdd = 1,
+	ParityEven = 2,
+	ParityForced1 = 3,
+	ParityForced0 = 4
 } SerialParity;
 
 typedef struct serial_s serial_t;
 
 struct serial_s {
-    /* basic information */
-    UARTName uart;
-    int index;
-    PinName pin_tx;
-    PinName pin_rx;
-    PinName pin_cts;
-    PinName pin_rts;
-    uint32_t flowctrl;
-    /* configure information */
-    uint32_t baudrate;
-    uint32_t databits;
-    uint32_t stopbits;
-    uint32_t parity;
-    /* operating parameters */
-    uint16_t rx_size;
-    uint8_t *tx_buffer_ptr;
-    uint8_t *rx_buffer_ptr;
-    /* used in HardwareSerial */
-    uint8_t *rx_buff;
-    uint8_t *tx_buff;
-    uint16_t tx_count;
-    uint16_t rx_count;
-    volatile uint16_t rx_tail;
-    volatile uint16_t tx_head;
-    volatile uint16_t rx_head;
-    volatile uint16_t tx_tail;
-    uint32_t error_code;
-    operation_state_enum tx_state;
-    operation_state_enum rx_state;
-    void (*tx_callback)(serial_t *obj);
-    void (*rx_callback)(serial_t *obj);
+	/* basic information */
+	UARTName uart;
+	int index;
+	PinName pin_tx;
+	PinName pin_rx;
+	PinName pin_cts;
+	PinName pin_rts;
+	uint32_t flowctrl;
+	/* configure information */
+	uint32_t baudrate;
+	uint32_t databits;
+	uint32_t stopbits;
+	uint32_t parity;
+	/* operating parameters */
+	uint16_t rx_size;
+	uint8_t *tx_buffer_ptr;
+	uint8_t *rx_buffer_ptr;
+	/* used in HardwareSerial */
+	uint8_t *rx_buff;
+	uint8_t *tx_buff;
+	uint16_t tx_count;
+	uint16_t rx_count;
+	volatile uint16_t rx_tail;
+	volatile uint16_t tx_head;
+	volatile uint16_t rx_head;
+	volatile uint16_t tx_tail;
+	uint32_t error_code;
+	operation_state_enum tx_state;
+	operation_state_enum rx_state;
+	void (*tx_callback)(serial_t *obj);
+	void (*rx_callback)(serial_t *obj);
 };
 
 typedef enum {
 #if defined(USART0)
-    UART0_INDEX,
+	UART0_INDEX,
 #endif
 #if defined(USART1)
-    UART1_INDEX,
+	UART1_INDEX,
 #endif
 #if defined(USART2)
-    UART2_INDEX,
+	UART2_INDEX,
 #endif
 #if defined(UART3) || defined(USART3)
-    UART3_INDEX,
+	UART3_INDEX,
 #endif
 #if defined(UART4) || defined(USART4)
-    UART4_INDEX,
+	UART4_INDEX,
 #endif
-    UART_NUM
+	UART_NUM
 } uart_index_t;
 
 /* Initialize the serial peripheral. It sets the default parameters for serial peripheral, and configures its specifieds pins. */

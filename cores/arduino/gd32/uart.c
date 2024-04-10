@@ -1,19 +1,19 @@
 /*
-    Copyright (c) 2020, GigaDevice Semiconductor Inc.
+	Copyright (c) 2020, GigaDevice Semiconductor Inc.
 
-    Redistribution and use in source and binary forms, with or without modification,
+	Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
 
-    1. Redistributions of source code must retain the above copyright notice, this
-       list of conditions and the following disclaimer.
-    2. Redistributions in binary form must reproduce the above copyright notice,
-       this list of conditions and the following disclaimer in the documentation
-       and/or other materials provided with the distribution.
-    3. Neither the name of the copyright holder nor the names of its contributors
-       may be used to endorse or promote products derived from this software without
-       specific prior written permission.
+	1. Redistributions of source code must retain the above copyright notice, this
+	   list of conditions and the following disclaimer.
+	2. Redistributions in binary form must reproduce the above copyright notice,
+	   this list of conditions and the following disclaimer in the documentation
+	   and/or other materials provided with the distribution.
+	3. Neither the name of the copyright holder nor the names of its contributors
+	   may be used to endorse or promote products derived from this software without
+	   specific prior written permission.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -24,7 +24,7 @@ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWIS
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 
-    Based on mbed-os/targets/TARGET_GigaDevice/TARGET_GD32F30X/serial_api.c
+	Based on mbed-os/targets/TARGET_GigaDevice/TARGET_GD32F30X/serial_api.c
 */
 
 #include "uart.h"
@@ -53,30 +53,30 @@ extern "C" {
 struct serial_s *obj_s_buf[UART_NUM] = {NULL};
 
 static rcu_periph_enum usart_clk[UART_NUM] = {
-    RCU_USART0,
-    RCU_USART1,
+	RCU_USART0,
+	RCU_USART1,
 #ifdef USART2
-    RCU_USART2,
+	RCU_USART2,
 #endif
 #ifdef USART3
-    RCU_UART3,
+	RCU_UART3,
 #endif
 #ifdef USART4
-    RCU_UART4
+	RCU_UART4
 #endif
 };
 
 static IRQn_Type usart_irq_n[UART_NUM] = {
-    USART0_IRQn,
-    USART1_IRQn,
+	USART0_IRQn,
+	USART1_IRQn,
 #ifdef USART2
-    USART2_IRQn,
+	USART2_IRQn,
 #endif
 #ifdef USART3
-    UART3_IRQn,
+	UART3_IRQn,
 #endif
 #ifdef USART4
-    UART4_IRQn
+	UART4_IRQn
 #endif
 };
 
@@ -88,18 +88,18 @@ static IRQn_Type usart_irq_n[UART_NUM] = {
  */
 static void usart_init(struct serial_s *obj_s)
 {
-    if (obj_s->index >= UART_NUM) {
-        return;
-    }
+	if (obj_s->index >= UART_NUM) {
+		return;
+	}
 
-    /* USART configuration */
-    usart_deinit(obj_s->uart);
-    usart_word_length_set(obj_s->uart, obj_s->databits);
-    usart_baudrate_set(obj_s->uart, obj_s->baudrate);
-    usart_stop_bit_set(obj_s->uart, obj_s->stopbits);
-    usart_parity_config(obj_s->uart, obj_s->parity);
-    usart_receive_config(obj_s->uart, USART_RECEIVE_DISABLE);
-    usart_transmit_config(obj_s->uart, USART_TRANSMIT_DISABLE);
+	/* USART configuration */
+	usart_deinit(obj_s->uart);
+	usart_word_length_set(obj_s->uart, obj_s->databits);
+	usart_baudrate_set(obj_s->uart, obj_s->baudrate);
+	usart_stop_bit_set(obj_s->uart, obj_s->stopbits);
+	usart_parity_config(obj_s->uart, obj_s->parity);
+	usart_receive_config(obj_s->uart, USART_RECEIVE_DISABLE);
+	usart_transmit_config(obj_s->uart, USART_TRANSMIT_DISABLE);
 }
 
 /**
@@ -107,9 +107,9 @@ static void usart_init(struct serial_s *obj_s)
  * Otherwise, after serial init, the UART is formatted at 9600 baud is turned on immediatelly..
 */
 void serial_enable(struct serial_s *obj_s) {
-    usart_enable(obj_s->uart);
-    usart_receive_config(obj_s->uart, USART_RECEIVE_ENABLE);
-    usart_transmit_config(obj_s->uart, USART_TRANSMIT_ENABLE);
+	usart_enable(obj_s->uart);
+	usart_receive_config(obj_s->uart, USART_RECEIVE_ENABLE);
+	usart_transmit_config(obj_s->uart, USART_TRANSMIT_ENABLE);
 }
 
 /**
@@ -122,84 +122,84 @@ void serial_enable(struct serial_s *obj_s) {
  */
 void serial_init(serial_t *obj, PinName tx, PinName rx, PinName rts, PinName cts)
 {
-    struct serial_s *p_obj = GET_SERIAL_S(obj);
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
 
-    UARTName uart_tx = (UARTName)pinmap_peripheral(tx, PinMap_UART_TX);
-    UARTName uart_rx = (UARTName)pinmap_peripheral(rx, PinMap_UART_RX);
-    UARTName uart_rts = (UARTName)pinmap_peripheral(rts, PinMap_UART_RTS);
-    UARTName uart_cts = (UARTName)pinmap_peripheral(cts, PinMap_UART_CTS);
+	UARTName uart_tx = (UARTName)pinmap_peripheral(tx, PinMap_UART_TX);
+	UARTName uart_rx = (UARTName)pinmap_peripheral(rx, PinMap_UART_RX);
+	UARTName uart_rts = (UARTName)pinmap_peripheral(rts, PinMap_UART_RTS);
+	UARTName uart_cts = (UARTName)pinmap_peripheral(cts, PinMap_UART_CTS);
 
-    p_obj->uart = (UARTName)pinmap_merge(uart_tx, uart_rx);
-    /* We also merge RTS/CTS and assert all pins belong to the same instance */
-    p_obj->uart = (UARTName)pinmap_peripheral(p_obj->uart, uart_rts);
-    p_obj->uart = (UARTName)pinmap_peripheral(p_obj->uart, uart_cts);
+	p_obj->uart = (UARTName)pinmap_merge(uart_tx, uart_rx);
+	/* We also merge RTS/CTS and assert all pins belong to the same instance */
+	p_obj->uart = (UARTName)pinmap_peripheral(p_obj->uart, uart_rts);
+	p_obj->uart = (UARTName)pinmap_peripheral(p_obj->uart, uart_cts);
 
-    /* set uart index */
-    switch (p_obj->uart) {
+	/* set uart index */
+	switch (p_obj->uart) {
 #if defined(USART0)
-        case USART0:
-            p_obj->index = UART0_INDEX;
-            break;
+		case USART0:
+			p_obj->index = UART0_INDEX;
+			break;
 #endif
 #if defined(USART1)
-        case USART1:
-            p_obj->index = UART1_INDEX;
-            break;
+		case USART1:
+			p_obj->index = UART1_INDEX;
+			break;
 #endif
 #if defined(USART2)
-        case USART2:
-            p_obj->index = UART2_INDEX;
-            break;
+		case USART2:
+			p_obj->index = UART2_INDEX;
+			break;
 #endif
 #if defined(UART3)
-        case UART3:
-            p_obj->index = UART3_INDEX;
-            break;
+		case UART3:
+			p_obj->index = UART3_INDEX;
+			break;
 #endif
 #if defined(UART4)
-        case UART4:
-            p_obj->index = UART4_INDEX;
-            break;
+		case UART4:
+			p_obj->index = UART4_INDEX;
+			break;
 #endif
-    }
+	}
 
-    /* enable UART peripheral clock */
-    rcu_periph_clock_enable(usart_clk[p_obj->index]);
+	/* enable UART peripheral clock */
+	rcu_periph_clock_enable(usart_clk[p_obj->index]);
 
-    /* configure the pins */
-    pinmap_pinout(tx, PinMap_UART_TX);
-    pinmap_pinout(rx, PinMap_UART_RX);
+	/* configure the pins */
+	pinmap_pinout(tx, PinMap_UART_TX);
+	pinmap_pinout(rx, PinMap_UART_RX);
 
-    /* Configure flow control */
-    uint32_t flowcontrol = 0;
-    if (uart_rts != NC) {
-        flowcontrol |= USART_RTS_ENABLE;
-        pinmap_pinout(rts, PinMap_UART_RTS);
-    }
-    if (uart_cts != NC) {
-        flowcontrol |= USART_CTS_ENABLE;
-        pinmap_pinout(cts, PinMap_UART_CTS);
-    }
+	/* Configure flow control */
+	uint32_t flowcontrol = 0;
+	if (uart_rts != NC) {
+		flowcontrol |= USART_RTS_ENABLE;
+		pinmap_pinout(rts, PinMap_UART_RTS);
+	}
+	if (uart_cts != NC) {
+		flowcontrol |= USART_CTS_ENABLE;
+		pinmap_pinout(cts, PinMap_UART_CTS);
+	}
 
-    /* default UART parameters */
-    p_obj->baudrate    = 9600U;
-    p_obj->databits    = USART_WL_8BIT;
-    p_obj->stopbits    = USART_STB_1BIT;
-    p_obj->parity      = USART_PM_NONE;
+	/* default UART parameters */
+	p_obj->baudrate    = 9600U;
+	p_obj->databits    = USART_WL_8BIT;
+	p_obj->stopbits    = USART_STB_1BIT;
+	p_obj->parity      = USART_PM_NONE;
 
-    p_obj->pin_tx = tx;
-    p_obj->pin_rx = rx;
-    p_obj->pin_rts = rts;
-    p_obj->pin_cts = cts;
-    p_obj->flowctrl = flowcontrol;
-    p_obj->tx_state = OP_STATE_BUSY;
-    p_obj->rx_state = OP_STATE_BUSY;
+	p_obj->pin_tx = tx;
+	p_obj->pin_rx = rx;
+	p_obj->pin_rts = rts;
+	p_obj->pin_cts = cts;
+	p_obj->flowctrl = flowcontrol;
+	p_obj->tx_state = OP_STATE_BUSY;
+	p_obj->rx_state = OP_STATE_BUSY;
 
-    usart_init(p_obj);
-    obj_s_buf[p_obj->index] = p_obj;
+	usart_init(p_obj);
+	obj_s_buf[p_obj->index] = p_obj;
 
-    p_obj->tx_state = OP_STATE_READY;
-    p_obj->rx_state = OP_STATE_READY;
+	p_obj->tx_state = OP_STATE_READY;
+	p_obj->rx_state = OP_STATE_READY;
 }
 
 /** Release the serial peripheral, not currently invoked. It requires further
@@ -209,20 +209,20 @@ void serial_init(serial_t *obj, PinName tx, PinName rx, PinName rts, PinName cts
  */
 void serial_free(serial_t *obj)
 {
-    struct serial_s *p_obj = GET_SERIAL_S(obj);
-    rcu_periph_enum rcu_periph = usart_clk[p_obj->index];
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
+	rcu_periph_enum rcu_periph = usart_clk[p_obj->index];
 
-    /* reset USART and disable clock */
-    usart_deinit(p_obj->uart);
-    rcu_periph_clock_disable(rcu_periph);
+	/* reset USART and disable clock */
+	usart_deinit(p_obj->uart);
+	rcu_periph_clock_disable(rcu_periph);
 
-    /* reset the GPIO state */
+	/* reset the GPIO state */
 #if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
-    pin_function(p_obj->pin_tx, PIN_MODE_INPUT_FLOATING);
-    pin_function(p_obj->pin_rx, PIN_MODE_INPUT_FLOATING);
+	pin_function(p_obj->pin_tx, PIN_MODE_INPUT_FLOATING);
+	pin_function(p_obj->pin_rx, PIN_MODE_INPUT_FLOATING);
 #else
-    pin_function(p_obj->pin_tx, PIN_MODE_INPUT);
-    pin_function(p_obj->pin_rx, PIN_MODE_INPUT);
+	pin_function(p_obj->pin_tx, PIN_MODE_INPUT);
+	pin_function(p_obj->pin_rx, PIN_MODE_INPUT);
 #endif
 }
 
@@ -233,23 +233,23 @@ void serial_free(serial_t *obj)
  */
 void serial_baud(serial_t *obj, int baudrate)
 {
-    uint16_t uen_flag = 0U;
-    struct serial_s *p_obj = GET_SERIAL_S(obj);
+	uint16_t uen_flag = 0U;
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
 
-    /* store the UEN flag */
-    uen_flag = USART_CTL0(p_obj->uart) & USART_CTL0_UEN;
+	/* store the UEN flag */
+	uen_flag = USART_CTL0(p_obj->uart) & USART_CTL0_UEN;
 
-    /* disable the USART first */
-    usart_disable(p_obj->uart);
+	/* disable the USART first */
+	usart_disable(p_obj->uart);
 
-    usart_baudrate_set(p_obj->uart, baudrate);
+	usart_baudrate_set(p_obj->uart, baudrate);
 
-    p_obj->baudrate = baudrate;
+	p_obj->baudrate = baudrate;
 
-    /* restore the UEN flag */
-    if (RESET != uen_flag) {
-        usart_enable(p_obj->uart);
-    }
+	/* restore the UEN flag */
+	if (RESET != uen_flag) {
+		usart_enable(p_obj->uart);
+	}
 }
 
 /** Configure the format. Set the number of bits, parity and the number of stop bits
@@ -261,64 +261,64 @@ void serial_baud(serial_t *obj, int baudrate)
  */
 void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_bits)
 {
-    uint16_t uen_flag = 0U;
-    struct serial_s *p_obj = GET_SERIAL_S(obj);
+	uint16_t uen_flag = 0U;
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
 
-    /* store the UEN flag */
-    uen_flag = USART_CTL0(p_obj->uart) & USART_CTL0_UEN;
+	/* store the UEN flag */
+	uen_flag = USART_CTL0(p_obj->uart) & USART_CTL0_UEN;
 
-    /* disable the UART clock first */
-    usart_disable(p_obj->uart);
+	/* disable the UART clock first */
+	usart_disable(p_obj->uart);
 
-    /* configurate the UART parity */
-    switch (parity) {
-        case ParityOdd:
-            p_obj->parity = USART_PM_ODD;
-            usart_parity_config(p_obj->uart, USART_PM_ODD);
-            break;
+	/* configurate the UART parity */
+	switch (parity) {
+		case ParityOdd:
+			p_obj->parity = USART_PM_ODD;
+			usart_parity_config(p_obj->uart, USART_PM_ODD);
+			break;
 
-        case ParityEven:
-            p_obj->parity = USART_PM_EVEN;
-            usart_parity_config(p_obj->uart, USART_PM_EVEN);
-            break;
+		case ParityEven:
+			p_obj->parity = USART_PM_EVEN;
+			usart_parity_config(p_obj->uart, USART_PM_EVEN);
+			break;
 
-        case ParityNone:
-        case ParityForced0:
-        case ParityForced1:
-        default:
-            p_obj->parity = USART_PM_NONE;
-            usart_parity_config(p_obj->uart, USART_PM_NONE);
-            break;
-    }
+		case ParityNone:
+		case ParityForced0:
+		case ParityForced1:
+		default:
+			p_obj->parity = USART_PM_NONE;
+			usart_parity_config(p_obj->uart, USART_PM_NONE);
+			break;
+	}
 
-    if (p_obj->parity == USART_PM_NONE) {
-        if (data_bits == 9) {
-            usart_word_length_set(p_obj->uart, USART_WL_9BIT);
-        } else if (data_bits == 8) {
-            usart_word_length_set(p_obj->uart, USART_WL_8BIT);
-        } else if (data_bits == 7) {
-            return;
-        }
-    } else {
-        if (data_bits == 9) {
-            return;
-        } else if (data_bits == 8) {
-            usart_word_length_set(p_obj->uart, USART_WL_9BIT);
-        } else if (data_bits == 7) {
-            usart_word_length_set(p_obj->uart, USART_WL_8BIT);
-        }
-    }
+	if (p_obj->parity == USART_PM_NONE) {
+		if (data_bits == 9) {
+			usart_word_length_set(p_obj->uart, USART_WL_9BIT);
+		} else if (data_bits == 8) {
+			usart_word_length_set(p_obj->uart, USART_WL_8BIT);
+		} else if (data_bits == 7) {
+			return;
+		}
+	} else {
+		if (data_bits == 9) {
+			return;
+		} else if (data_bits == 8) {
+			usart_word_length_set(p_obj->uart, USART_WL_9BIT);
+		} else if (data_bits == 7) {
+			usart_word_length_set(p_obj->uart, USART_WL_8BIT);
+		}
+	}
 
-    if (stop_bits == 2) {
-        usart_stop_bit_set(p_obj->uart, USART_STB_2BIT);
-    } else {
-        usart_stop_bit_set(p_obj->uart, USART_STB_1BIT);
-    }
+	if (stop_bits == 2) {
+		usart_stop_bit_set(p_obj->uart, USART_STB_2BIT);
+	} else {
+		usart_stop_bit_set(p_obj->uart, USART_STB_1BIT);
+	}
 
-    /* restore the UEN flag */
-    if (RESET != uen_flag) {
-        usart_enable(p_obj->uart);
-    }
+	/* restore the UEN flag */
+	if (RESET != uen_flag) {
+		usart_enable(p_obj->uart);
+	}
 }
 
 /** Get character. This is a blocking call, waiting for a character
@@ -327,9 +327,9 @@ void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_b
  */
 int serial_getc(serial_t *obj)
 {
-    struct serial_s *p_obj = GET_SERIAL_S(obj);
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
 
-    return (int)(usart_data_receive(p_obj->uart) & BITS(0, 7 + (p_obj->databits >> 12)));
+	return (int)(usart_data_receive(p_obj->uart) & BITS(0, 7 + (p_obj->databits >> 12)));
 }
 
 /** Send a character. This is a blocking call, waiting for a peripheral to be available
@@ -340,10 +340,10 @@ int serial_getc(serial_t *obj)
  */
 void serial_putc(serial_t *obj, int c)
 {
-    struct serial_s *p_obj = GET_SERIAL_S(obj);
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
 
-    while (!serial_writable(obj));
-    usart_data_transmit(p_obj->uart, (int)((c) & BITS(0, 7 + (p_obj->databits >> 12))));
+	while (!serial_writable(obj));
+	usart_data_transmit(p_obj->uart, (int)((c) & BITS(0, 7 + (p_obj->databits >> 12))));
 }
 
 /** Check if the serial peripheral is readable
@@ -353,9 +353,9 @@ void serial_putc(serial_t *obj, int c)
  */
 int serial_readable(serial_t *obj)
 {
-    struct serial_s *p_obj = GET_SERIAL_S(obj);
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
 
-    return (usart_flag_get(p_obj->uart, USART_FLAG_RBNE) != RESET) ? 1 : 0;
+	return (usart_flag_get(p_obj->uart, USART_FLAG_RBNE) != RESET) ? 1 : 0;
 }
 
 /** Check if the serial peripheral is writable
@@ -365,9 +365,9 @@ int serial_readable(serial_t *obj)
  */
 int serial_writable(serial_t *obj)
 {
-    struct serial_s *p_obj = GET_SERIAL_S(obj);
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
 
-    return (usart_flag_get(p_obj->uart, USART_FLAG_TBE) != RESET) ? 1 : 0;
+	return (usart_flag_get(p_obj->uart, USART_FLAG_TBE) != RESET) ? 1 : 0;
 }
 
 /** Clear the serial peripheral
@@ -376,10 +376,10 @@ int serial_writable(serial_t *obj)
  */
 void serial_clear(serial_t *obj)
 {
-    struct serial_s *p_obj = GET_SERIAL_S(obj);
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
 
-    p_obj->tx_count = 0U;
-    p_obj->rx_count = 0U;
+	p_obj->tx_count = 0U;
+	p_obj->rx_count = 0U;
 }
 
 /** Attempts to determine if the serial peripheral is already in use for TX
@@ -389,9 +389,9 @@ void serial_clear(serial_t *obj)
  */
 uint8_t serial_tx_active(serial_t *obj)
 {
-    struct serial_s *p_obj = GET_SERIAL_S(obj);
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
 
-    return ((p_obj->tx_state == OP_STATE_BUSY_TX) ? 1 : 0);
+	return ((p_obj->tx_state == OP_STATE_BUSY_TX) ? 1 : 0);
 }
 
 /** Attempts to determine if the serial peripheral is already in use for RX
@@ -401,9 +401,9 @@ uint8_t serial_tx_active(serial_t *obj)
  */
 uint8_t serial_rx_active(serial_t *obj)
 {
-    struct serial_s *p_obj = GET_SERIAL_S(obj);
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
 
-    return ((p_obj->rx_state == OP_STATE_BUSY_RX) ? 1 : 0);
+	return ((p_obj->rx_state == OP_STATE_BUSY_RX) ? 1 : 0);
 }
 
 /** Attach UART transmit callback
@@ -413,15 +413,15 @@ uint8_t serial_rx_active(serial_t *obj)
  */
 void uart_attach_tx_callback(serial_t *obj, void (*callback)(serial_t *))
 {
-    if (obj == NULL) {
-        return;
-    }
+	if (obj == NULL) {
+		return;
+	}
 
-    /* Exit if a reception is already on-going */
-    if (serial_tx_active(obj)) {
-        return;
-    }
-    obj->tx_callback = callback;
+	/* Exit if a reception is already on-going */
+	if (serial_tx_active(obj)) {
+		return;
+	}
+	obj->tx_callback = callback;
 }
 
 /** Attach UART receive callback
@@ -431,15 +431,15 @@ void uart_attach_tx_callback(serial_t *obj, void (*callback)(serial_t *))
  */
 void uart_attach_rx_callback(serial_t *obj, void (*callback)(serial_t *))
 {
-    if (obj == NULL) {
-        return;
-    }
+	if (obj == NULL) {
+		return;
+	}
 
-    /* Exit if a reception is already on-going */
-    if (serial_rx_active(obj)) {
-        return;
-    }
-    obj->rx_callback = callback;
+	/* Exit if a reception is already on-going */
+	if (serial_rx_active(obj)) {
+		return;
+	}
+	obj->rx_callback = callback;
 }
 
 /** Handle the serial rx interrupt
@@ -449,43 +449,43 @@ void uart_attach_rx_callback(serial_t *obj, void (*callback)(serial_t *))
  */
 static gd_status_enum usart_rx_interrupt(struct serial_s *obj_s)
 {
-    uint16_t *temp;
+	uint16_t *temp;
 
-    if (obj_s->rx_state == OP_STATE_BUSY_RX) {
-        if (obj_s->databits == USART_WL_9BIT) {
-            temp = (uint16_t *) obj_s->rx_buffer_ptr;
-            if (obj_s->parity == USART_PM_NONE) {
-                /* 9-bit data, none parity bit */
-                *temp = (uint16_t)(GD32_USART_RX_DATA(obj_s->uart) & (uint16_t)0x01FF);
-                obj_s->rx_buffer_ptr += 2U;
-            } else {
-                /* 9-bit data, with parity bit */
-                *temp = (uint16_t)(GD32_USART_RX_DATA(obj_s->uart) & (uint16_t)0x00FF);
-                obj_s->rx_buffer_ptr += 1U;
-            }
-        } else {
-            if (obj_s->parity == USART_PM_NONE) {
-                /* 8-bit data, none parity bit */
-                *obj_s->rx_buffer_ptr++ = (uint8_t)(GD32_USART_RX_DATA(obj_s->uart) & (uint8_t)0x00FF);
-            } else {
-                /* 8-bit data, with parity bit */
-                *obj_s->rx_buffer_ptr++ = (uint8_t)(GD32_USART_RX_DATA(obj_s->uart) & (uint8_t)0x007F);
-            }
-        }
+	if (obj_s->rx_state == OP_STATE_BUSY_RX) {
+		if (obj_s->databits == USART_WL_9BIT) {
+			temp = (uint16_t *) obj_s->rx_buffer_ptr;
+			if (obj_s->parity == USART_PM_NONE) {
+				/* 9-bit data, none parity bit */
+				*temp = (uint16_t)(GD32_USART_RX_DATA(obj_s->uart) & (uint16_t)0x01FF);
+				obj_s->rx_buffer_ptr += 2U;
+			} else {
+				/* 9-bit data, with parity bit */
+				*temp = (uint16_t)(GD32_USART_RX_DATA(obj_s->uart) & (uint16_t)0x00FF);
+				obj_s->rx_buffer_ptr += 1U;
+			}
+		} else {
+			if (obj_s->parity == USART_PM_NONE) {
+				/* 8-bit data, none parity bit */
+				*obj_s->rx_buffer_ptr++ = (uint8_t)(GD32_USART_RX_DATA(obj_s->uart) & (uint8_t)0x00FF);
+			} else {
+				/* 8-bit data, with parity bit */
+				*obj_s->rx_buffer_ptr++ = (uint8_t)(GD32_USART_RX_DATA(obj_s->uart) & (uint8_t)0x007F);
+			}
+		}
 
-        if (--obj_s->rx_count == 0U) {
-            usart_interrupt_disable(obj_s->uart, USART_INT_RBNE);
-            usart_interrupt_disable(obj_s->uart, USART_INT_PERR);
-            usart_interrupt_disable(obj_s->uart, USART_INT_ERR);
+		if (--obj_s->rx_count == 0U) {
+			usart_interrupt_disable(obj_s->uart, USART_INT_RBNE);
+			usart_interrupt_disable(obj_s->uart, USART_INT_PERR);
+			usart_interrupt_disable(obj_s->uart, USART_INT_ERR);
 
-            obj_s->rx_state = OP_STATE_READY;
-            obj_s->rx_callback(obj_s);
-        }
+			obj_s->rx_state = OP_STATE_READY;
+			obj_s->rx_callback(obj_s);
+		}
 
-        return GD_OK;
-    } else {
-        return GD_BUSY;
-    }
+		return GD_OK;
+	} else {
+		return GD_BUSY;
+	}
 }
 
 /** Handle the serial tx interrupt
@@ -495,33 +495,33 @@ static gd_status_enum usart_rx_interrupt(struct serial_s *obj_s)
  */
 static gd_status_enum usart_tx_interrupt(struct serial_s *obj_s)
 {
-    uint16_t *temp;
+	uint16_t *temp;
 
-    if (obj_s->tx_state == OP_STATE_BUSY_TX) {
-        if (obj_s->databits == USART_WL_9BIT) {
-            temp = (uint16_t *) obj_s->tx_buffer_ptr;
-            GD32_USART_TX_DATA(obj_s->uart) = (uint16_t)(*temp & (uint16_t)0x01FF);
-            if (obj_s->parity == USART_PM_NONE) {
-                obj_s->tx_buffer_ptr += 2U;
-            } else {
-                obj_s->tx_buffer_ptr += 1U;
-            }
-        } else {
-            GD32_USART_TX_DATA(obj_s->uart) = (uint8_t)(*obj_s->tx_buffer_ptr++ & (uint8_t)0x00FF);
-        }
+	if (obj_s->tx_state == OP_STATE_BUSY_TX) {
+		if (obj_s->databits == USART_WL_9BIT) {
+			temp = (uint16_t *) obj_s->tx_buffer_ptr;
+			GD32_USART_TX_DATA(obj_s->uart) = (uint16_t)(*temp & (uint16_t)0x01FF);
+			if (obj_s->parity == USART_PM_NONE) {
+				obj_s->tx_buffer_ptr += 2U;
+			} else {
+				obj_s->tx_buffer_ptr += 1U;
+			}
+		} else {
+			GD32_USART_TX_DATA(obj_s->uart) = (uint8_t)(*obj_s->tx_buffer_ptr++ & (uint8_t)0x00FF);
+		}
 
-        if (--obj_s->tx_count == 0U) {
-            /* disable USART_INT_TBE interrupt */
-            usart_interrupt_disable(obj_s->uart, USART_INT_TBE);
+		if (--obj_s->tx_count == 0U) {
+			/* disable USART_INT_TBE interrupt */
+			usart_interrupt_disable(obj_s->uart, USART_INT_TBE);
 
-            /* enable USART_INT_TC interrupt */
-            usart_interrupt_enable(obj_s->uart, USART_INT_TC);
-        }
+			/* enable USART_INT_TC interrupt */
+			usart_interrupt_enable(obj_s->uart, USART_INT_TC);
+		}
 
-        return GD_OK;
-    } else {
-        return GD_BUSY;
-    }
+		return GD_OK;
+	} else {
+		return GD_BUSY;
+	}
 }
 
 /** Handle the serial tx complete interrupt
@@ -530,10 +530,10 @@ static gd_status_enum usart_tx_interrupt(struct serial_s *obj_s)
  */
 static void usart_tx_complete_interrupt(struct serial_s *obj_s)
 {
-    usart_interrupt_disable(obj_s->uart, USART_INT_TC);
+	usart_interrupt_disable(obj_s->uart, USART_INT_TC);
 
-    obj_s->tx_state = OP_STATE_READY;
-    obj_s->tx_callback(obj_s);
+	obj_s->tx_state = OP_STATE_READY;
+	obj_s->tx_callback(obj_s);
 }
 
 /**
@@ -545,23 +545,23 @@ static void usart_tx_complete_interrupt(struct serial_s *obj_s)
  * @return Returns the status
  */
 static gd_status_enum usart_tx_interrupt_preprocess(struct serial_s *obj_s, uint8_t *pData,
-                                                    uint16_t Size)
+													uint16_t Size)
 {
-    if (obj_s->tx_state == OP_STATE_READY) {
-        if ((pData == NULL) || (Size == 0U)) {
-            return GD_ERROR;
-        }
+	if (obj_s->tx_state == OP_STATE_READY) {
+		if ((pData == NULL) || (Size == 0U)) {
+			return GD_ERROR;
+		}
 
-        obj_s->tx_buffer_ptr = pData;
-        obj_s->tx_count      = Size;
-        obj_s->tx_state      = OP_STATE_BUSY_TX;
+		obj_s->tx_buffer_ptr = pData;
+		obj_s->tx_count      = Size;
+		obj_s->tx_state      = OP_STATE_BUSY_TX;
 
-        usart_interrupt_enable(obj_s->uart, USART_INT_TBE);
+		usart_interrupt_enable(obj_s->uart, USART_INT_TBE);
 
-        return GD_OK;
-    } else {
-        return GD_BUSY;
-    }
+		return GD_OK;
+	} else {
+		return GD_BUSY;
+	}
 }
 
 /**
@@ -573,26 +573,26 @@ static gd_status_enum usart_tx_interrupt_preprocess(struct serial_s *obj_s, uint
  * @return Returns the status
  */
 static gd_status_enum usart_rx_interrupt_preprocess(struct serial_s *obj_s, uint8_t *pData,
-                                                    uint16_t Size)
+													uint16_t Size)
 {
-    if (obj_s->rx_state == OP_STATE_READY) {
-        if ((pData == NULL) || (Size == 0U)) {
-            return GD_ERROR;
-        }
+	if (obj_s->rx_state == OP_STATE_READY) {
+		if ((pData == NULL) || (Size == 0U)) {
+			return GD_ERROR;
+		}
 
-        obj_s->rx_buffer_ptr = pData;
-        obj_s->rx_size       = Size;
-        obj_s->rx_count      = Size;
-        obj_s->rx_state      = OP_STATE_BUSY_RX;
+		obj_s->rx_buffer_ptr = pData;
+		obj_s->rx_size       = Size;
+		obj_s->rx_count      = Size;
+		obj_s->rx_state      = OP_STATE_BUSY_RX;
 
-        usart_interrupt_enable(obj_s->uart, USART_INT_PERR);
-        usart_interrupt_enable(obj_s->uart, USART_INT_ERR);
-        usart_interrupt_enable(obj_s->uart, USART_INT_RBNE);
+		usart_interrupt_enable(obj_s->uart, USART_INT_PERR);
+		usart_interrupt_enable(obj_s->uart, USART_INT_ERR);
+		usart_interrupt_enable(obj_s->uart, USART_INT_RBNE);
 
-        return GD_OK;
-    } else {
-        return GD_BUSY;
-    }
+		return GD_OK;
+	} else {
+		return GD_BUSY;
+	}
 }
 
 /** Begin asynchronous TX transfer.
@@ -604,36 +604,36 @@ static gd_status_enum usart_rx_interrupt_preprocess(struct serial_s *obj_s, uint
  */
 int serial_transmit(serial_t *obj, const void *tx, size_t tx_length)
 {
-    struct serial_s *p_obj = GET_SERIAL_S(obj);
-    IRQn_Type irq = usart_irq_n[p_obj->index];
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
+	IRQn_Type irq = usart_irq_n[p_obj->index];
 
-    if (tx_length == 0) {
-        return 0;
-    }
+	if (tx_length == 0) {
+		return 0;
+	}
 
-    if (serial_tx_active(obj)) {
-        /* some transmit is in progress */
-        return 0;
-    }
+	if (serial_tx_active(obj)) {
+		/* some transmit is in progress */
+		return 0;
+	}
 
-    obj->tx_buffer_ptr = (void *)tx;
-    obj->tx_count = tx_length;
+	obj->tx_buffer_ptr = (void *)tx;
+	obj->tx_count = tx_length;
 
-    /* enable interrupt */
-    /* clear pending IRQ */
-    NVIC_ClearPendingIRQ(irq);
-    /* disable the IRQ first */
-    NVIC_DisableIRQ(irq);
-    /* set the priority and vector */
-    NVIC_SetPriority(irq, 1);
-    /* enable IRQ */
-    NVIC_EnableIRQ(irq);
+	/* enable interrupt */
+	/* clear pending IRQ */
+	NVIC_ClearPendingIRQ(irq);
+	/* disable the IRQ first */
+	NVIC_DisableIRQ(irq);
+	/* set the priority and vector */
+	NVIC_SetPriority(irq, 1);
+	/* enable IRQ */
+	NVIC_EnableIRQ(irq);
 
-    if (usart_tx_interrupt_preprocess(p_obj, (uint8_t *)tx, tx_length) != GD_OK) {
-        return 0;
-    }
+	if (usart_tx_interrupt_preprocess(p_obj, (uint8_t *)tx, tx_length) != GD_OK) {
+		return 0;
+	}
 
-    return tx_length;
+	return tx_length;
 }
 
 /**
@@ -645,32 +645,32 @@ int serial_transmit(serial_t *obj, const void *tx, size_t tx_length)
  */
 void serial_receive(serial_t *obj, void *rx, size_t rx_length)
 {
-    struct serial_s *p_obj = GET_SERIAL_S(obj);
-    IRQn_Type irq = usart_irq_n[p_obj->index];
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
+	IRQn_Type irq = usart_irq_n[p_obj->index];
 
-    if (rx_length == 0) {
-        return;
-    }
+	if (rx_length == 0) {
+		return;
+	}
 
-    if (serial_rx_active(obj)) {
-        /* some reception is in progress */
-        return;
-    }
+	if (serial_rx_active(obj)) {
+		/* some reception is in progress */
+		return;
+	}
 
-    obj->rx_buffer_ptr = rx;
-    obj->rx_count = rx_length;
+	obj->rx_buffer_ptr = rx;
+	obj->rx_count = rx_length;
 
-    /* enable interrupt */
-    /* clear pending IRQ */
-    NVIC_ClearPendingIRQ(irq);
-    /* disable the IRQ first */
-    NVIC_DisableIRQ(irq);
-    /* set the priority(higher than Tx) and vector */
-    NVIC_SetPriority(irq, 0);
-    /* enable IRQ */
-    NVIC_EnableIRQ(irq);
+	/* enable interrupt */
+	/* clear pending IRQ */
+	NVIC_ClearPendingIRQ(irq);
+	/* disable the IRQ first */
+	NVIC_DisableIRQ(irq);
+	/* set the priority(higher than Tx) and vector */
+	NVIC_SetPriority(irq, 0);
+	/* enable IRQ */
+	NVIC_EnableIRQ(irq);
 
-    usart_rx_interrupt_preprocess(p_obj, (uint8_t *)rx, rx_length);
+	usart_rx_interrupt_preprocess(p_obj, (uint8_t *)rx, rx_length);
 }
 
 /** This function handles USART interrupt handler
@@ -679,57 +679,57 @@ void serial_receive(serial_t *obj, void *rx, size_t rx_length)
  */
 static void usart_irq(struct serial_s *obj_s)
 {
-    uint32_t err_flags = 0U;
+	uint32_t err_flags = 0U;
 
-    /* no error occurs */
-    err_flags = (GD32_USART_STAT(obj_s->uart) & (uint32_t)(USART_FLAG_PERR | USART_FLAG_FERR |
-                                                           USART_FLAG_ORERR | USART_FLAG_NERR));
-    if (err_flags == RESET) {
-        /* check whether USART is in receiver mode or not */
-        if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_RBNE) != RESET) {
-            usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_RBNE);
-            usart_rx_interrupt(obj_s);
+	/* no error occurs */
+	err_flags = (GD32_USART_STAT(obj_s->uart) & (uint32_t)(USART_FLAG_PERR | USART_FLAG_FERR |
+														   USART_FLAG_ORERR | USART_FLAG_NERR));
+	if (err_flags == RESET) {
+		/* check whether USART is in receiver mode or not */
+		if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_RBNE) != RESET) {
+			usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_RBNE);
+			usart_rx_interrupt(obj_s);
 
-            return;
-        }
-    }
+			return;
+		}
+	}
 
-    if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_TBE) != RESET) {
-        usart_tx_interrupt(obj_s);
-        return;
-    }
+	if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_TBE) != RESET) {
+		usart_tx_interrupt(obj_s);
+		return;
+	}
 
-    if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_TC) != RESET) {
-        usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_TC);
-        usart_tx_complete_interrupt(obj_s);
-        return;
-    }
+	if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_TC) != RESET) {
+		usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_TC);
+		usart_tx_complete_interrupt(obj_s);
+		return;
+	}
 
-    if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_ERR_ORERR) != RESET) {
-        /* clear ORERR error flag by reading USART DATA register */
-        GD32_USART_RX_DATA(obj_s->uart);
-        usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_ERR_ORERR);
-    }
+	if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_ERR_ORERR) != RESET) {
+		/* clear ORERR error flag by reading USART DATA register */
+		GD32_USART_RX_DATA(obj_s->uart);
+		usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_ERR_ORERR);
+	}
 
-    if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_ERR_NERR) != RESET) {
-        /* clear NERR error flag by reading USART DATA register */
-        GD32_USART_RX_DATA(obj_s->uart);
-        usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_ERR_NERR);
-    }
+	if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_ERR_NERR) != RESET) {
+		/* clear NERR error flag by reading USART DATA register */
+		GD32_USART_RX_DATA(obj_s->uart);
+		usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_ERR_NERR);
+	}
 
-    if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_ERR_FERR) != RESET) {
-        /* clear FERR error flag by reading USART DATA register */
-        GD32_USART_RX_DATA(obj_s->uart);
-        /* also clear it by clearing the interrupt */
-        usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_ERR_FERR);
-    }
+	if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_ERR_FERR) != RESET) {
+		/* clear FERR error flag by reading USART DATA register */
+		GD32_USART_RX_DATA(obj_s->uart);
+		/* also clear it by clearing the interrupt */
+		usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_ERR_FERR);
+	}
 
-    if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_PERR) != RESET) {
-        /* clear PERR error flag by reading USART DATA register */
-        GD32_USART_RX_DATA(obj_s->uart);
-        /* also clear it by clearing the interrupt */
-        usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_PERR);
-    }
+	if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_PERR) != RESET) {
+		/* clear PERR error flag by reading USART DATA register */
+		GD32_USART_RX_DATA(obj_s->uart);
+		/* also clear it by clearing the interrupt */
+		usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_PERR);
+	}
 }
 
 /** This function handles USART0 interrupt handler
@@ -738,9 +738,9 @@ static void usart_irq(struct serial_s *obj_s)
 #if defined(USART0)
 void USART0_IRQHandler(void)
 {
-    /* clear pending IRQ */
-    NVIC_ClearPendingIRQ(usart_irq_n[UART0_INDEX]);
-    usart_irq(obj_s_buf[UART0_INDEX]);
+	/* clear pending IRQ */
+	NVIC_ClearPendingIRQ(usart_irq_n[UART0_INDEX]);
+	usart_irq(obj_s_buf[UART0_INDEX]);
 }
 #endif
 
@@ -750,9 +750,9 @@ void USART0_IRQHandler(void)
 #if defined(USART1)
 void USART1_IRQHandler(void)
 {
-    /* clear pending IRQ */
-    NVIC_ClearPendingIRQ(usart_irq_n[UART1_INDEX]);
-    usart_irq(obj_s_buf[UART1_INDEX]);
+	/* clear pending IRQ */
+	NVIC_ClearPendingIRQ(usart_irq_n[UART1_INDEX]);
+	usart_irq(obj_s_buf[UART1_INDEX]);
 }
 #endif
 
@@ -762,9 +762,9 @@ void USART1_IRQHandler(void)
 #if defined(USART2)
 void USART2_IRQHandler(void)
 {
-    /* clear pending IRQ */
-    NVIC_ClearPendingIRQ(usart_irq_n[UART2_INDEX]);
-    usart_irq(obj_s_buf[UART2_INDEX]);
+	/* clear pending IRQ */
+	NVIC_ClearPendingIRQ(usart_irq_n[UART2_INDEX]);
+	usart_irq(obj_s_buf[UART2_INDEX]);
 }
 #endif
 
@@ -774,18 +774,18 @@ void USART2_IRQHandler(void)
 #if defined(UART3)
 void UART3_IRQHandler(void)
 {
-    /* clear pending IRQ */
-    NVIC_ClearPendingIRQ(usart_irq_n[UART3_INDEX]);
-    usart_irq(obj_s_buf[UART3_INDEX]);
+	/* clear pending IRQ */
+	NVIC_ClearPendingIRQ(usart_irq_n[UART3_INDEX]);
+	usart_irq(obj_s_buf[UART3_INDEX]);
 }
 #endif
 
 #if defined(USART3)
 void USART3_IRQHandler(void)
 {
-    /* clear pending IRQ */
-    NVIC_ClearPendingIRQ(usart_irq_n[UART3_INDEX]);
-    usart_irq(obj_s_buf[UART3_INDEX]);
+	/* clear pending IRQ */
+	NVIC_ClearPendingIRQ(usart_irq_n[UART3_INDEX]);
+	usart_irq(obj_s_buf[UART3_INDEX]);
 }
 #endif
 
@@ -795,18 +795,18 @@ void USART3_IRQHandler(void)
 #if defined(UART4)
 void UART4_IRQHandler(void)
 {
-    /* clear pending IRQ */
-    NVIC_ClearPendingIRQ(usart_irq_n[UART4_INDEX]);
-    usart_irq(obj_s_buf[UART4_INDEX]);
+	/* clear pending IRQ */
+	NVIC_ClearPendingIRQ(usart_irq_n[UART4_INDEX]);
+	usart_irq(obj_s_buf[UART4_INDEX]);
 }
 #endif
 
 #if defined(USART4)
 void USART4_IRQHandler(void)
 {
-    /* clear pending IRQ */
-    NVIC_ClearPendingIRQ(usart_irq_n[UART4_INDEX]);
-    usart_irq(obj_s_buf[UART4_INDEX]);
+	/* clear pending IRQ */
+	NVIC_ClearPendingIRQ(usart_irq_n[UART4_INDEX]);
+	usart_irq(obj_s_buf[UART4_INDEX]);
 }
 #endif
 
