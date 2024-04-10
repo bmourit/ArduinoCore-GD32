@@ -25,6 +25,10 @@
 extern "C" {
 #endif
 
+extern const uint32_t bare_pin_map[16];
+
+#define GD_BARE_GPIO_PIN(X) (bare_pin_map[GD_PIN_GET(X)])
+
 typedef struct {
     PinName pin;
     int peripheral;

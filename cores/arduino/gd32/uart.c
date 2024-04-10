@@ -120,29 +120,34 @@ void serial_enable(struct serial_s *obj_s) {
  * @param tx  The TX pin name
  * @param rx  The RX pin name
  */
-void serial_init(serial_t *obj, PinName tx, PinName rx)
+void serial_init(serial_t *obj, PinName tx, PinName rx, PinName rts, PinName cts)
 {
     struct serial_s *p_obj = GET_SERIAL_S(obj);
 
     UARTName uart_tx = (UARTName)pinmap_peripheral(tx, PinMap_UART_TX);
     UARTName uart_rx = (UARTName)pinmap_peripheral(rx, PinMap_UART_RX);
+    UARTName uart_rts = (UARTName)pinmap_peripheral(rts, PinMap_UART_RTS);
+    UARTName uart_cts = (UARTName)pinmap_peripheral(cts, PinMap_UART_CTS);
 
     p_obj->uart = (UARTName)pinmap_merge(uart_tx, uart_rx);
+    /* We also merge RTS/CTS and assert all pins belong to the same instance */
+    p_obj->uart = (UARTName)pinmap_peripheral(p_obj->uart, uart_rts);
+    p_obj->uart = (UARTName)pinmap_peripheral(p_obj->uart, uart_cts);
 
     /* set uart index */
     switch (p_obj->uart) {
 #if defined(USART0)
-        case UART0:
+        case USART0:
             p_obj->index = UART0_INDEX;
             break;
 #endif
 #if defined(USART1)
-        case UART1:
+        case USART1:
             p_obj->index = UART1_INDEX;
             break;
 #endif
 #if defined(USART2)
-        case UART2:
+        case USART2:
             p_obj->index = UART2_INDEX;
             break;
 #endif
@@ -165,6 +170,17 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
     pinmap_pinout(tx, PinMap_UART_TX);
     pinmap_pinout(rx, PinMap_UART_RX);
 
+    /* Configure flow control */
+    uint32_t flowcontrol = 0;
+    if (uart_rts != NC) {
+        flowcontrol |= USART_RTS_ENABLE;
+        pinmap_pinout(rts, PinMap_UART_RTS);
+    }
+    if (uart_cts != NC) {
+        flowcontrol |= USART_CTS_ENABLE;
+        pinmap_pinout(cts, PinMap_UART_CTS);
+    }
+
     /* default UART parameters */
     p_obj->baudrate    = 9600U;
     p_obj->databits    = USART_WL_8BIT;
@@ -173,7 +189,9 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
 
     p_obj->pin_tx = tx;
     p_obj->pin_rx = rx;
-
+    p_obj->pin_rts = rts;
+    p_obj->pin_cts = cts;
+    p_obj->flowctrl = flowcontrol;
     p_obj->tx_state = OP_STATE_BUSY;
     p_obj->rx_state = OP_STATE_BUSY;
 

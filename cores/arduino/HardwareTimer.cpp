@@ -301,7 +301,7 @@ captureMode HardwareTimer::getCaptureMode(uint8_t channel)
   \param[out] none
   \retval     none
 */
-void setPreloadARSEnable(bool val)
+void HardwareTimer::setPreloadARSEnable(bool val)
 {
   if (val) {
     timer_auto_reload_shadow_enable(timerDevice);

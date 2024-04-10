@@ -31,8 +31,6 @@ from os.path import isfile, isdir, join
 from platformio.util import get_systype
 from SCons.Script import COMMAND_LINE_TARGETS, DefaultEnvironment
 
-IS_WINDOWS = sys.platform.startswith("win")
-
 # get environment
 env = DefaultEnvironment()
 platform = env.PioPlatform()
@@ -40,6 +38,7 @@ board_config = env.BoardConfig()
 board_name = env.subst("$BOARD")
 
 # check framework is installed
+IS_WINDOWS = sys.platform.startswith("win")
 FRAMEWORK_DIR = platform.get_package_dir("framework-arduinogd32")
 assert isdir(FRAMEWORK_DIR)
 
@@ -94,6 +93,8 @@ def add_upload_protocol_defines(board, upload_protocol):
     is_generic = board.startswith("generic")
     if upload_protocol in ("stlink", "dfu", "jlink") and is_generic:
         env.Append(CPPDEFINES=["GENERIC_BOOTLOADER"])
+
+    env.Append(CPPDEFINES=["GENERIC_BOOTLOADER"])
 
 def get_arm_math_lib(cpu):
     core = board_config.get("build.cpu")
@@ -206,7 +207,6 @@ env.Append(
         "-nostdlib",
         "--param",
         "max-inline-insns-single=500",
-        "-masm-syntax-unified",
     ],
     CPPDEFINES=[
         series,
@@ -322,7 +322,7 @@ configure_application_offset(mcu, upload_protocol)
 #
 
 if not board_config.get("build.ldscript", ""):
-    #env.Replace(LDSCRIPT_PATH=join(FRAMEWORK_DIR, "system", "ldscript.ld"))
+    env.Replace(LDSCRIPT_PATH=join(FRAMEWORK_DIR, "system", "ldscript.ld"))
     if not isfile(join(env.subst(variant_dir), "ldscript.ld")):
         print("Warning! Cannot find linker script for the current target!\n")
     env.Append(

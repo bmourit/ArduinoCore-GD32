@@ -80,9 +80,7 @@ void SPIClass::end()
 
 void SPIClass::beginTransaction(SPISettings settings)
 {
-    if (spiSettings != settings) {
-         config(settings);
-    }
+    config(settings);
 
     spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
 

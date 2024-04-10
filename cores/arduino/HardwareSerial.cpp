@@ -120,12 +120,14 @@ void serialEventRun(void)
 #endif
 }
 
-HardwareSerial::HardwareSerial(uint8_t rx, uint8_t tx, int uart_index)
+HardwareSerial::HardwareSerial(uint8_t rx, uint8_t tx, uint8_t rts, uint8_t cts, int uart_index)
 {
     // If Serial i defined in variant with SERIALx_RX/SERIALx_TX,
-    // set the defined pins for the com port
+    // set the defined pins for the port
     _serial.pin_rx = DIGITAL_TO_PINNAME(rx);
-    _serial.pin_tx =  DIGITAL_TO_PINNAME(tx);
+    _serial.pin_tx = DIGITAL_TO_PINNAME(tx);
+    _serial.pin_rts = DIGITAL_TO_PINNAME(rts);
+    _serial.pin_cts = DIGITAL_TO_PINNAME(cts);
     _serial.rx_buff = _rx_buffer;
     _serial.rx_head = 0;
     _serial.rx_tail = 0;
@@ -136,12 +138,14 @@ HardwareSerial::HardwareSerial(uint8_t rx, uint8_t tx, int uart_index)
     _serial.index = uart_index;
 }
 
+
 void HardwareSerial::begin(unsigned long baud, uint8_t config)
 {
     uint32_t databits = 0;
     uint32_t stopbits = 0;
     SerialParity parity;
-    // Manage databits
+
+    /* Manage databits */
     switch (config & 0x07) {
         case 0x04:
             databits = 7;
@@ -170,7 +174,7 @@ void HardwareSerial::begin(unsigned long baud, uint8_t config)
         stopbits = 1;
     }
 
-    serial_init(&_serial, _serial.pin_tx, _serial.pin_rx);
+    serial_init(&_serial, _serial.pin_tx, _serial.pin_rx, _serial.pin_rts, _serial.pin_cts);
     serial_baud(&_serial, baud);
     serial_format(&_serial, databits, parity, stopbits);
 

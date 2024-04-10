@@ -119,6 +119,9 @@ struct serial_s {
     int index;
     PinName pin_tx;
     PinName pin_rx;
+    PinName pin_cts;
+    PinName pin_rts;
+    uint32_t flowctrl;
     /* configure information */
     uint32_t baudrate;
     uint32_t databits;

@@ -60,92 +60,91 @@ typedef uint8_t rx_buffer_index_t;
 #endif
 
 typedef struct {
-    unsigned char buffer[SERIAL_RX_BUFFER_SIZE];
-    volatile int head;
-    volatile int tail;
+	unsigned char buffer[SERIAL_RX_BUFFER_SIZE];
+	volatile int head;
+	volatile int tail;
 } ring_buffer_r;
 
 typedef struct {
-    unsigned char buffer[SERIAL_TX_BUFFER_SIZE];
-    volatile int head;
-    volatile int tail;
+	unsigned char buffer[SERIAL_TX_BUFFER_SIZE];
+	volatile int head;
+	volatile int tail;
 } ring_buffer_t;
 
-#define SERIAL_8N1 0x06
-#define SERIAL_8N2 0x0E
-#define SERIAL_7E1 0x24
-#define SERIAL_8E1 0x26
-#define SERIAL_7E2 0x2C
-#define SERIAL_8E2 0x2E
-#define SERIAL_7O1 0x34
-#define SERIAL_8O1 0x36
-#define SERIAL_7O2 0x3C
-#define SERIAL_8O2 0x3E
+#define SERIAL_8N1  0x06
+#define SERIAL_8N2  0x0E
+#define SERIAL_7E1  0x24
+#define SERIAL_8E1  0x26
+#define SERIAL_7E2  0x2C
+#define SERIAL_8E2  0x2E
+#define SERIAL_7O1  0x34
+#define SERIAL_8O1  0x36
+#define SERIAL_7O2  0x3C
+#define SERIAL_8O2  0x3E
 
 class HardwareSerial : public Stream
 {
-    protected:
-        // Has any byte been written to the UART since begin()
-        volatile bool _written;
-        // Don't put any members after these buffers, since only the first
-        // 32 bytes of this struct can be accessed quickly using the ldd
-        // instruction.
-        unsigned char _rx_buffer[SERIAL_RX_BUFFER_SIZE];
-        unsigned char _tx_buffer[SERIAL_TX_BUFFER_SIZE];
-        serial_t _serial;
+	protected:
+		// Has any byte been written to the UART since begin()
+		volatile bool _written;
+		// Don't put any members after these buffers, since only the first
+		// 32 bytes of this struct can be accessed quickly using the ldd
+		// instruction.
+		unsigned char _rx_buffer[SERIAL_RX_BUFFER_SIZE];
+		unsigned char _tx_buffer[SERIAL_TX_BUFFER_SIZE];
+		serial_t _serial;
 
-    public:
-        HardwareSerial(uint8_t rx, uint8_t tx, int uart_index);
-        void begin(unsigned long baud)
-        {
-            begin(baud, SERIAL_8N1);
-        }
-        void begin(unsigned long, uint8_t);
-        void end();
-        virtual int available(void);
-        virtual int peek(void);
-        virtual int read(void);
-        int availableForWrite(void);
-        virtual void flush(void);
-        virtual size_t write(uint8_t);
-        inline size_t write(unsigned long n)
-        {
-            return write((uint8_t)n);
-        }
-        inline size_t write(long n)
-        {
-            return write((uint8_t)n);
-        }
-        inline size_t write(unsigned int n)
-        {
-            return write((uint8_t)n);
-        }
-        inline size_t write(int n)
-        {
-            return write((uint8_t)n);
-        }
-        using Print::write; // pull in write(str) and write(buf, size) from Print
-        operator bool()
-        {
-            return true;
-        }
+	public:
+		HardwareSerial(uint8_t rx, uint8_t tx, uint8_t rts, uint8_t cts, int uart_index);
 
-        // Interrupt handlers
-        static void _rx_complete_irq(serial_t *obj);
-        static void _tx_complete_irq(serial_t *obj);
+		void begin(unsigned long baud)
+		{
+			begin(baud, SERIAL_8N1);
+		}
+		void begin(unsigned long, uint8_t);
+		void end();
+		virtual int available(void);
+		virtual int peek(void);
+		virtual int read(void);
+		int availableForWrite(void);
+		virtual void flush(void);
+		virtual size_t write(uint8_t);
+		inline size_t write(unsigned long n)
+		{
+			return write((uint8_t)n);
+		}
+		inline size_t write(long n)
+		{
+			return write((uint8_t)n);
+		}
+		inline size_t write(unsigned int n)
+		{
+			return write((uint8_t)n);
+		}
+		inline size_t write(int n)
+		{
+			return write((uint8_t)n);
+		}
+		using Print::write; // pull in write(str) and write(buf, size) from Print
+		operator bool()
+		{
+			return true;
+		}
 
-        // helper func for linker
-        static int availableSerialN(unsigned n);
+		// Interrupt handlers
+		static void _rx_complete_irq(serial_t *obj);
+		static void _tx_complete_irq(serial_t *obj);
 
-    private:
+		// helper func for linker
+		static int availableSerialN(unsigned n);
 
+	private:
 };
 
-/*
+/**
  * ‘Serial’ is for the CDC-ACM if enabled. Hardware serial peripherals begin at
  * ‘Serial1’.
  */
-
 #ifndef DEFAULT_HWSERIAL_INSTANCE 
 #define DEFAULT_HWSERIAL_INSTANCE 1
 #endif

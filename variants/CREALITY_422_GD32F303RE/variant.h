@@ -131,33 +131,33 @@ extern "C" {
 
 // On-board LED pin number
 #ifndef LED_BUILTIN
-  #define LED_BUILTIN           PB11
+  #define LED_BUILTIN   PB11
 #endif
-#define LED_GREEN               LED_BUILTIN
+#define LED_GREEN       LED_BUILTIN
 
 // On-board user button
 #ifndef USER_BTN
-#define USER_BTN                PC13
+#define USER_BTN        PC13
 #endif
 
 // Override default Arduino configuration
 
 // SPI Definitions
-#define PIN_SPI_SS            PA4
-#define PIN_SPI_MOSI          PA7
-#define PIN_SPI_MISO          PA6
-#define PIN_SPI_SCK           PA5
+#define PIN_SPI_SS      PA4
+#define PIN_SPI_MOSI    PA7
+#define PIN_SPI_MISO    PA6
+#define PIN_SPI_SCK     PA5
 
 // I2C Definitions
-#define PIN_WIRE_SDA          PB7
-#define PIN_WIRE_SCL          PB6
+#define PIN_WIRE_SDA    PB7
+#define PIN_WIRE_SCL    PB6
 
 // Timer Definitions
 #ifndef TIMER_TONE
-  #define TIMER_TONE          TIMER2  // TIMER_TONE must be defined in this file
+  #define TIMER_TONE    TIMER2  // TIMER_TONE must be defined in this file
 #endif
 #ifndef TIMER_SERVO
-  #define TIMER_SERVO         TIMER1  // TIMER_SERVO must be defined in this file
+  #define TIMER_SERVO   TIMER1  // TIMER_SERVO must be defined in this file
 #endif
 
 // UART Definitions
@@ -165,8 +165,8 @@ extern "C" {
 #define DEFAULT_HWSERIAL_INSTANCE    1
 
 // Default pin used for 'Serial1' instance
-#define SERIAL0_TX          PA9
-#define SERIAL0_RX          PA10
+#define SERIAL0_TX      PA9
+#define SERIAL0_RX      PA10
 
 
 #ifdef __cplusplus
@@ -193,8 +193,8 @@ extern "C" {
   //
   // SERIAL_PORT_HARDWARE_OPEN  Hardware serial ports which are open for use.  Their RX & TX
   //                            pins are NOT connected to anything by default.
-  #define SERIAL_PORT_MONITOR     Serial
-  #define SERIAL_PORT_HARDWARE    Serial1
+  #define SERIAL_PORT_MONITOR   Serial
+  #define SERIAL_PORT_HARDWARE  Serial1
 #endif
 
 #endif /* _VARIANT_ARDUINO_GD32_ */
