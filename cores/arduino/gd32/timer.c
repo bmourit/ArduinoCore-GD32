@@ -275,7 +275,7 @@ uint32_t getTimerIndex(uint32_t instance)
 /*!
     \brief      get timer device from pinname
     \param[in]  instance: PWMx(x=0..11)
-    \param[out] nonex
+    \param[out] none
     \retval     pwmDevice_t obj(TIMERx and TIMER_CH_x)
 */
 pwmDevice_t getTimerDeviceFromPinname(PinName instance)

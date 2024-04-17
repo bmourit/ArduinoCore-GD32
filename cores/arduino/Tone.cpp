@@ -11,7 +11,7 @@ typedef struct {
 
 static void timerTonePinInit(PinName p, uint32_t frequency, uint32_t duration);
 static void tonePeriodElapsedCallback();
-static timerPinInfo_t TimerTone_pinInfo = {NC, 0};
+static timerPinInfo_t TimerTone_pinInfo = { NC, 0 };
 static HardwareTimer TimerTone(TIMER_TONE);
 
 // Tone Period elapsed callback in non-blocking mode

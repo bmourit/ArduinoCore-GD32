@@ -26,6 +26,7 @@
 
 #include "Arduino.h"
 #include <stdio.h>
+
 extern "C" {
 #include "utility/drv_spi.h"
 }
@@ -40,95 +41,56 @@ extern "C" {
 
 class SPISettings
 {
-    public:
-        SPISettings(uint32_t speedMax, BitOrder bitOrder, uint8_t dataMode)
-        {
-            this->speed = speedMax;
-            this->bitorder = bitOrder;
-            this->datamode = dataMode;
-        }
+  public:
+    SPISettings(uint32_t speedMax, BitOrder bitOrder, uint8_t dataMode)
+    {
+      this->speed = speedMax;
+      this->bitorder = bitOrder;
+      this->datamode = dataMode;
+    }
+    /* Set speed to default, SPI mode set to MODE 0 and Bit order set to MSB first. */
+    SPISettings()
+    {
+      this->speed = SPI_SPEED_DEFAULT;
+      this->bitorder = MSBFIRST;
+      this->datamode = SPI_MODE0;
+    }
 
-        /* Set speed to default, SPI mode set to MODE 0 and Bit order set to MSB first. */
-        SPISettings()
-        {
-            this->speed = SPI_SPEED_DEFAULT;
-            this->bitorder = MSBFIRST;
-            this->datamode = SPI_MODE0;
-        }
+  private:
+    uint32_t speed;
+    uint8_t datamode;
+    BitOrder bitorder;
 
-    private:
-        uint32_t speed;
-        uint8_t datamode;
-        BitOrder bitorder;
-
-        friend class SPIClass;
+    friend class SPIClass;
 };
 
 const SPISettings DEFAULT_SPI_SETTINGS = SPISettings();
 
 class SPIClass
 {
-    public:
-        SPIClass();
-        SPIClass(PinName mosi, PinName miso, PinName sclk, PinName ssel);
-        SPIClass(PinName mosi, PinName miso, PinName sclk);
+  public:
+    SPIClass();
+    SPIClass(PinName mosi, PinName miso, PinName sclk, PinName ssel);
+    SPIClass(PinName mosi, PinName miso, PinName sclk);
 
-        // setMISO/MOSI/SCLK/SSEL have to be called before begin()
-        void setMISO(uint32_t miso)
-        {
-          _spi.pin_miso = DIGITAL_TO_PINNAME(miso);
-        };
-        void setMOSI(uint32_t mosi)
-        {
-          _spi.pin_mosi = DIGITAL_TO_PINNAME(mosi);
-        };
-        void setSCLK(uint32_t sclk)
-        {
-          _spi.pin_sclk = DIGITAL_TO_PINNAME(sclk);
-        };
-        void setSSEL(uint32_t ssel)
-        {
-          _spi.pin_ssel = DIGITAL_TO_PINNAME(ssel);
-        };
+    void begin();
+    void end();
+    void beginTransaction(SPISettings settings);
+    void endTransaction(void);
+    uint8_t transfer(uint8_t val8);
+    uint16_t transfer16(uint16_t val16);
+    void transfer(void *buf, size_t count);
+    void transfer(void *bufout, void *bufin, size_t count);
+    void setBitOrder(BitOrder order);
+    void setDataMode(uint8_t mode);
+    void setClockDivider(uint32_t divider);
 
-        void setMISO(PinName miso)
-        {
-          _spi.pin_miso = (miso);
-        };
-        void setMOSI(PinName mosi)
-        {
-          _spi.pin_mosi = (mosi);
-        };
-        void setSCLK(PinName sclk)
-        {
-          _spi.pin_sclk = (sclk);
-        };
-        void setSSEL(PinName ssel)
-        {
-          _spi.pin_ssel = (ssel);
-        };
+  private:
+    void config(SPISettings settings);
 
-        void begin();
-        void end();
-
-        void beginTransaction(SPISettings settings);
-        void endTransaction(void);
-
-        uint8_t transfer(uint8_t val8);
-        uint16_t transfer16(uint16_t val16);
-        void transfer(void *buf, size_t count);
-        void transfer(void *bufout, void *bufin, size_t count);
-
-        void setBitOrder(BitOrder order);
-        void setDataMode(uint8_t mode);
-        void setClockDivider(uint32_t divider);
-
-    private:
-        void config(SPISettings settings);
-
-        SPISettings spisettings;
-
-        spi_t _spi;
+    SPISettings spisettings;
+    bool initialized;
+    spi_t _spi;
 };
 
 extern SPIClass SPI;

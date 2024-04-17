@@ -30,7 +30,7 @@ OF SUCH DAMAGE.
 
 #define TIMERNUMS   13
 
-HardwareTimer *hardwaretimerObj[TIMERNUMS] = {NULL};
+HardwareTimer *hardwaretimerObj[TIMERNUMS] = { NULL };
 
 /*!
   \brief      HardwareTimer object construct
@@ -270,7 +270,6 @@ void HardwareTimer::setCaptureMode(uint32_t ulpin, uint8_t channel, captureMode 
   timer_icinitpara.icprescaler = TIMER_IC_PSC_DIV1;
   timer_icinitpara.icfilter = 0x0;
   timer_input_capture_config(timerDevice, channel, &timer_icinitpara);
-
   /* save the selected channel mode to object attribute */
   _ChannelMode[channel - 1] = mode;
 }
@@ -286,7 +285,7 @@ captureMode HardwareTimer::getCaptureMode(uint8_t channel)
   if ((0 <= channel) && (channel <= TIMER_NUM_CHANNELS)) {
     return _ChannelMode[channel - 1];
   } else {
-  return DISABLED;
+    return DISABLED;
   }
 }
 

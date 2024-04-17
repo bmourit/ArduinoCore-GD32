@@ -13,7 +13,7 @@ WEAK void _Error_Handler(const char *msg, int val)
 {
     (void) msg;
     (void) val;
-    /* User can add his own implementation to report the HAL error return state */
+    /* User can add his own implementation to report the SPL error return state */
     while (1) {
     }
 }

@@ -186,6 +186,7 @@ enum timeFormat {
 };
 
 typedef struct {
+	void *__this;		// HardwarePWM instance
 	uint32_t timer;
 	uint8_t channel;
 } pwmDevice_t;

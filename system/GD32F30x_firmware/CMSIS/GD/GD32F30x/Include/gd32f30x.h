@@ -97,31 +97,34 @@ OF SUCH DAMAGE.
 #define __GD32F30x_STDPERIPH_VERSION_SUB1	(0x00) /*!< [23:16] sub1 version     */
 #define __GD32F30x_STDPERIPH_VERSION_SUB2	(0x00) /*!< [15:8]  sub2 version     */
 #define __GD32F30x_STDPERIPH_VERSION_RC		(0x00) /*!< [7:0]  release candidate */
-#define __GD32F30x_STDPERIPH_VERSION		((__GD32F30x_STDPERIPH_VERSION_MAIN << 24)\
-							|(__GD32F30x_STDPERIPH_VERSION_SUB1 << 16)\
-							|(__GD32F30x_STDPERIPH_VERSION_SUB2 << 8)\
-							|(__GD32F30x_STDPERIPH_VERSION_RC))
+#define __GD32F30x_STDPERIPH_VERSION		((__GD32F30x_STDPERIPH_VERSION_MAIN << 24) \
+												| (__GD32F30x_STDPERIPH_VERSION_SUB1 << 16) \
+												| (__GD32F30x_STDPERIPH_VERSION_SUB2 << 8) \
+												| (__GD32F30x_STDPERIPH_VERSION_RC))
 
 /* configuration of the Cortex-M4 processor and core peripherals */
 #define __CM4_REV                 0x0001   /*!< Core revision r0p1                                       */
-#define __MPU_PRESENT             1        /*!< GD32F30x provide MPU                                     */
+//#define __MPU_PRESENT           1      /*!< GD32F30x provide MPU                                       */
+#define __MPU_PRESENT             0        /*!< GD32F30x provide MPU                                     */
 #define __NVIC_PRIO_BITS          4        /*!< GD32F30x uses 4 bits for the priority levels             */
 #define __Vendor_SysTickConfig    0        /*!< set to 1 if different sysTick config is used             */
-#define __FPU_PRESENT             1        /*!< FPU present                                              */
+//#define __FPU_PRESENT			  1
 
 /* define interrupt number */
 typedef enum IRQn
 {
 	/* Cortex-M4 processor exceptions numbers */
-	NonMaskableInt_IRQn          = -14,    /*!< 2 non maskable interrupt                                 */
-	MemoryManagement_IRQn        = -12,    /*!< 4 Cortex-M4 memory management interrupt                  */
-	BusFault_IRQn                = -11,    /*!< 5 Cortex-M4 bus fault interrupt                          */
-	UsageFault_IRQn              = -10,    /*!< 6 Cortex-M4 usage fault interrupt                        */
+	NonMaskableInt_IRQn          = -14,    /*!< 2 Non Maskable Interrupt                                 */
+	HardFault_IRQn				 = -13,	   /*!< 3 HardFault Interrupt                                    */
+	MemoryManagement_IRQn        = -12,    /*!< 4 Cortex-M4 Memory Management Interrupt                  */
+	BusFault_IRQn                = -11,    /*!< 5 Cortex-M4 Bus Fault Interrupt                          */
+	UsageFault_IRQn              = -10,    /*!< 6 Cortex-M4 Usage Fault Interrupt                        */
 	SVCall_IRQn                  = -5,     /*!< 11 Cortex-M4 SV call interrupt                           */
-	DebugMonitor_IRQn            = -4,     /*!< 12 Cortex-M4 debug monitor interrupt                     */
-	PendSV_IRQn                  = -2,     /*!< 14 Cortex-M4 pend SV interrupt                           */
-	SysTick_IRQn                 = -1,     /*!< 15 Cortex-M4 system tick interrupt                       */
-	/* interruput numbers */
+	DebugMonitor_IRQn            = -4,     /*!< 12 Cortex-M4 Debug mMonitor Interrupt                     */
+	PendSV_IRQn                  = -2,     /*!< 14 Cortex-M4 Pend SV Interrupt                           */
+	SysTick_IRQn                 = -1,     /*!< 15 Cortex-M4 System Tick Interrupt                       */
+
+	/* GD32F30X specific Interruput Numbers */
 	WWDGT_IRQn                   = 0,      /*!< window watchDog timer interrupt                          */
 	LVD_IRQn                     = 1,      /*!< LVD through EXTI line detect interrupt                   */
 	TAMPER_IRQn                  = 2,      /*!< tamper through EXTI line detect                          */

@@ -33,188 +33,187 @@ TwoWire Wire(SDA, SCL, 0);
 
 TwoWire::TwoWire(uint8_t sda, uint8_t scl, int i2c_index)
 {
-    user_onRequest = NULL;
-    transmitting = 0;
+  user_onRequest = NULL;
+  transmitting = 0;
+  _i2c.sda = DIGITAL_TO_PINNAME(sda);
+  _i2c.scl = DIGITAL_TO_PINNAME(scl);
 
-    _i2c.sda = DIGITAL_TO_PINNAME(sda);
-    _i2c.scl = DIGITAL_TO_PINNAME(scl);
+  _i2c.rx_buffer_ptr = _rx_buffer.buffer;
+  _i2c.tx_buffer_ptr = _tx_buffer.buffer;
+  _i2c.tx_rx_buffer_size = (uint16_t) sizeof(_tx_buffer.buffer);
+  _i2c.tx_count = 0;
+  _i2c.rx_count = 0;
+  _i2c.index = i2c_index;
 
-    _i2c.rx_buffer_ptr = _rx_buffer.buffer;
-    _i2c.tx_buffer_ptr = _tx_buffer.buffer;
-    _i2c.tx_rx_buffer_size = (uint16_t) sizeof(_tx_buffer.buffer);
-    _i2c.tx_count = 0;
-    _i2c.rx_count = 0;
-    _i2c.index = i2c_index;
-
-    _rx_buffer.head = 0;
-    _rx_buffer.tail = 0;
-    _tx_buffer.head = 0;
-    _tx_buffer.tail = 0;
+  _rx_buffer.head = 0;
+  _rx_buffer.tail = 0;
+  _tx_buffer.head = 0;
+  _tx_buffer.tail = 0;
 }
 
 /*!
-    \brief      configure I2C
-    \param[in]  none
-    \param[out] none
-    \retval     none
+  \brief      configure I2C
+  \param[in]  none
+  \param[out] none
+  \retval     none
 */
 void TwoWire::begin()
 {
-    ownAddress = MASTER_ADDRESS << 1;
-    i2c_init(&_i2c, _i2c.sda, _i2c.scl, ownAddress);
+  ownAddress = MASTER_ADDRESS << 1;
+  i2c_init(&_i2c, _i2c.sda, _i2c.scl, ownAddress);
 }
 
 /*!
-    \brief      configure slave I2C
-    \param[in]  slave address
-    \param[out] none
-    \retval     none
+  \brief      configure slave I2C
+  \param[in]  slave address
+  \param[out] none
+  \retval     none
 */
 void TwoWire::begin(uint8_t address)
 {
-    ownAddress = address << 1;
+  ownAddress = address << 1;
 
-    i2c_init(&_i2c, _i2c.sda, _i2c.scl, ownAddress);
-    i2c_slaves_interrupt_enable(&_i2c);
-    i2c_attach_slave_tx_callback(&_i2c, &TwoWire::onRequestService, this);
-    i2c_attach_slave_rx_callback(&_i2c, &TwoWire::onReceiveService, this);
+  i2c_init(&_i2c, _i2c.sda, _i2c.scl, ownAddress);
+  i2c_slaves_interrupt_enable(&_i2c);
+  i2c_attach_slave_tx_callback(&_i2c, &TwoWire::onRequestService, this);
+  i2c_attach_slave_rx_callback(&_i2c, &TwoWire::onReceiveService, this);
 }
 
 void TwoWire::begin(int address)
 {
-    begin((uint8_t)address);
+  begin((uint8_t)address);
 }
 
 void TwoWire::end(void)
 {
-    /* clear any received data */
-    _rx_buffer.head = _rx_buffer.tail;
-    /* wait for any outstanding data to be sent */
-    flush();
-    i2c_deinit(_i2c.i2c);
+  //clear any received data
+  _rx_buffer.head = _rx_buffer.tail;
+
+  //wait for any outstanding data to be sent
+  flush();
+  i2c_deinit(_i2c.i2c);
 }
 
-uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint32_t iaddress,
-                             uint8_t isize, uint8_t sendStop)
+uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint32_t iaddress, uint8_t isize, uint8_t sendStop)
 {
-    if (isize > 0) {
-        /**
-         * send internal address; this mode allows sending a repeated start to access
-         * some devices' internal registers. This function is executed by the hardware
-         * TWI module on other processors (for example Due's TWI_IADR and TWI_MMR registers)
-         */
-        beginTransmission(address);
+  if (isize > 0) {
+    // send internal address; this mode allows sending a repeated start to access
+    // some devices' internal registers. This function is executed by the hardware
+    // TWI module on other processors (for example Due's TWI_IADR and TWI_MMR registers)
+    beginTransmission(address);
 
-        /* maximum size of internal address is 3 bytes */
-        if (isize > 3) {
-            isize = 3;
-        }
-
-        /* write internal register address MSBFIRST */
-        while (isize-- > 0) {
-            write((uint8_t)(iaddress >> (isize * 8)));
-        }
-        endTransmission(false);
+    // the maximum size of internal address is 3 bytes
+    if (isize > 3) {
+      isize = 3;
     }
 
-    /* clamp to buffer length */
-    if (quantity > WIRE_BUFFER_LENGTH) {
-        quantity = WIRE_BUFFER_LENGTH;
+    // write internal register address - most significant byte first
+    while (isize-- > 0) {
+      write((uint8_t)(iaddress >> (isize * 8)));
     }
+    endTransmission(false);
+  }
 
-    _rx_buffer.head = 0;
-    if (I2C_OK == i2c_master_receive(&_i2c, address << 1, &_rx_buffer.buffer[_rx_buffer.head], quantity, sendStop)) {
-        _rx_buffer.head = quantity;
-    }
-    /* set rx buffer iterator vars */
-    _rx_buffer.tail = 0;
+  // clamp to buffer length
+  if (quantity > WIRE_BUFFER_LENGTH) {
+    quantity = WIRE_BUFFER_LENGTH;
+  }
 
-    return quantity;
+  _rx_buffer.head = 0;
+  if (I2C_OK == i2c_master_receive(&_i2c, address << 1, &_rx_buffer.buffer[_rx_buffer.head], quantity,
+                   sendStop)) {
+    _rx_buffer.head = quantity;
+  }
+  // set rx buffer iterator vars
+  _rx_buffer.tail = 0;
+
+  return quantity;
 }
 
 uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop)
 {
-    return requestFrom((uint8_t)address, (uint8_t)quantity, (uint32_t)0, (uint8_t)0, (uint8_t)sendStop);
+  return requestFrom((uint8_t)address, (uint8_t)quantity, (uint32_t)0, (uint8_t)0, (uint8_t)sendStop);
 }
 
 uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity)
 {
-    return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)true);
+  return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)true);
 }
 
 uint8_t TwoWire::requestFrom(int address, int quantity)
 {
-    return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)true);
+  return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)true);
 }
 
 uint8_t TwoWire::requestFrom(int address, int quantity, int sendStop)
 {
-    return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)sendStop);
+  return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)sendStop);
 }
 
 /*!
-    \brief      Begin a transmission to the I2C slave device with the given address.
-    \param[in]  the 7-bit address of the device to transmit to
-    \param[out] none
-    \retval     none
+  \brief      Begin a transmission to the I2C slave device with the given address.
+  \param[in]  the 7-bit address of the device to transmit to
+  \param[out] none
+  \retval     none
 */
 void TwoWire::beginTransmission(uint8_t address)
 {
-    /* transmitting */
-    transmitting = 1;
-    /* set address of targeted slave */
-    txAddress = address << 1;
-    /* reset tx buffer iterator vars */
-    _tx_buffer.head = 0;
-    _tx_buffer.tail = 0;
+  // indicate that we are transmitting
+  transmitting = 1;
+  // set address of targeted slave
+  txAddress = address << 1;
+  // reset tx buffer iterator vars
+  _tx_buffer.head = 0;
+  _tx_buffer.tail = 0;
 }
 
 void TwoWire::beginTransmission(int address)
 {
-    beginTransmission((uint8_t)address);
+  beginTransmission((uint8_t)address);
 }
 
 uint8_t TwoWire::endTransmission(uint8_t sendStop)
 {
-    int8_t ret = 4;
-    ret = i2c_master_transmit(&_i2c, txAddress, &_tx_buffer.buffer[_tx_buffer.tail],
-                              _i2c.tx_count, sendStop);
-    _tx_buffer.head = 0;
-    _tx_buffer.tail = 0;
-    _i2c.tx_count = 0;
-    /* done transmitting */
-    transmitting = 0;
+  int8_t ret = 4;
+  ret = i2c_master_transmit(&_i2c, txAddress, &_tx_buffer.buffer[_tx_buffer.tail], _i2c.tx_count, sendStop);
 
-    return ret;
+  _tx_buffer.head = 0;
+  _tx_buffer.tail = 0;
+  _i2c.tx_count = 0;
+  /* indicate that we are done transmitting */
+  transmitting = 0;
+
+  return ret;
 }
 
-/**
- * This provides backwards compatibility with the original
- * definition and expected behaviour of endTransmission
- */
+//  This provides backwards compatibility with the original
+//  definition, and expected behaviour, of endTransmission
+//
 uint8_t TwoWire::endTransmission(void)
 {
-    return endTransmission((uint8_t)true);
+  return endTransmission((uint8_t)true);
 }
 
-/* must be called in slave tx event callback or after beginTransmission(address) */
+// must be called in:
+// slave tx event callback
+// or after beginTransmission(address)
 size_t TwoWire::write(uint8_t data)
 {
-    size_t ret = 1;
+  size_t ret = 1;
 
-    if (transmitting) {
-        _tx_buffer.buffer[_tx_buffer.head] = data;
-        _tx_buffer.head = (_tx_buffer.head + 1) % WIRE_BUFFER_LENGTH;
-        _i2c.tx_count++;
-    } else {
-        /* slave send mode */
-        /* reply to master */
-        if (i2c_slave_write_buffer(&_i2c, &data, 1) != I2C_OK) {
-            ret = 0;
-        }
+  if (transmitting) {
+    _tx_buffer.buffer[_tx_buffer.head] = data;
+    _tx_buffer.head = (_tx_buffer.head + 1) % WIRE_BUFFER_LENGTH;
+    _i2c.tx_count++;
+  } else {
+    // in slave send mode
+    // reply to master
+    if (i2c_slave_write_buffer(&_i2c, &data, 1) != I2C_OK) {
+      ret = 0;
     }
+  }
 
-    return ret;
+  return ret;
 }
 
 /**
@@ -226,110 +225,108 @@ size_t TwoWire::write(uint8_t data)
   */
 size_t TwoWire::write(const uint8_t *data, size_t quantity)
 {
-    size_t i;
-    size_t ret = quantity;
+  size_t i;
+  size_t ret = quantity;
 
-    if (transmitting) {
-        for (i = 0; i < quantity; ++i) {
-            write(data[i]);
-        }
-    } else {
-        /* slave send mode */
-        /* reply to master */
-        if (i2c_slave_write_buffer(&_i2c, (uint8_t *)data, quantity) != I2C_OK) {
-            ret = 0;
-        }
+  if (transmitting) {
+    for (i = 0; i < quantity; ++i) {
+      write(data[i]);
     }
+  } else {
+    // in slave send mode
+    // reply to master
+    if (i2c_slave_write_buffer(&_i2c, (uint8_t *)data, quantity) != I2C_OK) {
+      ret = 0;
+    }
+  }
 
-    return ret;
+  return ret;
 }
 
 int TwoWire::available(void)
 {
-    return ((unsigned int)(WIRE_BUFFER_LENGTH + _rx_buffer.head - _rx_buffer.tail)) %
-             WIRE_BUFFER_LENGTH;
+  return ((unsigned int)(WIRE_BUFFER_LENGTH + _rx_buffer.head - _rx_buffer.tail)) % WIRE_BUFFER_LENGTH;
 }
 
 int TwoWire::read(void)
 {
-    unsigned char c;
+  unsigned char c;
 
-    if (_rx_buffer.head > _rx_buffer.tail) {
-        c = _rx_buffer.buffer[_rx_buffer.tail];
-        _rx_buffer.tail = (_rx_buffer.tail + 1) % WIRE_BUFFER_LENGTH;
-        return c;
-    } else {
-        /* TODO: there are no elements in the ringbuffer... think about better error handling here! */
-        return -1;
-    }
+  if (_rx_buffer.head > _rx_buffer.tail) {
+    c = _rx_buffer.buffer[_rx_buffer.tail];
+    _rx_buffer.tail = (_rx_buffer.tail + 1) % WIRE_BUFFER_LENGTH;
+    return c;
+  } else {
+    /* TODO: there are no elements in the ringbuffer... think about better error handling here! */
+    return -1;
+  }
 }
 
 int TwoWire::peek(void)
 {
-    if (_rx_buffer.head == _rx_buffer.tail) {
-        return -1;
-    } else {
-        return _rx_buffer.buffer[_rx_buffer.tail];
-    }
+  if (_rx_buffer.head == _rx_buffer.tail) {
+    return -1;
+  } else {
+    return _rx_buffer.buffer[_rx_buffer.tail];
+  }
 }
 
 void TwoWire::flush()
 {
-    /* wait for transmit data to be sent */
-    while ((_tx_buffer.head != _tx_buffer.tail)) {
-    }
+  //wait for transmit data to be sent
+  while ((_tx_buffer.head != _tx_buffer.tail)) {
+    // wait for transmit data to be sent
+  }
 }
-
 
 void TwoWire::onReceiveService(void* pWireObj, uint8_t *inBytes, int numBytes)
 {
-    TwoWire* pWire = (TwoWire*) pWireObj;
+  TwoWire *pWire = (TwoWire *)pWireObj;
 
-    if (pWire->user_onReceive) {
-        pWire->_rx_buffer.head = numBytes;
-        pWire->_rx_buffer.tail = 0;
-        //*alert user program */
-        pWire->user_onReceive(numBytes);
-    }
+  if (pWire->user_onReceive) {
+    pWire->_rx_buffer.head = numBytes;
+    pWire->_rx_buffer.tail = 0;
+    // alert user program
+    pWire->user_onReceive(numBytes);
+  }
 }
 
-/* behind the scenes function that is called when data is requested */
-void TwoWire::onRequestService(void* pWireObj)
+// behind the scenes function that is called when data is requested
+void TwoWire::onRequestService(void *pWireObj)
 {
-    TwoWire *pWire = (TwoWire *)pWireObj;
-
-    /* don't bother if user hasn't registered a callback */
-    if (pWire->user_onRequest) {
-        /* reset master tx buffer iterator vars */
-        /* !!! this will kill any pending pre-master sendTo() activity */
-        pWire->_tx_buffer.head = 0;
-        pWire->_tx_buffer.tail = 0;
-        /* reset slave tx buffer iterator vars */
-        pWire->_i2c.tx_buffer_ptr = pWire->_tx_buffer.buffer;
-        pWire->_i2c.tx_count = 0;
-        /* alert user program */
-        pWire->user_onRequest();
-        /* reset slave tx buffer iterator to let interrupt transmit the buffer */
-        pWire->_i2c.tx_buffer_ptr = pWire->_tx_buffer.buffer;
-    }
+  TwoWire *pWire = (TwoWire *)pWireObj;
+  // don't bother if user hasn't registered a callback
+  if (pWire->user_onRequest) {
+    // reset master tx buffer iterator vars
+    // !!! this will kill any pending pre-master sendTo() activity
+    pWire->_tx_buffer.head = 0;
+    pWire->_tx_buffer.tail = 0;
+    // reset slave tx buffer iterator vars
+    pWire->_i2c.tx_buffer_ptr = pWire->_tx_buffer.buffer;
+    pWire->_i2c.tx_count = 0;
+    // alert user program
+    pWire->user_onRequest();
+    // reset slave tx buffer iterator to let interrupt transmit the buffer
+    pWire->_i2c.tx_buffer_ptr = pWire->_tx_buffer.buffer;
+  }
 }
 
-/* sets function called on slave write */
+// sets function called on slave write
 void TwoWire::onReceive(void (*function)(int))
 {
-    user_onReceive = function;
+  user_onReceive = function;
 }
 
-/* sets function called on slave read */
+// sets function called on slave read
 void TwoWire::onRequest(void (*function)(void))
 {
-    user_onRequest = function;
+  user_onRequest = function;
 }
 
 void TwoWire::setClock(uint32_t clock_hz)
 {
-    /* tests show the clock can only be changed while the I2C peripheral is off */
-    i2c_disable(_i2c.i2c);
-    i2c_set_clock(&_i2c, clock_hz);
-    i2c_enable(_i2c.i2c);
+  //tests show tha clock can only be changed while the I2C peripheral is **of**.
+  i2c_disable(_i2c.i2c);
+  i2c_set_clock(&_i2c, clock_hz);
+  i2c_enable(_i2c.i2c);
 }

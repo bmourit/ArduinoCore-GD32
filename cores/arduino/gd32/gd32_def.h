@@ -27,6 +27,7 @@ OF SUCH DAMAGE.
 
 #ifndef _GD32_DEF_
 #define _GD32_DEF_
+
 #include "gd32xxyy.h"
 
 /**
@@ -45,4 +46,14 @@ OF SUCH DAMAGE.
 #define WEAK __attribute__ ((weak))
 #endif
 
-#endif /*_GD32_DEF_ */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void _Error_Handler(const char *, int);
+#define Error_Handler() _Error_Handler(__FILE__, __LINE__)
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* _GD32_DEF_ */

@@ -91,14 +91,14 @@ void i2c_clock_config(uint32_t i2c_periph, uint32_t clkspeed, uint32_t dutycyc)
     uint32_t temp;
     
     /* check the clkspeed value */
-    if(0U == clkspeed){
+    if (0U == clkspeed){
         I2C_ERROR_HANDLE("the parameter can not be 0 \r\n");
     }
-    
+
     pclk1 = rcu_clock_freq_get(CK_APB1);
     /* I2C peripheral clock frequency */
-    freq = (uint32_t)(pclk1/1000000U);
-    if(freq >= I2CCLK_MAX){
+    freq = (uint32_t)(pclk1 / 1000000U);
+    if (freq >= I2CCLK_MAX) {
         freq = I2CCLK_MAX;
     }
     temp = I2C_CTL1(i2c_periph);
@@ -107,45 +107,45 @@ void i2c_clock_config(uint32_t i2c_periph, uint32_t clkspeed, uint32_t dutycyc)
     
     I2C_CTL1(i2c_periph) = temp;
     
-    if(100000U >= clkspeed){
+    if (100000U >= clkspeed) {
         /* the maximum SCL rise time is 1000ns in standard mode */
-        risetime = (uint32_t)((pclk1/1000000U)+1U);
-        if(risetime >= I2CCLK_MAX){
+        risetime = (uint32_t)((pclk1 / 1000000U) + 1U);
+        if (risetime >= I2CCLK_MAX) {
             I2C_RT(i2c_periph) = I2CCLK_MAX;
-        }else if(risetime <= I2CCLK_MIN){
+        } else if (risetime <= I2CCLK_MIN) {
             I2C_RT(i2c_periph) = I2CCLK_MIN;
-        }else{
+        } else {
             I2C_RT(i2c_periph) = risetime;
         }
-        clkc = (uint32_t)(pclk1/(clkspeed*2U));
-        if(clkc < 0x04U){
+        clkc = (uint32_t)(pclk1 / (clkspeed * 2U));
+        if (clkc < 0x04U){
             /* the CLKC in standard mode minmum value is 4 */
             clkc = 0x04U;
         }
         I2C_CKCFG(i2c_periph) |= (I2C_CKCFG_CLKC & clkc);
 
-    }else if(400000U >= clkspeed){
+    } else if (400000U >= clkspeed) {
         /* the maximum SCL rise time is 300ns in fast mode */
-        I2C_RT(i2c_periph) = (uint32_t)(((freq*(uint32_t)300U)/(uint32_t)1000U)+(uint32_t)1U);
-        if(I2C_DTCY_2 == dutycyc){
+        I2C_RT(i2c_periph) = (uint32_t)(((freq * (uint32_t)300U) / (uint32_t)1000U) + (uint32_t)1U);
+        if (I2C_DTCY_2 == dutycyc) {
             /* I2C duty cycle is 2 */
-            clkc = (uint32_t)(pclk1/(clkspeed*3U));
+            clkc = (uint32_t)(pclk1 / (clkspeed * 3U));
             I2C_CKCFG(i2c_periph) &= ~I2C_CKCFG_DTCY;
-        }else{
+        } else {
             /* I2C duty cycle is 16/9 */
-            clkc = (uint32_t)(pclk1/(clkspeed*25U));
+            clkc = (uint32_t)(pclk1 / (clkspeed * 25U));
             I2C_CKCFG(i2c_periph) |= I2C_CKCFG_DTCY;
         }
-        if(0U == (clkc & I2C_CKCFG_CLKC)){
+        if (0U == (clkc & I2C_CKCFG_CLKC)) {
             /* the CLKC in fast mode minmum value is 1 */
             clkc |= 0x0001U;  
         }
         I2C_CKCFG(i2c_periph) |= I2C_CKCFG_FAST;
         I2C_CKCFG(i2c_periph) |= clkc;
-    }else{
+    } else {
         /* fast mode plus, the maximum SCL rise time is 120ns */
         I2C_RT(i2c_periph) = (uint32_t)(((freq*(uint32_t)120U)/(uint32_t)1000U)+(uint32_t)1U);
-        if(I2C_DTCY_2 == dutycyc){
+        if (I2C_DTCY_2 == dutycyc){
             /* I2C duty cycle is 2 */
             clkc = (uint32_t)(pclk1/(clkspeed*3U));
             I2C_CKCFG(i2c_periph) &= ~I2C_CKCFG_DTCY;

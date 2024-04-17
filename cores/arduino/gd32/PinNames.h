@@ -275,7 +275,7 @@ typedef enum {
 #define PIN_CHON_BITS (0x1 << 24)
 
 
-/*
+/**
  * BIT[7:4] port number (0=PORTA, 1=PORTB, 2=PORTC, 3=PORTD, 4=PORTE)
  * BIT[3:0] pin number
  */
@@ -292,9 +292,9 @@ typedef enum {
 #define GD_PIN_CHANNEL_GET(X)		((X >> PIN_CHANNEL_SHIFT) & PIN_CHANNEL_MASK)
 #define GD_PIN_CHON_GET(X)			((X >> PIN_CHON_SHIFT) & PIN_CHON_MASK)
 
-/*
-/* This typedef is used to extend the PinMode typedef enum
-/* in the ArduinoAPI, since they don't have constants
+/**
+ * This typedef is used to extend the PinMode typedef enum
+ * in the ArduinoAPI, since they don't have constants
  */
 typedef enum {
 	OUTPUT_OPEN_DRAIN = 4,	// This was merged into Arduino API, so we know it will have this value in the future.
@@ -326,7 +326,7 @@ enum {
 #define PIN_MODE_AF 2
 #define PIN_MODE_ANALOG 3
 
-/*
+/**
  * We need a way to insure we cleanly encode these bits
  * in a unified way. Using the definitions below makes sure all devices
  * are encoded the same way. This cleans up a lot of code.

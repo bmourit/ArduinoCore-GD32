@@ -659,11 +659,11 @@ typedef enum
 /* rcu clock frequency */
 typedef enum
 {
-    CK_SYS      = 0,                                                        /*!< system clock */
-    CK_AHB,                                                                 /*!< AHB clock */
-    CK_APB1,                                                                /*!< APB1 clock */
-    CK_APB2,                                                                /*!< APB2 clock */
-}rcu_clock_freq_enum;
+   CK_SYS = 0,                                                             /*!< system clock */
+   CK_AHB,                                                                 /*!< AHB clock */
+   CK_APB1,                                                                /*!< APB1 clock */
+   CK_APB2,                                                                /*!< APB2 clock */
+} rcu_clock_freq_enum;
 
 /* RCU_CFG0 register bit define */
 /* system clock source select */

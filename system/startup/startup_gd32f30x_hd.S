@@ -2,7 +2,8 @@
   .cpu cortex-m4
   .fpu softvfp
   .thumb
-  
+
+.global  __gVectors
 .global  Default_Handler
 
 /* necessary symbols defined in linker script to initialize data */
@@ -12,6 +13,7 @@
 .word  _sbss
 .word  _ebss
 
+  /* .equ  BootRAM,        0xF1E0F85F */
 
   .section  .text.Reset_Handler
   .weak  Reset_Handler
@@ -19,6 +21,9 @@
 
 /* reset Handler */
 Reset_Handler:
+  ldr sp, =_sp        /* Atollic update: set stack pointer */
+
+/* Copy the data segment initializers from flash to SRAM */
   movs r1, #0
   b DataInit
 
@@ -45,11 +50,12 @@ Zerobss:
   ldr r3, = _ebss
   cmp r2, r3
   bcc FillZerobss
+
 /* Call SystemInit function */
   bl  SystemInit
 /* Call static constructors */
   bl __libc_init_array
-/*Call the main function */
+/* Call the main function (entry point) */
   bl main
   bx lr
 .size Reset_Handler, .-Reset_Handler
@@ -61,7 +67,8 @@ Infinite_Loop:
   .size Default_Handler, .-Default_Handler
 
    .section  .vectors,"a",%progbits
-   .global __gVectors
+   .type __gVectors, %object
+   .size __gVectors. .-__gVectors
 
 __gVectors:
                     .word _sp                            /* Top of Stack */
@@ -142,9 +149,52 @@ __gVectors:
                     .word DMA1_Channel1_IRQHandler       /* 73:DMA1 Channel1 */
                     .word DMA1_Channel2_IRQHandler       /* 74:DMA1 Channel2 */
                     .word DMA1_Channel3_4_IRQHandler     /* 75:DMA1 Channel3 and Channel4 */
-                                       
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word 0
+                    .word BootRAM       /* @0x1E0 GD32F303x HD devices boot RAM mode */
 
-   .size   __gVectors, . - __gVectors
 
   .weak NMI_Handler
   .thumb_set NMI_Handler,Default_Handler

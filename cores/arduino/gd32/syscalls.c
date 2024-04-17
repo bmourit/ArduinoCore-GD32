@@ -79,12 +79,10 @@ int _read(UNUSED(int file), UNUSED(char *ptr), UNUSED(int len))
   return 0;
 }
 
-/* Moved to Print.cpp to support Print::printf()
 __attribute__((weak))
 int _write(UNUSED(int file), char *ptr, int len)
 {
 }
-*/
 
 __attribute__((weak))
 void _exit(UNUSED(int status))

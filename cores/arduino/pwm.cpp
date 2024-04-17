@@ -43,7 +43,7 @@ HardwarePWM::HardwarePWM(uint32_t pin)
     PinName instance = DIGITAL_TO_PINNAME(pin);
     this->pwmCallback = NULL;
     this->pwmPeriodCycle = {9999, 4999, FORMAT_US};
-    this->pwmDevice   = getTimerDeviceFromPinname(instance);
+    this->pwmDevice = getTimerDeviceFromPinname(instance);
     this->ispwmActive = false;
     this->index = getPWMIndex(pwmDevice);
     pwmObj[index] = this;

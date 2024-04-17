@@ -30,137 +30,130 @@ SPIClass SPI;
 
 SPIClass::SPIClass(void)
 {
-    _spi.pin_miso = DIGITAL_TO_PINNAME(MISO);
-    _spi.pin_mosi = DIGITAL_TO_PINNAME(MOSI);
-    _spi.pin_sclk = DIGITAL_TO_PINNAME(SCK);
-    _spi.pin_ssel = NC;
-
-    _spi.initialized = false;
+  _spi.pin_miso = DIGITAL_TO_PINNAME(MISO);
+  _spi.pin_mosi = DIGITAL_TO_PINNAME(MOSI);
+  _spi.pin_sclk = DIGITAL_TO_PINNAME(SCK);
+  _spi.pin_ssel = NC;
+  initialized = false;
 }
 
 SPIClass::SPIClass(PinName mosi, PinName miso, PinName sclk, PinName ssel)
 {
-    _spi.pin_miso = miso;
-    _spi.pin_mosi = mosi;
-    _spi.pin_sclk = sclk;
-    _spi.pin_ssel = ssel;
-
-    _spi.initialized = false;
+  _spi.pin_miso = miso;
+  _spi.pin_mosi = mosi;
+  _spi.pin_sclk = sclk;
+  _spi.pin_ssel = ssel;
+  initialized = false;
 }
 
 SPIClass::SPIClass(PinName mosi, PinName miso, PinName sclk)
 {
-    _spi.pin_miso = miso;
-    _spi.pin_mosi = mosi;
-    _spi.pin_sclk = sclk;
-    _spi.pin_ssel = NC;
-
-    _spi.initialized = false;
+  _spi.pin_miso = miso;
+  _spi.pin_mosi = mosi;
+  _spi.pin_sclk = sclk;
+  _spi.pin_ssel = NC;
+  initialized = false;
 }
 
 void SPIClass::begin()
 {
-    uint32_t test = 0;
-    if (_spi.initialized) {
-        return;
-    }
+  uint32_t test = 0;
 
-    spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
-
-    _spi.initialized = true;
+  if (initialized) {
+    return;
+  }
+  spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
+  initialized = true;
 }
 
 void SPIClass::end()
 {
-    if (_spi.initialized) {
-        spi_free(&_spi);
-        _spi.initialized = false;
-    }
+  if (initialized) {
+    spi_free(&_spi);
+    initialized = false;
+  }
 }
 
 void SPIClass::beginTransaction(SPISettings settings)
 {
-    config(settings);
-
-    spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
-
-    _spi.initialized = true;
+  config(settings);
+  spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
+  initialized = true;
 }
 
 void SPIClass::endTransaction(void)
 {
-    if (_spi.initialized) {
-        spi_free(&_spi);
-        _spi.initialized = false;
-    }
+  if (initialized) {
+    spi_free(&_spi);
+    initialized = false;
+  }
 }
 
 uint8_t SPIClass::transfer(uint8_t val8)
 {
-    uint32_t out_byte;
-    out_byte = spi_master_write(&_spi, val8);
+  uint32_t out_byte;
+  out_byte = spi_master_write(&_spi, val8);
 
-    return out_byte;
+  return out_byte;
 }
 
 uint16_t SPIClass::transfer16(uint16_t val16)
 {
-    uint16_t out_halfword;
-    uint8_t trans_data0, trans_data1, rec_data0, rec_data1;
+  uint16_t out_halfword;
+  uint8_t trans_data0, trans_data1, rec_data0, rec_data1;
 
-    trans_data0 = uint8_t(val16 & 0x00FF);
-    trans_data1 = uint8_t((val16 & 0xFF00) >> 8);
+  trans_data0 = uint8_t(val16 & 0x00FF);
+  trans_data1 = uint8_t((val16 & 0xFF00) >> 8);
 
-    if (spisettings.bitorder == LSBFIRST) {
-        rec_data0 = transfer(trans_data0);
-        rec_data1 = transfer(trans_data1);
-        out_halfword = uint16_t(rec_data0 || rec_data1 << 8);
-    } else {
-        rec_data0 = transfer(trans_data1);
-        rec_data1 = transfer(trans_data0);
-        out_halfword = uint16_t(rec_data1 || rec_data0 << 8);
-    }
+  if (spisettings.bitorder == LSBFIRST) {
+    rec_data0 = transfer(trans_data0);
+    rec_data1 = transfer(trans_data1);
+    out_halfword = uint16_t(rec_data0 || rec_data1 << 8);
+  } else {
+    rec_data0 = transfer(trans_data1);
+    rec_data1 = transfer(trans_data0);
+    out_halfword = uint16_t(rec_data1 || rec_data0 << 8);
+  }
 
-    return out_halfword;
+  return out_halfword;
 }
 
 void SPIClass::transfer(void *buf, size_t count)
 {
-    spi_master_block_write(&_spi, ((uint8_t *)buf), ((uint8_t *)buf), count);
+  spi_master_block_write(&_spi, ((uint8_t *)buf), ((uint8_t *)buf), count);
 }
 
 void SPIClass::transfer(void *bufout, void *bufin, size_t count)
 {
-    spi_master_block_write(&_spi, ((uint8_t *)bufout), ((uint8_t *)bufin), count);
+  spi_master_block_write(&_spi, ((uint8_t *)bufout), ((uint8_t *)bufin), count);
 }
 
 void SPIClass::setBitOrder(BitOrder order)
 {
-    spisettings.bitorder = order;
-    spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
+  spisettings.bitorder = order;
+  spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
 }
 
 void SPIClass::setDataMode(uint8_t mode)
 {
-    spisettings.datamode = mode;
-    spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
+  spisettings.datamode = mode;
+  spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
 }
 
 void SPIClass::setClockDivider(uint32_t divider)
 {
-    if (divider == 0) {
-        spisettings.speed = SPI_SPEED_DEFAULT;
-    } else {
-        /* Get clk freq of the SPI instance and compute it */
-        spisettings.speed = dev_spi_clock_source_frequency_get(&_spi) / divider;
-    }
-
-    spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
+  if (divider == 0) {
+    spisettings.speed = SPI_SPEED_DEFAULT;
+  } else {
+    /* Get clk freq of the SPI instance and compute it */
+    spisettings.speed = dev_spi_clock_source_frequency_get(&_spi) / divider;
+  }
+  spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
 }
 
 void SPIClass::config(SPISettings settings)
 {
-    spisettings.speed = settings.speed;
-    spisettings.datamode = settings.datamode;
-    spisettings.bitorder = settings.bitorder;
+  spisettings.speed = settings.speed;
+  spisettings.datamode = settings.datamode;
+  spisettings.bitorder = settings.bitorder;
 }
