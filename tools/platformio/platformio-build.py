@@ -181,8 +181,6 @@ env.Append(
         join(FRAMEWORK_DIR, "system", spl_series + "_firmware", "CMSIS", "GD", spl_series, "Source"),
         join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_standard_peripheral", "Include"),
         join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_standard_peripheral", "Source"),
-        join(CMSIS_DIR, "Core", "Include"),
-        join(CMSIS_DIR, "DSP", "Include"),
         join(FRAMEWORK_DIR, "cores", "arduino"),
         variant_dir,
     ],
