@@ -1,19 +1,19 @@
 /*
-    Copyright (c) 2020, GigaDevice Semiconductor Inc.
+   Copyright (c) 2020, GigaDevice Semiconductor Inc.
 
-    Redistribution and use in source and binary forms, with or without modification,
+   Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
 
-    1. Redistributions of source code must retain the above copyright notice, this
-       list of conditions and the following disclaimer.
-    2. Redistributions in binary form must reproduce the above copyright notice,
-       this list of conditions and the following disclaimer in the documentation
-       and/or other materials provided with the distribution.
-    3. Neither the name of the copyright holder nor the names of its contributors
-       may be used to endorse or promote products derived from this software without
-       specific prior written permission.
+   1. Redistributions of source code must retain the above copyright notice, this
+     list of conditions and the following disclaimer.
+   2. Redistributions in binary form must reproduce the above copyright notice,
+     this list of conditions and the following disclaimer in the documentation
+     and/or other materials provided with the distribution.
+   3. Neither the name of the copyright holder nor the names of its contributors
+     may be used to endorse or promote products derived from this software without
+     specific prior written permission.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -34,22 +34,22 @@ typedef void(*pwmCallback_t)(void);
 
 class HardwarePWM
 {
-	public:
-		HardwarePWM(uint32_t pin);																						// HardwarePWM object construct
-		void start(void);																									// start pwm output
-		void stop(void);																									// stop pwm output
-		void setPeriodCycle(uint32_t time, uint16_t cycle, enum timeFormat format = FORMAT_US);	// set pwm period and cycle
-		void writeCycleValue(uint32_t cycle, enum timeFormat format = FORMAT_US);						// set pwm cycle time with the inital format
-		void attachInterrupt(pwmCallback_t callback);															// attach callback for capture/compare interrupt
-		void detachInterrupt(void);																					// detach callback for capture/compare interrupt
-		void captureCompareCallback(void);																			// capture/compare callback handler
+  public:
+    HardwarePWM(uint32_t pin);                                            // HardwarePWM object construct
+    void start(void);                                                 // start pwm output
+    void stop(void);                                                  // stop pwm output
+    void setPeriodCycle(uint32_t time, uint16_t cycle, enum timeFormat format = FORMAT_US); // set pwm period and cycle
+    void writeCycleValue(uint32_t cycle, enum timeFormat format = FORMAT_US);           // set pwm cycle time with the inital format
+    void attachInterrupt(pwmCallback_t callback);                             // attach callback for capture/compare interrupt
+    void detachInterrupt(void);                                         // detach callback for capture/compare interrupt
+    void captureCompareCallback(void);                                      // capture/compare callback handler
 
-	private:
-		uint32_t index;
-		bool ispwmActive;
-		pwmPeriodCycle_t pwmPeriodCycle;
-		pwmDevice_t pwmDevice;
-		pwmCallback_t pwmCallback;
+  private:
+    uint32_t index;
+    bool ispwmActive;
+    pwmPeriodCycle_t pwmPeriodCycle;
+    pwmDevice_t pwmDevice;
+    pwmCallback_t pwmCallback;
 };
 
 extern pwmhandle_t pwmHandle;

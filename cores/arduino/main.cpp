@@ -23,7 +23,9 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *****************************************************************************/
+
 #include "Arduino.h"
+
 #ifdef USBCON
 #include "USBCore.h"
 #endif
@@ -31,35 +33,35 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 void init(void)
 {
-    systick_config();
+  systick_config();
 }
 
 #ifdef __cplusplus
 }
 #endif
 
-
 // Force init to be called *first*, i.e. before static object allocation.
 // Otherwise, statically allocated objects that need libmaple may fail.
 __attribute__((constructor(101))) void premain()
 {
-    init();
+  init();
 }
 
 int main(void)
 {
 #ifdef USBCON
-    // TODO: remove this and only call it when the USB is attempted to
-    // be used.
-    USBCore().connect();
+  // TODO: remove this and only call it when the USB is attempted to
+  // be used.
+  USBCore().connect();
 #endif
+  setup();
 
-    setup();
+  while (1) {
+    loop();
+  }
 
-    while (1) {
-        loop();
-    }
-    return 0;
+  return 0;
 }

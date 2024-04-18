@@ -6,10 +6,13 @@
   */
 
 #include "gd32_def.h"
+
 #if defined (  __GNUC__  ) /* GCC CS3 */
   #include <sys/stat.h>
 #endif
+
 #include <errno.h>
+
 #undef errno
 extern int errno;
 

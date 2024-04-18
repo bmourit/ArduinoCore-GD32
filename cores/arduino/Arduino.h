@@ -24,7 +24,6 @@
  * SOFTWARE.
  *****************************************************************************/
 
-
 #ifndef Arduino_h
 #define Arduino_h
 
@@ -41,13 +40,14 @@ using namespace arduino;
 
 #define EXTENDED_PIN_MODE
 
-#define interrupts() __enable_irq()
-#define noInterrupts() __disable_irq()
-#define digitalPinToInterrupt(pin) (pin)
+#define interrupts()      __enable_irq()
+#define noInterrupts()    __disable_irq()
+#define digitalPinToInterrupt(pin)  (pin)
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+
 #include "gd32/systick.h"
 #include "analog.h"
 #include "wiring_analog_extra.h"

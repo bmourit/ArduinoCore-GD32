@@ -11,11 +11,11 @@ extern "C" {
   */
 WEAK void _Error_Handler(const char *msg, int val)
 {
-    (void) msg;
-    (void) val;
-    /* User can add his own implementation to report the SPL error return state */
-    while (1) {
-    }
+  (void) msg;
+  (void) val;
+  /* User can add his own implementation to report the SPL error return state */
+  while (1) {
+  }
 }
 
 #ifdef __cplusplus

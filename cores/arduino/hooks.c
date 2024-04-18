@@ -24,6 +24,6 @@
  */
 static void __empty()
 {
-    // Empty
+  // Empty
 }
 void yield(void) __attribute__((weak, alias("__empty")));

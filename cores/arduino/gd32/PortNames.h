@@ -1,19 +1,19 @@
 /*
-    Copyright (c) 2020, GigaDevice Semiconductor Inc.
+  Copyright (c) 2020, GigaDevice Semiconductor Inc.
 
-    Redistribution and use in source and binary forms, with or without modification,
+  Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
 
-    1. Redistributions of source code must retain the above copyright notice, this
-       list of conditions and the following disclaimer.
-    2. Redistributions in binary form must reproduce the above copyright notice,
-       this list of conditions and the following disclaimer in the documentation
-       and/or other materials provided with the distribution.
-    3. Neither the name of the copyright holder nor the names of its contributors
-       may be used to endorse or promote products derived from this software without
-       specific prior written permission.
+  1. Redistributions of source code must retain the above copyright notice, this
+     list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright notice,
+     this list of conditions and the following disclaimer in the documentation
+     and/or other materials provided with the distribution.
+  3. Neither the name of the copyright holder nor the names of its contributors
+     may be used to endorse or promote products derived from this software without
+     specific prior written permission.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -35,45 +35,45 @@ extern "C" {
 #endif
 
 typedef enum {
-    PORTA = 0x00,
-    PORTB,
+  PORTA = 0x00,
+  PORTB,
 #if defined GPIOC
-    PORTC,
+  PORTC,
 #else
-    PORTC_NOT_THERE,
+  PORTC_NOT_THERE,
 #endif
 #if defined GPIOD
-    PORTD,
+  PORTD,
 #else
-    PORTD_NOT_THERE,
+  PORTD_NOT_THERE,
 #endif
 #if defined GPIOE
-    PORTE,
+  PORTE,
 #else
-    PORTE_NOT_THERE,
+  PORTE_NOT_THERE,
 #endif
 #if defined GPIOF
-    PORTF,
+  PORTF,
 #else
-    PORTF_NOT_THERE,
+  PORTF_NOT_THERE,
 #endif
 #if defined GPIOG
-    PORTG,
+  PORTG,
 #else
-    PORTG_NOT_THERE,
+  PORTG_NOT_THERE,
 #endif
 #if defined GPIOH
-    PORTH,
+  PORTH,
 #else
-    PORTH_NOT_THERE,
+  PORTH_NOT_THERE,
 #endif
 #if defined GPIOI
-    PORTI,
+  PORTI,
 #else
-    PORTI_NOT_THERE,
+  PORTI_NOT_THERE,
 #endif
-    PORTEND,
-    LastPort = PORTEND - 1
+  PORTEND,
+  LastPort = PORTEND - 1
 } PortName;
 
 #define GPIO_PORT_NUM (PORTEND)

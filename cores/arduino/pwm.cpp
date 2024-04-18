@@ -1,19 +1,19 @@
 /*
-    Copyright (c) 2020, GigaDevice Semiconductor Inc.
+  Copyright (c) 2020, GigaDevice Semiconductor Inc.
 
-    Redistribution and use in source and binary forms, with or without modification,
+  Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
 
-    1. Redistributions of source code must retain the above copyright notice, this
-       list of conditions and the following disclaimer.
-    2. Redistributions in binary form must reproduce the above copyright notice,
-       this list of conditions and the following disclaimer in the documentation
-       and/or other materials provided with the distribution.
-    3. Neither the name of the copyright holder nor the names of its contributors
-       may be used to endorse or promote products derived from this software without
-       specific prior written permission.
+  1. Redistributions of source code must retain the above copyright notice, this
+     list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright notice,
+     this list of conditions and the following disclaimer in the documentation
+     and/or other materials provided with the distribution.
+  3. Neither the name of the copyright holder nor the names of its contributors
+     may be used to endorse or promote products derived from this software without
+     specific prior written permission.
 
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -28,136 +28,136 @@ OF SUCH DAMAGE.
 #include "pwm.h"
 #include "pins_arduino.h"
 
-#define PWMNUMS		56
+#define PWMNUMS   56
 
 HardwarePWM *pwmObj[PWMNUMS] = { NULL };
 
 /*!
-    \brief      PWM object construct
-    \param[in]  pin: pin supporting PWM
-    \param[out] none
-    \retval     none
+  \brief      PWM object construct
+  \param[in]  pin: pin supporting PWM
+  \param[out] none
+  \retval     none
 */
 HardwarePWM::HardwarePWM(uint32_t pin)
 {
-    PinName instance = DIGITAL_TO_PINNAME(pin);
-    this->pwmCallback = NULL;
-    this->pwmPeriodCycle = {9999, 4999, FORMAT_US};
-    this->pwmDevice = getTimerDeviceFromPinname(instance);
-    this->ispwmActive = false;
-    this->index = getPWMIndex(pwmDevice);
-    pwmObj[index] = this;
-    pinmap_pinout(instance, PinMap_PWM);
-    pwmHandle.init(&pwmDevice);
+  PinName instance = DIGITAL_TO_PINNAME(pin);
+  this->pwmCallback = NULL;
+  this->pwmPeriodCycle = {9999, 4999, FORMAT_US};
+  this->pwmDevice = getTimerDeviceFromPinname(instance);
+  this->ispwmActive = false;
+  this->index = getPWMIndex(pwmDevice);
+  pwmObj[index] = this;
+  pinmap_pinout(instance, PinMap_PWM);
+  pwmHandle.init(&pwmDevice);
 }
 
 /*!
-    \brief      start pwm output
-    \param[in]  none
-    \param[out] none
-    \retval     none
+  \brief      start pwm output
+  \param[in]  none
+  \param[out] none
+  \retval     none
 */
 void HardwarePWM::start(void)
 {
-    pwmHandle.start(&pwmDevice);
-    this->ispwmActive = true;
+  pwmHandle.start(&pwmDevice);
+  this->ispwmActive = true;
 }
 
 /*!
-    \brief      stop pwm output
-    \param[in]  none
-    \param[out] none
-    \retval     none
+  \brief      stop pwm output
+  \param[in]  none
+  \param[out] none
+  \retval     none
 */
 void HardwarePWM::stop(void)
 {
-    pwmHandle.stop(&pwmDevice);
-    this->ispwmActive = false;
+  pwmHandle.stop(&pwmDevice);
+  this->ispwmActive = false;
 }
 
 /*!
-    \brief      set pwm period and cycle
-    \param[in]  time: period time
-    \param[in]  cycle: cycle time
-    \param[in]  format: time format
-    \param[out] none
-    \retval     none
+  \brief      set pwm period and cycle
+  \param[in]  time: period time
+  \param[in]  cycle: cycle time
+  \param[in]  format: time format
+  \param[out] none
+  \retval     none
 */
 void HardwarePWM::setPeriodCycle(uint32_t time, uint16_t cycle, enum timeFormat format)
 {
-    this->pwmPeriodCycle.period = time;
-    this->pwmPeriodCycle.cycle = cycle;
-    this->pwmPeriodCycle.format = format;
-    pwmHandle.setPeriodCycle(&pwmDevice, &pwmPeriodCycle);
+  this->pwmPeriodCycle.period = time;
+  this->pwmPeriodCycle.cycle = cycle;
+  this->pwmPeriodCycle.format = format;
+  pwmHandle.setPeriodCycle(&pwmDevice, &pwmPeriodCycle);
 }
 
 /*!
-    \brief      set pwm cycle time with the inital format
-    \param[in]  value: period time
-    \param[out] none
-    \retval     none
+  \brief      set pwm cycle time with the inital format
+  \param[in]  value: period time
+  \param[out] none
+  \retval     none
 */
 void HardwarePWM::writeCycleValue(uint32_t cycle, enum timeFormat format)
 {
-    this->pwmPeriodCycle.cycle = cycle;
-    this->pwmPeriodCycle.format = format;
-    pwmHandle.writeCycleValue(&pwmDevice, &pwmPeriodCycle);
+  this->pwmPeriodCycle.cycle = cycle;
+  this->pwmPeriodCycle.format = format;
+  pwmHandle.writeCycleValue(&pwmDevice, &pwmPeriodCycle);
 }
 
 /*!
-    \brief      attach callback for capture/compare interrupt
-    \param[in]  callback: callback function
-    \param[out] none
-    \retval     none
+  \brief      attach callback for capture/compare interrupt
+  \param[in]  callback: callback function
+  \param[out] none
+  \retval     none
 */
 void HardwarePWM::attachInterrupt(pwmCallback_t callback)
 {
-    this->pwmCallback = callback;
-    pwmHandle.enablePWMIT(&pwmDevice);
+  this->pwmCallback = callback;
+  pwmHandle.enablePWMIT(&pwmDevice);
 }
 
 /*!
-    \brief      detach callback for capture/compare interrupt
-    \param[in]  none
-    \param[out] none
-    \retval     none
+  \brief      detach callback for capture/compare interrupt
+  \param[in]  none
+  \param[out] none
+  \retval     none
 */
 void HardwarePWM::detachInterrupt(void)
 {
-    this->pwmCallback = NULL;
-    pwmHandle.disablePWMIT(&pwmDevice);
+  this->pwmCallback = NULL;
+  pwmHandle.disablePWMIT(&pwmDevice);
 }
 
 /*!
-    \brief      capture/compare callback handler
-    \param[in]  none
-    \param[out] none
-    \retval     none
+  \brief      capture/compare callback handler
+  \param[in]  none
+  \param[out] none
+  \retval     none
 */
 void HardwarePWM::captureCompareCallback(void)
 {
-    if (NULL != this->pwmCallback) {
-        this->pwmCallback();
-    }
+  if (NULL != this->pwmCallback) {
+    this->pwmCallback();
+  }
 }
 
 extern "C"
 {
-    /*!
-        \brief      pwm capture/compare interrupt handler
-        \param[in]  timer: PWMx(x=0..11)
-        \param[in]  channel: TIMER_CH_x(x=0..4)
-        \param[out] none
-        \retval     none
-    */
-    void PWM_irqHandle(uint32_t timer, uint8_t channel)
-    {
-        uint32_t index = 0;
-        pwmDevice_t pwmDevice = {timer, channel};
-        index = getPWMIndex(pwmDevice);
-        if (pwmObj[index]) {
-            pwmObj[index]->captureCompareCallback();
-        }
+  /*!
+    \brief      pwm capture/compare interrupt handler
+    \param[in]  timer: PWMx(x=0..11)
+    \param[in]  channel: TIMER_CH_x(x=0..4)
+    \param[out] none
+    \retval     none
+  */
+  void PWM_irqHandle(uint32_t timer, uint8_t channel)
+  {
+    uint32_t index = 0;
+    pwmDevice_t pwmDevice = {timer, channel};
+    index = getPWMIndex(pwmDevice);
+    if (pwmObj[index]) {
+      pwmObj[index]->captureCompareCallback();
     }
+  }
 }
 
