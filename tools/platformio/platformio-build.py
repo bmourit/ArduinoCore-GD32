@@ -155,7 +155,7 @@ env.Append(
         "-Os",  # optimize for size
         "-ffunction-sections",  # place each function in its own section
         "-fdata-sections",
-        "-Wall".
+        "-Wall",
         "-nostdlib",
         "--param",
         "max-inline-insns-single=500",
