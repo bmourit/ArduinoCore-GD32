@@ -19,6 +19,7 @@
 #define _PINNAMES_H
 
 #include "cmsis.h"
+#include "PortNames.h"
 
 #ifdef __cplusplus
 extern "C" {
