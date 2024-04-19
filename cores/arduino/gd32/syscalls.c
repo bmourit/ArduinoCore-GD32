@@ -83,7 +83,7 @@ int _read(UNUSED(int file), UNUSED(char *ptr), UNUSED(int len))
 }
 
 __attribute__((weak))
-int _write((int file), char *ptr, int len)
+int _write(int file, char *ptr, int len)
 {
   switch (file) {
     case STDOUT_FILENO:
