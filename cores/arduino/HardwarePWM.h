@@ -25,24 +25,23 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
-#ifndef PWM_H
-#define PWM_H
+#ifndef HARDWAREPWM_H
+#define PARDWAREPWM_H
 
 #include "timer.h"
 
 typedef void(*pwmCallback_t)(void);
 
-class HardwarePWM
-{
+class HardwarePWM {
   public:
-    HardwarePWM(uint32_t pin);                                            // HardwarePWM object construct
-    void start(void);                                                 // start pwm output
-    void stop(void);                                                  // stop pwm output
+    HardwarePWM(uint32_t pin);                                                              // HardwarePWM object construct
+    void start(void);                                                                       // start pwm output
+    void stop(void);                                                                        // stop pwm output
     void setPeriodCycle(uint32_t time, uint16_t cycle, enum timeFormat format = FORMAT_US); // set pwm period and cycle
-    void writeCycleValue(uint32_t cycle, enum timeFormat format = FORMAT_US);           // set pwm cycle time with the inital format
-    void attachInterrupt(pwmCallback_t callback);                             // attach callback for capture/compare interrupt
-    void detachInterrupt(void);                                         // detach callback for capture/compare interrupt
-    void captureCompareCallback(void);                                      // capture/compare callback handler
+    void writeCycleValue(uint32_t cycle, enum timeFormat format = FORMAT_US);               // set pwm cycle time with the inital format
+    void attachInterrupt(pwmCallback_t callback);                                           // attach callback for capture/compare interrupt
+    void detachInterrupt(void);                                                             // detach callback for capture/compare interrupt
+    void captureCompareCallback(void);                                                      // capture/compare callback handler
 
   private:
     uint32_t index;
@@ -54,4 +53,4 @@ class HardwarePWM
 
 extern pwmhandle_t pwmHandle;
 
-#endif /* PWM_H */
+#endif /* HARDWAREPWM_H */

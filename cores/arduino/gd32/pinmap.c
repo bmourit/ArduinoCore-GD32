@@ -19,7 +19,7 @@
  */
 #include "pinmap.h"
 #include "PortNames.h"
-#include <gd32_debug.h>
+#include <gd_debug.h>
 
 //extern const int GD_GPIO_MODE[];
 extern const int GD_GPIO_SPEED[];
@@ -59,9 +59,9 @@ void pin_function(PinName pin, int function)
 	uint32_t port = GD_PORT_GET(pin);
 	uint32_t gd_pin = 1 << GD_PIN_GET(pin);
 
-	uint32_t spl_mode;
-	uint32_t spl_output;
-	uint32_t spl_pull;
+	uint32_t spl_mode = GPIO_MODE_IN_FLOATING;
+	uint32_t spl_output = 0;
+	uint32_t spl_pull = 0;
 
 	uint32_t mode = GD_PIN_MODE_GET(function);
 	uint32_t output = GD_PIN_OUTPUT_MODE_GET(function);
@@ -87,7 +87,7 @@ void pin_function(PinName pin, int function)
 		break;
 	case PIN_MODE_OUTPUT:
 		spl_mode = GPIO_MODE_OUTPUT;
-		break;l
+		break;
 	default:
 		break;
 	}

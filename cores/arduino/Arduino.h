@@ -36,7 +36,6 @@ using namespace arduino;
 #include "gd32xxyy.h"
 #include "gd32/pins_arduino.h"
 #include "gd32/PeripheralPins.h"
-#include "pwm.h"
 
 #define EXTENDED_PIN_MODE
 
@@ -45,9 +44,10 @@ using namespace arduino;
 #define digitalPinToInterrupt(pin)  (pin)
 
 #ifdef __cplusplus
+#include "HardwarePWM.h"
+
 extern "C" {
 #endif /* __cplusplus */
-
 #include "gd32/systick.h"
 #include "analog.h"
 #include "wiring_analog_extra.h"
@@ -60,6 +60,8 @@ extern "C" {
 }
 #endif /* __cplusplus */
 
+#ifdef __cplusplus
+
 void init(void);
 void setup();
 void loop();
@@ -70,4 +72,5 @@ void loop();
 #include "CDCACM.h"
 #endif
 
+#endif
 #endif

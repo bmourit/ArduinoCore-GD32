@@ -25,8 +25,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
-#include "pwm.h"
 #include "pins_arduino.h"
+#include "HardwarePWM.h"
 
 #define PWMNUMS   56
 
@@ -153,7 +153,7 @@ extern "C"
   void PWM_irqHandle(uint32_t timer, uint8_t channel)
   {
     uint32_t index = 0;
-    pwmDevice_t pwmDevice = {timer, channel};
+    pwmDevice_t pwmDevice = {(void *)timer, timer, channel};
     index = getPWMIndex(pwmDevice);
     if (pwmObj[index]) {
       pwmObj[index]->captureCompareCallback();

@@ -29,7 +29,7 @@ OF SUCH DAMAGE.
 */
 
 #include "analog.h"
-#include "pwm.h"
+#include "HardwarePWM.h"
 #include "gd_debug.h"
 
 #ifdef __cplusplus

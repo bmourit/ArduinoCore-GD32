@@ -29,7 +29,7 @@ OF SUCH DAMAGE.
 #define _TIMER_H_
 
 #include "gd32xxyy.h"
-#include "PinNames.h"
+//#include "PinNames.h"
 #include "PeripheralPins.h"
 
 #ifdef __cplusplus

@@ -50,7 +50,7 @@ extern "C" {
 #error "We don't understand this USART peripheral."
 #endif
 
-struct serial_s *obj_s_buff[UART_NUM] = { NULL };
+struct serial_s *obj_s_buf[UART_NUM] = { NULL };
 
 static rcu_periph_enum usart_clk[UART_NUM] = {
   RCU_USART0,
@@ -99,8 +99,8 @@ static void usart_init(struct serial_s *obj_s)
 	usart_baudrate_set(obj_s->uart, obj_s->baudrate);
 	usart_stop_bit_set(obj_s->uart, obj_s->stopbits);
 	usart_parity_config(obj_s->uart, obj_s->parity);
-	usart_receive_config(peripheral, USART_RECEIVE_ENABLE);
-	usart_transmit_config(peripheral, USART_TRANSMIT_ENABLE);
+	usart_receive_config(obj_s->uart, USART_RECEIVE_ENABLE);
+	usart_transmit_config(obj_s->uart, USART_TRANSMIT_ENABLE);
 }
 
 /**
@@ -125,14 +125,14 @@ void serial_enable(struct serial_s *obj_s)
  */
 void serial_init(serial_t *obj, PinName tx, PinName rx)
 {
+  struct serial_s *p_obj = GET_SERIAL_S(obj);
+
   if (p_obj == NULL) {
     return;
   }
 
-  struct serial_s *p_obj = GET_SERIAL_S(obj);
-
 	UARTName uart_tx = (UARTName)pinmap_peripheral(tx, PinMap_UART_TX);
-	UARTName uart_rx = (UARTName)pinmap_peripheral(x, PinMap_UART_RX);
+	UARTName uart_rx = (UARTName)pinmap_peripheral(rx, PinMap_UART_RX);
 
 	p_obj->uart = (UARTName)pinmap_merge(uart_tx, uart_rx);
 
@@ -295,7 +295,7 @@ void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_b
 			case 7:
 				return;
 		}
-		usart_word_length_set(p_obj->uart, p->obj->databits);
+		usart_word_length_set(p_obj->uart, p_obj->databits);
 	} else {
 		switch (data_bits) {
 			case 9:
@@ -330,7 +330,7 @@ void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_b
  */
 int serial_getc(serial_t *obj)
 {
-  serial_s *p_obj = GET_SERIAL_S(obj);
+  struct serial_s *p_obj = GET_SERIAL_S(obj);
 
 	return (int)(usart_data_receive(p_obj->uart) & BITS(0, 7 + (p_obj->databits >> 12)));
 }
@@ -419,7 +419,7 @@ uint8_t serial_rx_active(serial_t *obj)
  * @param obj The serial object
  * @param callback The transmit callback
  */
-void uart_attach_tx_callback(serial_t *obj, int (*callback)(serial_t *))
+void uart_attach_tx_callback(serial_t *obj, void(*callback)(serial_t *))
 {
 	if (obj == NULL) {
 		return;
@@ -437,7 +437,7 @@ void uart_attach_tx_callback(serial_t *obj, int (*callback)(serial_t *))
  * @param obj The serial object
  * @param callback The transmit callback
  */
-void uart_attach_rx_callback(serial_t *obj, void (*callback)(serial_t *))
+void uart_attach_rx_callback(serial_t *obj, void(*callback)(serial_t *))
 {
 	if (obj == NULL) {
 		return;
@@ -456,7 +456,7 @@ void uart_attach_rx_callback(serial_t *obj, void (*callback)(serial_t *))
  * @param obj_s The serial object
  * @return Returns the status
  */
-static gd_status_enum uart_rx_interrupt(struct serial_s *obj_s)
+static gd_status_enum usart_rx_interrupt(struct serial_s *obj_s)
 {
 	uint16_t *temp;
 
@@ -502,7 +502,7 @@ static gd_status_enum uart_rx_interrupt(struct serial_s *obj_s)
  * @param obj_s The serial object
  * @return Returns the status
  */
-static gd_status_enum uart_tx_interrupt(struct serial_s *obj_s)
+static gd_status_enum usart_tx_interrupt(struct serial_s *obj_s)
 {
 	uint16_t *temp;
 
@@ -607,7 +607,7 @@ static gd_status_enum usart_rx_interrupt_preprocess(struct serial_s *obj_s, uint
  * @param tx_length The number of bytes to transmit
  * @return Returns number of data transfered, otherwise returns 0
  */
-int serial_transmit(serial_t *obj, const void *tx, size_t tx_length)
+int serial_transmit(serial_t *obj, const uint8_t *tx, size_t tx_length)
 {
   struct serial_s *p_obj = GET_SERIAL_S(obj);
   IRQn_Type irq = usart_irq_n[p_obj->index];
@@ -621,7 +621,7 @@ int serial_transmit(serial_t *obj, const void *tx, size_t tx_length)
       return 0;
   }
 
-  obj->tx_buffer_ptr = (void *)tx;
+  obj->tx_buffer_ptr = (uint8_t *)tx;
   obj->tx_count = tx_length;
 
   /* enable interrupt */
@@ -642,7 +642,7 @@ int serial_transmit(serial_t *obj, const void *tx, size_t tx_length)
 /**
  *  Begin RX transfer (blocking) 
  */
-void serial_receive(serial_t *obj, void *rx, size_t rx_length)
+void serial_receive(serial_t *obj, const uint8_t *rx, size_t rx_length)
 {
   struct serial_s *p_obj = GET_SERIAL_S(obj);
   IRQn_Type irq = usart_irq_n[p_obj->index];
@@ -656,7 +656,7 @@ void serial_receive(serial_t *obj, void *rx, size_t rx_length)
 		return;
   }
 
-	obj->rx_buffer_ptr = rx;
+	obj->rx_buffer_ptr = (uint8_t *)rx;
 	obj->rx_count = rx_length;
 
 	/* enable interrupt */

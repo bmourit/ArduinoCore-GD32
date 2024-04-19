@@ -36,9 +36,9 @@ board_config = env.BoardConfig()
 
 # check framework is installed
 FRAMEWORK_DIR = platform.get_package_dir("framework-arduinogd32")
-#CMSIS_DIR = join(platform.get_package_dir("framework-arduinogd32"), "CMSIS", "CMSIS")
+# CMSIS_DIR = join(platform.get_package_dir("framework-arduinogd32"), "CMSIS", "CMSIS")
 assert isdir(FRAMEWORK_DIR)
-#assert isdir(CMSIS_DIR)
+# assert isdir(CMSIS_DIR)
 
 
 # get mcu and board variant
@@ -87,16 +87,16 @@ def add_upload_protocol_defines(upload_protocol):
     if upload_protocol in ("stlink", "dfu", "jlink") and is_generic:
         env.Append(CPPDEFINES=["GENERIC_BOOTLOADER"])
 
-def get_arm_math_lib(cpu):
-    core = board_config.get("build.cpu")
-    if "m4" in core:
-        return "arm_cortexM4lf_math"
-    elif "m7" in core:
-        return "arm_cortexM7lfsp_math"
-    elif "m33" in core:
-        return "arm_ARMv8MMLlfsp_math"
-
-    return "arm_cortex%sl_math" % core[7:9].upper()
+#def get_arm_math_lib(cpu):
+#    core = board_config.get("build.cpu")
+#    if "m4" in core:
+#        return "arm_cortexM4lf_math"
+#    elif "m7" in core:
+#        return "arm_cortexM7lfsp_math"
+#    elif "m33" in core:
+#        return "arm_ARMv8MMLlfsp_math"
+#
+#    return "arm_cortex%sl_math" % core[7:9].upper()
 
 def configure_application_offset(mcu, upload_protocol):
     offset = 0
@@ -197,7 +197,6 @@ env.Append(
         "-Wl,--defsym=LD_MAX_DATA_SIZE=%d" % board_config.get("upload.maximum_ram_size"),
     ],
     LIBS=[
-        get_arm_math_lib(env.BoardConfig().get("build.cou")),
         "c",
         "m",
         "gcc",

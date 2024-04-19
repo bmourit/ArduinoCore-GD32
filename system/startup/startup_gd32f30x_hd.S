@@ -68,7 +68,7 @@ Infinite_Loop:
 
    .section  .vectors,"a",%progbits
    .type __gVectors, %object
-   .size __gVectors. .-__gVectors
+   .size __gVectors, .-__gVectors
 
 __gVectors:
                     .word _sp                            /* Top of Stack */
@@ -149,52 +149,6 @@ __gVectors:
                     .word DMA1_Channel1_IRQHandler       /* 73:DMA1 Channel1 */
                     .word DMA1_Channel2_IRQHandler       /* 74:DMA1 Channel2 */
                     .word DMA1_Channel3_4_IRQHandler     /* 75:DMA1 Channel3 and Channel4 */
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word 0
-                    .word BootRAM       /* @0x1E0 GD32F303x HD devices boot RAM mode */
-
 
   .weak NMI_Handler
   .thumb_set NMI_Handler,Default_Handler

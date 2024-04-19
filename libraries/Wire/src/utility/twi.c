@@ -647,6 +647,7 @@ static void i2c_irq(struct i2c_s *obj_s)
   }
 }
 
+#ifdef __cplusplus
 #ifdef I2C0
 /** Handle I2C0 event interrupt request
  *
@@ -701,4 +702,5 @@ extern "C" void I2C2_ER_IRQHandler(void)
   i2c_err_handler(I2C2);
 }
 
+#endif
 #endif

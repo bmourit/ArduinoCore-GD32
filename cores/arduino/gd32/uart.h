@@ -141,7 +141,7 @@ struct serial_s {
   uint32_t stopbits;
   uint32_t parity;
   /* operating params */
-  uint16_t rx_size
+  uint16_t rx_size;
   uint8_t *tx_buffer_ptr;
   uint8_t *rx_buffer_ptr;
   /* for use in HardwareSerial */
@@ -180,7 +180,7 @@ typedef enum {
 } uart_index_t;
 
 /* Initialize the serial peripheral. It sets the default parameters for serial peripheral, and configures its specifieds pins. */
-void serial_init(serial_t *obj, uint32_t baudrate, uint32_t databits, SerialParity parity, uint32_t stopbits);
+void serial_init(serial_t *obj, PinName pin_rx, PinName pin_tx);
 /* Enable serial peripheral after init or init + format. */
 void serial_enable(struct serial_s *obj_s);
 /* Release the serial peripheral, not currently invoked. It requires further resource management. */
@@ -208,23 +208,23 @@ void uart_attach_tx_callback(serial_t *obj, void(*callback)(serial_t *));
 /* Attach UART receive callback */
 void uart_attach_rx_callback(serial_t *obj, void(*callback)(serial_t *));
 /* Begin asynchronous TX transfer */
-gd_status_enum serial_transmit(serial_t *obj, const uint8_t *txData, size_t txsize);
+int serial_transmit(serial_t *obj, const uint8_t *tx, size_t tx_length);
 /* Begin asynchronous RX transfer (enable interrupt for data collecting) */
-gd_status_enum serial_receive(serial_t *obj, const uint8_t *rxData, size_t rxsize);
+void serial_receive(serial_t *obj, const uint8_t *rx, size_t rx_length);
 
 
 /* non-blocking */
-gd_status_enum serial_transmit_nb(serial_t *obj, const uint8_t *txData, size_t txSize);
+//gd_status_enum serial_transmit_nb(serial_t *obj, const uint8_t *txData, size_t txSize);
 /* non-blocking */
-gd_status_enum serial_receive_nb(serial_t *obj, uint8_t *rxData, size_t rxSize);
+//gd_status_enum serial_receive_nb(serial_t *obj, uint8_t *rxData, size_t rxSize);
 /* tx transfer complete callback */
-void uart_rx_transfercomplete(serial_t *obj);
+//void uart_rx_transfercomplete(serial_t *obj);
 /* rx transfer complete callback */
-void uart_tx_transfercomplete(serial_t *obj);
+//void uart_tx_transfercomplete(serial_t *obj);
 /* error callback */
-void uart_error_callback(struct serial_s *obj_s);
+//void uart_error_callback(struct serial_s *obj_s);
 /* IRQ Handler */
-void UART_IRQHandler(struct serial_s *obj_s);
+//void UART_IRQHandler(struct serial_s *obj_s);
 
 #ifdef __cplusplus
 }

@@ -68,9 +68,9 @@ static void Servo_PeriodElapsedCallback()
 // Servo Timer init
 static void TimerServoInit()
 {
-  uint32_t fre = TimerServo.getTimerClkFre();
+  uint32_t freq = TimerServo.getTimerClkFreq();
 
-  TimerServo.setPrescaler(fre / 1000000 - 1);
+  TimerServo.setPrescaler(freq / 1000000 - 1);
   TimerServo.setReloadValue(20000);
   TimerServo.attachInterrupt(Servo_PeriodElapsedCallback);
   TimerServo.start();

@@ -29,6 +29,7 @@ OF SUCH DAMAGE.
 #include "pins_arduino.h"
 
 #define TIMERNUMS   13
+#define TIMER_NUM_CHANNELS 4
 
 HardwareTimer *hardwaretimerObj[TIMERNUMS] = { NULL };
 
