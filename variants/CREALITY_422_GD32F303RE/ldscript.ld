@@ -1,5 +1,4 @@
 
-
 ENTRY(Reset_Handler)
 
 _sp = 0x20000000 + LD_MAX_DATA_SIZE;
@@ -123,12 +122,12 @@ SECTIONS
     __bss_end__ = _ebss;
   } >RAM
 
-  /* User_heap_stack section, used to check that there is enough "RAM" Ram  type memory left *
-  ._user_heap_stack :
+  /* user_heap_stack section, used to check that there is enough "RAM" Ram  type memory left */
+  .user_heap_stack :
   {
     . = ALIGN(8);
-    PROVIDE ( end = . );
-    PROVIDE ( _end = . );
+    PROVIDE ( end = _ebss );
+    PROVIDE ( _end = _ebss );
     . = . + _Min_Heap_Size;
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
