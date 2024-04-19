@@ -60,8 +60,6 @@ void pin_function(PinName pin, int function)
 	uint32_t gd_pin = 1 << GD_PIN_GET(pin);
 
 	uint32_t spl_mode = GPIO_MODE_IN_FLOATING;
-	uint32_t spl_output = 0;
-	uint32_t spl_pull = 0;
 
 	uint32_t mode = GD_PIN_MODE_GET(function);
 	uint32_t output = GD_PIN_OUTPUT_MODE_GET(function);
@@ -74,6 +72,8 @@ void pin_function(PinName pin, int function)
 
 #if defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32F4xx) || defined(GD32E23x)
 	uint32_t af = GD_PIN_AF_GET(function);
+	uint32_t spl_output = 0;
+	uint32_t spl_pull = 0;
 
 	switch (mode) {
 	case PIN_MODE_ANALOG:
@@ -149,8 +149,6 @@ void pin_function(PinName pin, int function)
 	default:
 		break;
 	}
-	spl_output = 0;
-	spl_pull = 0;
 #endif
 
 	uint32_t gpio = gpio_clock_enable(port);
