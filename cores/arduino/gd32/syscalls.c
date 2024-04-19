@@ -12,6 +12,7 @@
 #endif
 
 #include <errno.h>
+#include <unistd.h>
 
 #undef errno
 extern int errno;
@@ -83,19 +84,9 @@ int _read(UNUSED(int file), UNUSED(char *ptr), UNUSED(int len))
 }
 
 __attribute__((weak))
-int _write(int file, char *ptr, int len)
+int _write(UNUSED(int file), UNUSED(char *ptr), UNUSED(int len))
 {
-  switch (file) {
-    case STDOUT_FILENO:
-    case STDERR_FILENO:
-    case STDIN_FILENO:
-      break;
-    default:
-      ((class Print *)file)->write((uint8_t *)ptr, len);
-      break;
-  }
-
-  return len;
+  return 0;
 }
 
 

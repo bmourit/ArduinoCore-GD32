@@ -57,8 +57,6 @@ SPIClass::SPIClass(PinName mosi, PinName miso, PinName sclk)
 
 void SPIClass::begin()
 {
-  uint32_t test = 0;
-
   if (initialized) {
     return;
   }
@@ -108,11 +106,11 @@ uint16_t SPIClass::transfer16(uint16_t val16)
   if (spisettings.bitorder == LSBFIRST) {
     rec_data0 = transfer(trans_data0);
     rec_data1 = transfer(trans_data1);
-    out_halfword = uint16_t(rec_data0 || (rec_data1 << 8));
+    out_halfword = uint16_t(rec_data0 | (rec_data1 << 8));
   } else {
     rec_data0 = transfer(trans_data1);
     rec_data1 = transfer(trans_data0);
-    out_halfword = uint16_t(rec_data1 || (rec_data0 << 8));
+    out_halfword = uint16_t(rec_data1 | (rec_data0 << 8));
   }
 
   return out_halfword;

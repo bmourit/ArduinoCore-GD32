@@ -499,7 +499,7 @@ void i2c_attach_slave_rx_callback(i2c_t *obj, void (*function)(void*, uint8_t*, 
     return;
   }
   obj->slave_receive_callback = function;
-  obj->pWireObj;
+  obj->pWireObj = pWireObj;
 }
 
 /** sets function called before a slave write operation
@@ -532,8 +532,7 @@ i2c_status_enum i2c_slave_write_buffer(i2c_t *obj, uint8_t *data, uint16_t lengt
   if (    (obj_s->tx_count + length) > obj->tx_rx_buffer_size) 
     return I2C_DATA_TOO_LONG;
 
-  uint8_t i = 0;
-  for (i; i < length; i++)
+  for (uint8_t i = 0; i < length; i++)
     *obj_s->tx_buffer_ptr++ = *(data + i);
   obj_s->tx_count += length;
   return I2C_OK;
@@ -648,11 +647,14 @@ static void i2c_irq(struct i2c_s *obj_s)
 }
 
 #ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef I2C0
 /** Handle I2C0 event interrupt request
  *
  */
-extern "C" void I2C0_EV_IRQHandler(void)
+void I2C0_EV_IRQHandler(void)
 {
   i2c_irq(obj_s_buf[I2C0_INDEX]);
 }
@@ -660,18 +662,17 @@ extern "C" void I2C0_EV_IRQHandler(void)
 /** handle I2C0 error interrupt request
  *
  */
-extern "C" void I2C0_ER_IRQHandler(void)
+void I2C0_ER_IRQHandler(void)
 {
   i2c_err_handler(I2C0);
 }
 #endif
 
 #ifdef I2C1
-
 /** Handle I2C1 event interrupt request
  *
  */
-extern "C" void I2C1_EV_IRQHandler(void)
+void I2C1_EV_IRQHandler(void)
 {
   i2c_irq(obj_s_buf[I2C1_INDEX]);
 }
@@ -679,7 +680,7 @@ extern "C" void I2C1_EV_IRQHandler(void)
 /** handle I2C1 error interrupt request
  *
  */
-extern "C" void I2C1_ER_IRQHandler(void)
+void I2C1_ER_IRQHandler(void)
 {
   i2c_err_handler(I2C1);
 }
@@ -689,7 +690,7 @@ extern "C" void I2C1_ER_IRQHandler(void)
 /** Handle I2C2 event interrupt request
  *
  */
-extern "C" void I2C2_EV_IRQHandler(void)
+void I2C2_EV_IRQHandler(void)
 {
   i2c_irq(obj_s_buf[I2C2_INDEX]);
 }
@@ -697,10 +698,12 @@ extern "C" void I2C2_EV_IRQHandler(void)
 /** handle I2C1 error interrupt request
  *
  */
-extern "C" void I2C2_ER_IRQHandler(void)
+void I2C2_ER_IRQHandler(void)
 {
   i2c_err_handler(I2C2);
 }
-
 #endif
+
+#ifdef __cplusplus
+}
 #endif

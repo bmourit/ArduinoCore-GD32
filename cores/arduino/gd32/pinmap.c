@@ -18,7 +18,7 @@
  * Based on mbed-os/hal/mbed_pinmap_common.c
  */
 #include "pinmap.h"
-#include "PortNames.h"
+//#include "PortNames.h"
 #include <gd_debug.h>
 
 //extern const int GD_GPIO_MODE[];

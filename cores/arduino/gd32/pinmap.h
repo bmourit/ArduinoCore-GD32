@@ -18,6 +18,7 @@
 #define _PINMAP_H
 
 #include "PinNames.h"
+#include "pins_arduino.h"
 #include <stdbool.h>
 #include <string.h>
 

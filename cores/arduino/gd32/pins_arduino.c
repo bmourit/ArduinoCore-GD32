@@ -24,76 +24,126 @@ extern "C" {
 
 uint32_t PinName_to_digital(PinName p)
 {
-    uint32_t i = DIGITAL_PINS_NUM;
-    p &= ~ALTMASK;
-    if (GD_PORT_GET(p) <= (PORTEND - 1)) {
-        for (i = 0; i < DIGITAL_PINS_NUM; i++) {
-            if (digital_pins[i] == p) {
-                break;
-            }
-        }
+  uint32_t i = DIGITAL_PINS_NUM;
+  p &= ~ALTMASK;
+  if (GD_PORT_GET(p) <= (PORTEND - 1)) {
+    for (i = 0; i < DIGITAL_PINS_NUM; i++) {
+      if (digital_pins[i] == p) {
+        break;
+      }
     }
-    return i;
+  }
+  return i;
 }
 
 PinName analog_pin_to_PinName(uint32_t pin)
 {
-    PinName pn = DIGITAL_TO_PINNAME(ANALOG_PINS_TO_DIGITAL(pin));
-    if (pn == NC) {
-        switch (pin) {
+  PinName pn = DIGITAL_TO_PINNAME(ANALOG_PINS_TO_DIGITAL(pin));
+  if (pn == NC) {
+    switch (pin) {
 #if defined(ADC_CHANNEL_TEMPSENSOR) || defined(ADC_CHANNEL_TEMPSENSOR_ADC1)
-            case ATEMP:
-                pn = ADC_TEMP;
-                break;
+      case ATEMP:
+        pn = ADC_TEMP;
+        break;
 #endif
 #ifdef AVREF
-            case AVREF:
-                pn = ADC_VREF;
-                break;
+      case AVREF:
+        pn = ADC_VREF;
+        break;
 #endif
-            default:
-                break;
-        }
+      default:
+        break;
     }
-    return pn;
+  }
+  return pn;
 }
 
 bool pin_in_analog_pins(uint32_t pin)
 {
-    bool ret = false;
+  bool ret = false;
 #if ANALOG_PINS_NUM > 0
 #ifndef ANALOG_PINS_LAST
-    pin &= ~ALTMASK;
-    ret = (pin >= A0) && (pin < (A0 + ANALOG_PINS_NUM));
+  pin &= ~ALTMASK;
+  ret = (pin >= A0) && (pin < (A0 + ANALOG_PINS_NUM));
 #else
-    for (uint32_t i = 0; i < ANALOG_PINS_NUM; i++) {
-        if (analog_pins[i] == pin) {
-            ret = true;
-            break;
-        }
+  for (uint32_t i = 0; i < ANALOG_PINS_NUM; i++) {
+    if (analog_pins[i] == pin) {
+      ret = true;
+      break;
     }
+  }
 #endif /* ANALOG_PINS_LAST */
 #endif /* ANALOG_PINS_NUM > 0 */
-    return ret;
+  return ret;
 }
 
 uint32_t digital_pin_to_analog(uint32_t pin)
 {
-    uint32_t ret = ANALOG_PINS_NUM;
+  uint32_t ret = ANALOG_PINS_NUM;
 #if ANALOG_PINS_NUM > 0
 #ifndef ANALOG_PINS_LAST
-    pin &= ~ALTMASK;
-    ret = pin - A0;
+  pin &= ~ALTMASK;
+  ret = pin - A0;
 #else
-    for (uint32_t i = 0; i < ANALOG_PINS_NUM; i++) {
-        if (analog_pins[i] == pin) {
-            ret = i;
-            break;
-        }
+  for (uint32_t i = 0; i < ANALOG_PINS_NUM; i++) {
+    if (analog_pins[i] == pin) {
+      ret = i;
+      break;
     }
+  }
 #endif /* ANALOG_PINS_LAST */
 #endif /* ANALOG_PINS_NUM > 0 */
-    return ret;
+  return ret;
+}
+
+uint32_t port_to_gpio_reg(uint32_t port)
+{
+  uint32_t gpio_base = GPIO_PORT_NUM;
+
+  switch(port) {
+    case PORTA:
+      gpio_base = GPIOA;
+      break;
+    case PORTB:
+      gpio_base = GPIOB;
+      break;
+#if defined GPIOC
+    case PORTC:
+      gpio_base = GPIOC;
+      break;
+#endif
+#if defined GPIOD
+    case PORTD:
+      gpio_base = GPIOD;
+      break;
+#endif
+#if defined GPIOE
+    case PORTE:
+      gpio_base = GPIOE;
+      break;
+#endif
+#if defined GPIOF
+    case PORTF:
+      gpio_base = GPIOF;
+      break;
+#endif
+#if defined GPIOG
+    case PORTG:
+      gpio_base = GPIOG;
+      break;
+#endif
+#if defined GPIOH
+    case PORTH:
+      gpio_base = GPIOH;
+      break;
+#endif
+#if defined GPIOI
+    case PORTI:
+      gpio_base = GPIOI;
+      break;
+#endif
+  }
+  return gpio_base;
 }
 
 #ifdef __cplusplus

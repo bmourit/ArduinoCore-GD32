@@ -140,6 +140,18 @@ extern "C" {
 #define USER_BTN        PC13
 #endif
 
+#ifndef EXTENDED_PIN_MODE
+#define EXTENDED_PIN_MODE
+#endif
+
+#ifndef ADC_CHANNEL_TEMPSENSOR
+#define ADC_CHANNEL_TEMPSENSOR
+#endif
+
+#ifndef ADC_CHANNEL_VREFINT
+#define ADC_CHANNEL_VREFINT
+#endif
+
 // Override default Arduino configuration
 
 // SPI Definitions

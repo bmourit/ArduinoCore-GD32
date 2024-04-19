@@ -249,8 +249,8 @@ typedef enum {
  * BIT[7:4] port number (0=PORTA, 1=PORTB, 2=PORTC, 3=PORTD, 4=PORTE)
  * BIT[3:0] pin number
  */
-#define GD_PORT_GET(X) (((uint32_t)(X) >> 4) & 0xF)
-#define GD_PIN_GET(X)  (((uint32_t)(X) & 0xF))
+//#define GD_PORT_GET(X)  (port_to_gpio_reg(((uint32_t)(X) >> 4) & 0xF))
+#define GD_PIN_GET(X)   (((uint32_t)(X) & 0xF))
 
 /* get mode, speed, remap, output, pull state, af function, channel, and channel-ON of GPIO pin */
 #define GD_PIN_MODE_GET(X)        ((X >> PIN_MODE_SHIFT) & PIN_MODE_MASK)
