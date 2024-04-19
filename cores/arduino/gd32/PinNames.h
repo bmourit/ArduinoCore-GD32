@@ -37,177 +37,177 @@ extern "C" {
 
 typedef enum {
 #if defined GPIOA
-  PORTA_0  = (PORTA << 4) + 0x00,
-  PORTA_1  = (PORTA << 4) + 0x01,
-  PORTA_2  = (PORTA << 4) + 0x02,
-  PORTA_3  = (PORTA << 4) + 0x03,
-  PORTA_4  = (PORTA << 4) + 0x04,
-  PORTA_5  = (PORTA << 4) + 0x05,
-  PORTA_6  = (PORTA << 4) + 0x06,
-  PORTA_7  = (PORTA << 4) + 0x07,
-  PORTA_8  = (PORTA << 4) + 0x08,
-  PORTA_9  = (PORTA << 4) + 0x09,
-  PORTA_10 = (PORTA << 4) + 0x0A,
-  PORTA_11 = (PORTA << 4) + 0x0B,
-  PORTA_12 = (PORTA << 4) + 0x0C,
-  PORTA_13 = (PORTA << 4) + 0x0D,
-  PORTA_14 = (PORTA << 4) + 0x0E,
-  PORTA_15 = (PORTA << 4) + 0x0F,
+	PORTA_0  = (PORTA << 4) + 0x00,
+	PORTA_1  = (PORTA << 4) + 0x01,
+	PORTA_2  = (PORTA << 4) + 0x02,
+	PORTA_3  = (PORTA << 4) + 0x03,
+	PORTA_4  = (PORTA << 4) + 0x04,
+	PORTA_5  = (PORTA << 4) + 0x05,
+	PORTA_6  = (PORTA << 4) + 0x06,
+	PORTA_7  = (PORTA << 4) + 0x07,
+	PORTA_8  = (PORTA << 4) + 0x08,
+	PORTA_9  = (PORTA << 4) + 0x09,
+	PORTA_10 = (PORTA << 4) + 0x0A,
+	PORTA_11 = (PORTA << 4) + 0x0B,
+	PORTA_12 = (PORTA << 4) + 0x0C,
+	PORTA_13 = (PORTA << 4) + 0x0D,
+	PORTA_14 = (PORTA << 4) + 0x0E,
+	PORTA_15 = (PORTA << 4) + 0x0F,
 #endif
 #if defined GPIOB
-  PORTB_0  = (PORTB << 4) + 0x10,
-  PORTB_1  = (PORTB << 4) + 0x11,
-  PORTB_2  = (PORTB << 4) + 0x12,
-  PORTB_3  = (PORTB << 4) + 0x13,
-  PORTB_4  = (PORTB << 4) + 0x14,
-  PORTB_5  = (PORTB << 4) + 0x15,
-  PORTB_6  = (PORTB << 4) + 0x16,
-  PORTB_7  = (PORTB << 4) + 0x17,
-  PORTB_8  = (PORTB << 4) + 0x18,
-  PORTB_9  = (PORTB << 4) + 0x19,
-  PORTB_10 = (PORTB << 4) + 0x1A,
-  PORTB_11 = (PORTB << 4) + 0x1B,
-  PORTB_12 = (PORTB << 4) + 0x1C,
-  PORTB_13 = (PORTB << 4) + 0x1D,
-  PORTB_14 = (PORTB << 4) + 0x1E,
-  PORTB_15 = (PORTB << 4) + 0x1F,
+	PORTB_0  = (PORTB << 4) + 0x00,
+	PORTB_1  = (PORTB << 4) + 0x01,
+	PORTB_2  = (PORTB << 4) + 0x02,
+	PORTB_3  = (PORTB << 4) + 0x03,
+	PORTB_4  = (PORTB << 4) + 0x04,
+	PORTB_5  = (PORTB << 4) + 0x05,
+	PORTB_6  = (PORTB << 4) + 0x06,
+	PORTB_7  = (PORTB << 4) + 0x07,
+	PORTB_8  = (PORTB << 4) + 0x08,
+	PORTB_9  = (PORTB << 4) + 0x09,
+	PORTB_10 = (PORTB << 4) + 0x0A,
+	PORTB_11 = (PORTB << 4) + 0x0B,
+	PORTB_12 = (PORTB << 4) + 0x0C,
+	PORTB_13 = (PORTB << 4) + 0x0D,
+	PORTB_14 = (PORTB << 4) + 0x0E,
+	PORTB_15 = (PORTB << 4) + 0x0F,
 #endif
 #if defined GPIOC
-  PORTC_0  = (PORTC << 4) + 0x20,
-  PORTC_1  = (PORTC << 4) + 0x21,
-  PORTC_2  = (PORTC << 4) + 0x22,
-  PORTC_3  = (PORTC << 4) + 0x23,
-  PORTC_4  = (PORTC << 4) + 0x24,
-  PORTC_5  = (PORTC << 4) + 0x25,
-  PORTC_6  = (PORTC << 4) + 0x26,
-  PORTC_7  = (PORTC << 4) + 0x27,
-  PORTC_8  = (PORTC << 4) + 0x28,
-  PORTC_9  = (PORTC << 4) + 0x29,
-  PORTC_10 = (PORTC << 4) + 0x2A,
-  PORTC_11 = (PORTC << 4) + 0x2B,
-  PORTC_12 = (PORTC << 4) + 0x2C,
-  PORTC_13 = (PORTC << 4) + 0x2D,
-  PORTC_14 = (PORTC << 4) + 0x2E,
-  PORTC_15 = (PORTC << 4) + 0x2F,
+	PORTC_0  = (PORTC << 4) + 0x00,
+	PORTC_1  = (PORTC << 4) + 0x01,
+	PORTC_2  = (PORTC << 4) + 0x02,
+	PORTC_3  = (PORTC << 4) + 0x03,
+	PORTC_4  = (PORTC << 4) + 0x04,
+	PORTC_5  = (PORTC << 4) + 0x05,
+	PORTC_6  = (PORTC << 4) + 0x06,
+	PORTC_7  = (PORTC << 4) + 0x07,
+	PORTC_8  = (PORTC << 4) + 0x08,
+	PORTC_9  = (PORTC << 4) + 0x09,
+	PORTC_10 = (PORTC << 4) + 0x0A,
+	PORTC_11 = (PORTC << 4) + 0x0B,
+	PORTC_12 = (PORTC << 4) + 0x0C,
+	PORTC_13 = (PORTC << 4) + 0x0D,
+	PORTC_14 = (PORTC << 4) + 0x0E,
+	PORTC_15 = (PORTC << 4) + 0x0F,
 #endif
 #if defined GPIOD
-  PORTD_0  = (PORTD << 4) + 0x30,
-  PORTD_1  = (PORTD << 4) + 0x31,
-  PORTD_2  = (PORTD << 4) + 0x32,
-  PORTD_3  = (PORTD << 4) + 0x33,
-  PORTD_4  = (PORTD << 4) + 0x34,
-  PORTD_5  = (PORTD << 4) + 0x35,
-  PORTD_6  = (PORTD << 4) + 0x36,
-  PORTD_7  = (PORTD << 4) + 0x37,
-  PORTD_8  = (PORTD << 4) + 0x38,
-  PORTD_9  = (PORTD << 4) + 0x39,
-  PORTD_10 = (PORTD << 4) + 0x3A,
-  PORTD_11 = (PORTD << 4) + 0x3B,
-  PORTD_12 = (PORTD << 4) + 0x3C,
-  PORTD_13 = (PORTD << 4) + 0x3D,
-  PORTD_14 = (PORTD << 4) + 0x3E,
-  PORTD_15 = (PORTD << 4) + 0x3F,
+	PORTD_0  = (PORTD << 4) + 0x00,
+	PORTD_1  = (PORTD << 4) + 0x01,
+	PORTD_2  = (PORTD << 4) + 0x02,
+	PORTD_3  = (PORTD << 4) + 0x03,
+	PORTD_4  = (PORTD << 4) + 0x04,
+	PORTD_5  = (PORTD << 4) + 0x05,
+	PORTD_6  = (PORTD << 4) + 0x06,
+	PORTD_7  = (PORTD << 4) + 0x07,
+	PORTD_8  = (PORTD << 4) + 0x08,
+	PORTD_9  = (PORTD << 4) + 0x09,
+	PORTD_10 = (PORTD << 4) + 0x0A,
+	PORTD_11 = (PORTD << 4) + 0x0B,
+	PORTD_12 = (PORTD << 4) + 0x0C,
+	PORTD_13 = (PORTD << 4) + 0x0D,
+	PORTD_14 = (PORTD << 4) + 0x0E,
+	PORTD_15 = (PORTD << 4) + 0x0F,
 #endif
 #if defined GPIOE
-  PORTE_0  = (PORTE << 4) + 0x40,
-  PORTE_1  = (PORTE << 4) + 0x41,
-  PORTE_2  = (PORTE << 4) + 0x42,
-  PORTE_3  = (PORTE << 4) + 0x43,
-  PORTE_4  = (PORTE << 4) + 0x44,
-  PORTE_5  = (PORTE << 4) + 0x45,
-  PORTE_6  = (PORTE << 4) + 0x46,
-  PORTE_7  = (PORTE << 4) + 0x47,
-  PORTE_8  = (PORTE << 4) + 0x48,
-  PORTE_9  = (PORTE << 4) + 0x49,
-  PORTE_10 = (PORTE << 4) + 0x4A,
-  PORTE_11 = (PORTE << 4) + 0x4B,
-  PORTE_12 = (PORTE << 4) + 0x4C,
-  PORTE_13 = (PORTE << 4) + 0x4D,
-  PORTE_14 = (PORTE << 4) + 0x4E,
-  PORTE_15 = (PORTE << 4) + 0x4F,
+	PORTE_0  = (PORTE << 4) + 0x00,
+	PORTE_1  = (PORTE << 4) + 0x01,
+	PORTE_2  = (PORTE << 4) + 0x02,
+	PORTE_3  = (PORTE << 4) + 0x03,
+	PORTE_4  = (PORTE << 4) + 0x04,
+	PORTE_5  = (PORTE << 4) + 0x05,
+	PORTE_6  = (PORTE << 4) + 0x06,
+	PORTE_7  = (PORTE << 4) + 0x07,
+	PORTE_8  = (PORTE << 4) + 0x08,
+	PORTE_9  = (PORTE << 4) + 0x09,
+	PORTE_10 = (PORTE << 4) + 0x0A,
+	PORTE_11 = (PORTE << 4) + 0x0B,
+	PORTE_12 = (PORTE << 4) + 0x0C,
+	PORTE_13 = (PORTE << 4) + 0x0D,
+	PORTE_14 = (PORTE << 4) + 0x0E,
+	PORTE_15 = (PORTE << 4) + 0x0F,
 #endif
 #if defined GPIOF
-  PORTF_0  = (PORTF << 4) + 0x50,
-  PORTF_1  = (PORTF << 4) + 0x51,
-  PORTF_2  = (PORTF << 4) + 0x52,
-  PORTF_3  = (PORTF << 4) + 0x53,
-  PORTF_4  = (PORTF << 4) + 0x54,
-  PORTF_5  = (PORTF << 4) + 0x55,
-  PORTF_6  = (PORTF << 4) + 0x56,
-  PORTF_7  = (PORTF << 4) + 0x57,
-  PORTF_8  = (PORTF << 4) + 0x58,
-  PORTF_9  = (PORTF << 4) + 0x59,
-  PORTF_10 = (PORTF << 4) + 0x5A,
-  PORTF_11 = (PORTF << 4) + 0x5B,
-  PORTF_12 = (PORTF << 4) + 0x5C,
-  PORTF_13 = (PORTF << 4) + 0x5D,
-  PORTF_14 = (PORTF << 4) + 0x5E,
-  PORTF_15 = (PORTF << 4) + 0x5F,
+	PORTF_0  = (PORTF << 4) + 0x00,
+	PORTF_1  = (PORTF << 4) + 0x01,
+	PORTF_2  = (PORTF << 4) + 0x02,
+	PORTF_3  = (PORTF << 4) + 0x03,
+	PORTF_4  = (PORTF << 4) + 0x04,
+	PORTF_5  = (PORTF << 4) + 0x05,
+	PORTF_6  = (PORTF << 4) + 0x06,
+	PORTF_7  = (PORTF << 4) + 0x07,
+	PORTF_8  = (PORTF << 4) + 0x08,
+	PORTF_9  = (PORTF << 4) + 0x09,
+	PORTF_10 = (PORTF << 4) + 0x0A,
+	PORTF_11 = (PORTF << 4) + 0x0B,
+	PORTF_12 = (PORTF << 4) + 0x0C,
+	PORTF_13 = (PORTF << 4) + 0x0D,
+	PORTF_14 = (PORTF << 4) + 0x0E,
+	PORTF_15 = (PORTF << 4) + 0x0F,
 #endif
 #if defined GPIOG
-  PORTG_0  = (PORTG << 4) + 0x60,
-  PORTG_1  = (PORTG << 4) + 0x61,
-  PORTG_2  = (PORTG << 4) + 0x62,
-  PORTG_3  = (PORTG << 4) + 0x63,
-  PORTG_4  = (PORTG << 4) + 0x64,
-  PORTG_5  = (PORTG << 4) + 0x65,
-  PORTG_6  = (PORTG << 4) + 0x66,
-  PORTG_7  = (PORTG << 4) + 0x67,
-  PORTG_8  = (PORTG << 4) + 0x68,
-  PORTG_9  = (PORTG << 4) + 0x69,
-  PORTG_10 = (PORTG << 4) + 0x6A,
-  PORTG_11 = (PORTG << 4) + 0x6B,
-  PORTG_12 = (PORTG << 4) + 0x6C,
-  PORTG_13 = (PORTG << 4) + 0x6D,
-  PORTG_14 = (PORTG << 4) + 0x6E,
-  PORTG_15 = (PORTG << 4) + 0x6F,
+	PORTG_0  = (PORTG << 4) + 0x00,
+	PORTG_1  = (PORTG << 4) + 0x01,
+	PORTG_2  = (PORTG << 4) + 0x02,
+	PORTG_3  = (PORTG << 4) + 0x03,
+	PORTG_4  = (PORTG << 4) + 0x04,
+	PORTG_5  = (PORTG << 4) + 0x05,
+	PORTG_6  = (PORTG << 4) + 0x06,
+	PORTG_7  = (PORTG << 4) + 0x07,
+	PORTG_8  = (PORTG << 4) + 0x08,
+	PORTG_9  = (PORTG << 4) + 0x09,
+	PORTG_10 = (PORTG << 4) + 0x0A,
+	PORTG_11 = (PORTG << 4) + 0x0B,
+	PORTG_12 = (PORTG << 4) + 0x0C,
+	PORTG_13 = (PORTG << 4) + 0x0D,
+	PORTG_14 = (PORTG << 4) + 0x0E,
+	PORTG_15 = (PORTG << 4) + 0x0F,
 #endif
 #if defined GPIOH
-  PORTH_0  = (PORTH << 4) + 0x70,
-  PORTH_1  = (PORTH << 4) + 0x71,
-  PORTH_2  = (PORTH << 4) + 0x72,
-  PORTH_3  = (PORTH << 4) + 0x73,
-  PORTH_4  = (PORTH << 4) + 0x74,
-  PORTH_5  = (PORTH << 4) + 0x75,
-  PORTH_6  = (PORTH << 4) + 0x76,
-  PORTH_7  = (PORTH << 4) + 0x77,
-  PORTH_8  = (PORTH << 4) + 0x78,
-  PORTH_9  = (PORTH << 4) + 0x79,
-  PORTH_10 = (PORTH << 4) + 0x7A,
-  PORTH_11 = (PORTH << 4) + 0x7B,
-  PORTH_12 = (PORTH << 4) + 0x7C,
-  PORTH_13 = (PORTH << 4) + 0x7D,
-  PORTH_14 = (PORTH << 4) + 0x7E,
-  PORTH_15 = (PORTH << 4) + 0x7F,
+	PORTH_0  = (PORTH << 4) + 0x00,
+	PORTH_1  = (PORTH << 4) + 0x01,
+	PORTH_2  = (PORTH << 4) + 0x02,
+	PORTH_3  = (PORTH << 4) + 0x03,
+	PORTH_4  = (PORTH << 4) + 0x04,
+	PORTH_5  = (PORTH << 4) + 0x05,
+	PORTH_6  = (PORTH << 4) + 0x06,
+	PORTH_7  = (PORTH << 4) + 0x07,
+	PORTH_8  = (PORTH << 4) + 0x08,
+	PORTH_9  = (PORTH << 4) + 0x09,
+	PORTH_10 = (PORTH << 4) + 0x0A,
+	PORTH_11 = (PORTH << 4) + 0x0B,
+	PORTH_12 = (PORTH << 4) + 0x0C,
+	PORTH_13 = (PORTH << 4) + 0x0D,
+	PORTH_14 = (PORTH << 4) + 0x0E,
+	PORTH_15 = (PORTH << 4) + 0x0F,
 #endif
 #if defined GPIOI
-  PORTI_0  = (PORTI << 4) + 0x80,
-  PORTI_1  = (PORTI << 4) + 0x81,
-  PORTI_2  = (PORTI << 4) + 0x82,
-  PORTI_3  = (PORTI << 4) + 0x83,
-  PORTI_4  = (PORTI << 4) + 0x84,
-  PORTI_5  = (PORTI << 4) + 0x85,
-  PORTI_6  = (PORTI << 4) + 0x86,
-  PORTI_7  = (PORTI << 4) + 0x87,
-  PORTI_8  = (PORTI << 4) + 0x88,
-  PORTI_9  = (PORTI << 4) + 0x89,
-  PORTI_10 = (PORTI << 4) + 0x8A,
-  PORTI_11 = (PORTI << 4) + 0x8B,
-  PORTI_12 = (PORTI << 4) + 0x8C,
-  PORTI_13 = (PORTI << 4) + 0x8D,
-  PORTI_14 = (PORTI << 4) + 0x8E,
-  PORTI_15 = (PORTI << 4) + 0x8F,
+	PORTI_0  = (PORTI << 4) + 0x00,
+	PORTI_1  = (PORTI << 4) + 0x01,
+	PORTI_2  = (PORTI << 4) + 0x02,
+	PORTI_3  = (PORTI << 4) + 0x03,
+	PORTI_4  = (PORTI << 4) + 0x04,
+	PORTI_5  = (PORTI << 4) + 0x05,
+	PORTI_6  = (PORTI << 4) + 0x06,
+	PORTI_7  = (PORTI << 4) + 0x07,
+	PORTI_8  = (PORTI << 4) + 0x08,
+	PORTI_9  = (PORTI << 4) + 0x09,
+	PORTI_10 = (PORTI << 4) + 0x0A,
+	PORTI_11 = (PORTI << 4) + 0x0B,
+	PORTI_12 = (PORTI << 4) + 0x0C,
+	PORTI_13 = (PORTI << 4) + 0x0D,
+	PORTI_14 = (PORTI << 4) + 0x0E,
+	PORTI_15 = (PORTI << 4) + 0x0F,
 #endif
-  //INT_ADC_BASE = PIN_NAME_INT_ANALOG_BASE,
-  /* ADC internal channels */
-  ADC_PINS_BASE = 0x100,
-  ADC_TEMP,
-  ADC_VREF,
+	//INT_ADC_BASE = PIN_NAME_INT_ANALOG_BASE,
+	/* ADC internal channels */
+	ADC_PINS_BASE = 0x100,
+	ADC_TEMP,
+	ADC_VREF,
 /* pin names specific to the variant */
 #if __has_include("PinNamesVar.h")
 #include "PinNamesVar.h"
 #endif
-  NC = 0xFFFFFFFF
+	NC = 0xFFFFFFFF
 } PinName;
 
 /* pin mode */
@@ -267,28 +267,28 @@ typedef enum {
  * in the ArduinoAPI, since they don't have constants
  */
 typedef enum {
-  OUTPUT_OPEN_DRAIN = 4,  // This was merged into Arduino API, so we know it will have this value in the future.
-  INPUT_ANALOG,           // With the merge of both GD32 pin APIs, I believe we can get rid of this Analog define.
+	OUTPUT_OPEN_DRAIN = 4,  // This was merged into Arduino API, so we know it will have this value in the future.
+	INPUT_ANALOG,           // With the merge of both GD32 pin APIs, I believe we can get rid of this Analog define.
 } PinModeExtension;
 
 /* GPIO pull-up/pull-down/none */
 enum {
-  PIN_PUPD_NONE = 0,
-  PIN_PUPD_PULLUP = 1,
-  PIN_PUPD_PULLDOWN = 2,
+	PIN_PUPD_NONE = 0,
+	PIN_PUPD_PULLUP = 1,
+	PIN_PUPD_PULLDOWN = 2,
 };
 
 /* GPIO output push-pull/open drain */
 enum {
-  PIN_OTYPE_PP = 0,
-  PIN_OTYPE_OD = 1,
+	PIN_OTYPE_PP = 0,
+	PIN_OTYPE_OD = 1,
 };
 
 /* GPIO output speed type */
 enum {
-  PIN_SPEED_2MHZ = 0,
-  PIN_SPEED_10MHZ = 1,
-  PIN_SPEED_50MHZ = 3,
+	PIN_SPEED_2MHZ = 0,
+	PIN_SPEED_10MHZ = 1,
+	PIN_SPEED_50MHZ = 3,
 };
 
 #define PIN_MODE_INPUT    0
@@ -314,18 +314,18 @@ enum {
 
 #define GD_PIN_DATA(MODE, PUPD, AFN)  ((int)(MODE) | ((PUPD & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT) | ((AFN & PIN_AF_MASK) << PIN_AF_SHIFT))
 #define GD_PIN_DATA_EXT(MODE, PUPD, AFN, CHAN, CHON) \
-                                      ((int)(MODE) | ((PUPD & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT) | \
-                                      ((AFN & PIN_AF_MASK) << PIN_AF_SHIFT) | \
-                                      ((CHAN & PIN_CHANNEL_MASK) << PIN_CHANNEL_SHIFT) | \
-                                      ((CHON & PIN_CHON_MASK) << PIN_CHON_SHIFT))
+																			((int)(MODE) | ((PUPD & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT) | \
+																			((AFN & PIN_AF_MASK) << PIN_AF_SHIFT) | \
+																			((CHAN & PIN_CHANNEL_MASK) << PIN_CHANNEL_SHIFT) | \
+																			((CHON & PIN_CHON_MASK) << PIN_CHON_SHIFT))
 #define GD_PIN_DATA_REMAP(MODE, PUPD, REMAP)  ((int)(MODE & PIN_MODE_MASK) | \
-                                              ((PUPD & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT ) | \
-                                              ((REMAP & PIN_REMAP_MASK) << PIN_REMAP_SHIFT))
+																							((PUPD & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT ) | \
+																							((REMAP & PIN_REMAP_MASK) << PIN_REMAP_SHIFT))
 #define GD_PIN_DATA_EXT_REMAP(MODE, PUPD, REMAP, CHAN, CHON) \
-                                      ((int)(MODE) | ((PUPD & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT) | \
-                                      ((REMAP & PIN_REMAP_MASK) << PIN_REMAP_SHIFT) | \
-                                      ((CHAN & PIN_CHANNEL_MASK) << PIN_CHANNEL_SHIFT) | \
-                                      ((CHON & PIN_CHON_MASK) << PIN_CHON_SHIFT))
+																			((int)(MODE) | ((PUPD & PIN_PULL_STATE_MASK) << PIN_PULL_STATE_SHIFT) | \
+																			((REMAP & PIN_REMAP_MASK) << PIN_REMAP_SHIFT) | \
+																			((CHAN & PIN_CHANNEL_MASK) << PIN_CHANNEL_SHIFT) | \
+																			((CHON & PIN_CHON_MASK) << PIN_CHON_SHIFT))
 
 #ifdef __cplusplus
 }
