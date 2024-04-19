@@ -200,7 +200,7 @@ typedef enum {
 #endif
   //INT_ADC_BASE = PIN_NAME_INT_ANALOG_BASE,
   /* ADC internal channels */
-  ADC_BASE = 0x100
+  ADC_PINS_BASE = 0x100,
   ADC_TEMP,
   ADC_VREF,
 /* pin names specific to the variant */
