@@ -139,8 +139,12 @@ machine_flags = [
     "-mthumb",
 ]
 
+# Some GD32F303RET6 chips shipped without FPU support. There is no easy way to check this
+# TODO: Do a check somehow?
 #if any(mcu in board_config.get("build.cpu") for cpu in ("cortex-m4", "cortex-m7")):
 #    machine_flags.extend(["-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"])
+if board_config.get("build.cpu") == "cortex-m7":
+    machine_flags.extend(["-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"])
 
 if board_config.get("build.cpu") == "cortex-m33":
     machine_flags.extend(["-mfpu=fp-armv8", "-mfloat-abi=softfp"])
@@ -215,6 +219,59 @@ env.Append(
     LIBPATH=[variant_dir, join(FRAMEWORK_DIR, "system", "CMSIS", "DSP", "Lib", "GCC")],
 )
 
+# include the USB stack for boards that support it
+if not board_config.get("build.spl_series").lower().startswith("gd32e23"):
+    if isdir(join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library")):
+        env.Append(
+            CPPPATH=[
+                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "device", "Include"),
+                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "device", "Source"),
+                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "usbd", "Include"),
+                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "usbd", "Source"),
+            ]
+        )
+    # never activate USB FS driver since we have no core support for it yet
+    if isdir(join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver")) and False:
+        env.Append(
+            CPPPATH=[
+                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "driver", "Include"),
+                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "driver", "Source"),
+                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "core", "Include"),
+                join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "core", "Source"),
+            ]
+        )
+
+def process_usb_configuration(cpp_defines):
+    # support standard way of enabling CDC
+    if "PIO_FRAMEWORK_ARDUINO_ENABLE_CDC" in cpp_defines:
+        env.Append(CPPDEFINES=["USBD_USE_CDC"])
+    # any USB flags enabled? more might be to come 
+    if any(
+        d in cpp_defines
+        for d in (
+            "PIO_FRAMEWORK_ARDUINO_ENABLE_CDC",
+        )
+    ):
+        # then add usb flags
+        usb_vid = int(board_config.get("build.hwids", [["0xdead", "0xbeef"]])[0][0], 16)
+        usb_pid = int(board_config.get("build.hwids", [["0xdead", "0xbeef"]])[0][1], 16)
+        # prevent usage of Leaflabs VID/PID, otherwise if people have the DFU
+        # driver installed, it will recognize it as "Maple DFU" and not the 
+        # actual USB device it is :(
+        if usb_vid == 0x1EAF and usb_pid == 0x0003:
+            (usb_vid, usb_pid) = (0xdead, 0xbeef)
+        env.Append(
+            CPPDEFINES=[
+                "USBCON",
+                ("USB_VID", hex(usb_vid)),
+                ("USB_PID", hex(usb_pid)),
+                ("USB_PRODUCT", '\\"%s\\"' %
+                    board_config.get("build.usb_product", board_config.get("name", "Undefined USB Product")).replace('"', "")),
+                ("USB_MANUFACTURER", '\\"%s\\"' %
+                    board_config.get("build.usb_manufacturer",  board_config.get("vendor", "Undefined Manufacturer")).replace('"', ""))
+            ]
+        )
+
 env.ProcessFlags(board_config.get("build.framework_extra_flags.arduino", ""))
 
 configure_application_offset(mcu, upload_protocol)
@@ -235,7 +292,7 @@ cpp_defines = env.Flatten(env.get("CPPDEFINES", []))
 
 process_standard_library_configuration(cpp_defines)
 add_upload_protocol_defines(upload_protocol)
-#process_usb_configuration(cpp_defines)
+process_usb_configuration(cpp_defines)
 #process_usart_configuration(cpp_defines)
 
 # copy CCFLAGS to ASFLAGS (-x assembler-with-cpp mode)
