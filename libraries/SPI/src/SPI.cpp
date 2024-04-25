@@ -23,6 +23,7 @@
 
 #include <Arduino.h>
 #include <assert.h>
+
 #include "SPI.h"
 #include "pins_arduino.h"
 
@@ -60,7 +61,7 @@ void SPIClass::begin()
   if (initialized) {
     return;
   }
-  spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
+  spi_begin(&_spi, spiSettings.speed, spiSettings.datamode, spiSettings.bitorder);
   initialized = true;
 }
 
@@ -75,7 +76,7 @@ void SPIClass::end()
 void SPIClass::beginTransaction(SPISettings settings)
 {
   config(settings);
-  spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
+  spi_begin(&_spi, spiSettings.speed, spiSettings.datamode, spiSettings.bitorder);
   initialized = true;
 }
 
@@ -103,7 +104,7 @@ uint16_t SPIClass::transfer16(uint16_t val16)
   trans_data0 = uint8_t(val16 & 0x00FF);
   trans_data1 = uint8_t((val16 & 0xFF00) >> 8);
 
-  if (spisettings.bitorder == LSBFIRST) {
+  if (spiSettings.bitorder == LSBFIRST) {
     rec_data0 = transfer(trans_data0);
     rec_data1 = transfer(trans_data1);
     out_halfword = uint16_t(rec_data0 | (rec_data1 << 8));
@@ -128,30 +129,30 @@ void SPIClass::transfer(void *bufout, void *bufin, size_t count)
 
 void SPIClass::setBitOrder(BitOrder order)
 {
-  spisettings.bitorder = order;
-  spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
+  spiSettings.bitorder = order;
+  spi_begin(&_spi, spiSettings.speed, spiSettings.datamode, spiSettings.bitorder);
 }
 
 void SPIClass::setDataMode(uint8_t mode)
 {
-  spisettings.datamode = mode;
-  spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
+  spiSettings.datamode = mode;
+  spi_begin(&_spi, spiSettings.speed, spiSettings.datamode, spiSettings.bitorder);
 }
 
 void SPIClass::setClockDivider(uint32_t divider)
 {
   if (divider == 0) {
-    spisettings.speed = SPI_SPEED_DEFAULT;
+    spiSettings.speed = SPI_SPEED_DEFAULT;
   } else {
     /* Get clk freq of the SPI instance and compute it */
-    spisettings.speed = dev_spi_clock_source_frequency_get(&_spi) / divider;
+    spiSettings.speed = dev_spi_clock_source_frequency_get(&_spi) / divider;
   }
-  spi_begin(&_spi, spisettings.speed, spisettings.datamode, spisettings.bitorder);
+  spi_begin(&_spi, spiSettings.speed, spiSettings.datamode, spiSettings.bitorder);
 }
 
 void SPIClass::config(SPISettings settings)
 {
-  spisettings.speed = settings.speed;
-  spisettings.datamode = settings.datamode;
-  spisettings.bitorder = settings.bitorder;
+  spiSettings.speed = settings.speed;
+  spiSettings.datamode = settings.datamode;
+  spiSettings.bitorder = settings.bitorder;
 }

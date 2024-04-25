@@ -42,6 +42,8 @@ class HardwarePWM {
     void attachInterrupt(pwmCallback_t callback);                                           // attach callback for capture/compare interrupt
     void detachInterrupt(void);                                                             // detach callback for capture/compare interrupt
     void captureCompareCallback(void);                                                      // capture/compare callback handler
+    uint32_t getPeriod(void);
+    uint16_t getCycle(void);
 
   private:
     uint32_t index;

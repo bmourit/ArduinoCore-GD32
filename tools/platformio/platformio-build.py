@@ -36,16 +36,23 @@ board_config = env.BoardConfig()
 
 # check framework is installed
 FRAMEWORK_DIR = platform.get_package_dir("framework-arduinogd32")
-# CMSIS_DIR = join(platform.get_package_dir("framework-arduinogd32"), "CMSIS", "CMSIS")
+#CMSIS_DIR = join(platform.get_package_dir("framework-arduinogd32"), "CMSIS", "CMSIS")
 assert isdir(FRAMEWORK_DIR)
-# assert isdir(CMSIS_DIR)
+#assert isdir(CMSIS_DIR)
 
+VARIANT_REMAP = {
+    "CREALITY_422_GD32F303RE": "CREALITY_422_GD32F303RE"
+}
+
+def get_variant(board):
+    variant = VARIANT_REMAP[board] if board in VARIANT_REMAP else board_config.get("build.variant")
+    return variant
 
 # get mcu and board variant
 mcu = board_config.get("build.mcu", "")
 board_name = env.subst("$BOARD")
 mcu_type = mcu[:-2]
-variant = board_config.get("build.variant")
+variant = get_variant(board_name) #board_config.get("build.variant")
 series = mcu_type[:7].upper() + "x"
 spl_series = board_config.get("build.spl_series", "")
 variants_dir = (
@@ -87,16 +94,16 @@ def add_upload_protocol_defines(upload_protocol):
     if upload_protocol in ("stlink", "dfu", "jlink") and is_generic:
         env.Append(CPPDEFINES=["GENERIC_BOOTLOADER"])
 
-#def get_arm_math_lib(cpu):
-#    core = board_config.get("build.cpu")
-#    if "m4" in core:
-#        return "arm_cortexM4lf_math"
-#    elif "m7" in core:
-#        return "arm_cortexM7lfsp_math"
-#    elif "m33" in core:
-#        return "arm_ARMv8MMLlfsp_math"
-#
-#    return "arm_cortex%sl_math" % core[7:9].upper()
+def get_arm_math_lib(cpu):
+    core = board_config.get("build.cpu")
+    if "m4" in core:
+        return "arm_cortexM4lf_math"
+    elif "m7" in core:
+        return "arm_cortexM7lfsp_math"
+    elif "m33" in core:
+        return "arm_ARMv8MMLlfsp_math"
+
+    return "arm_cortex%sl_math" % core[7:9].upper()
 
 def configure_application_offset(mcu, upload_protocol):
     offset = 0
@@ -176,6 +183,8 @@ env.Append(
         join(FRAMEWORK_DIR, "cores", "arduino", "gd32"),
         join(FRAMEWORK_DIR, "cores", "arduino", "gd32", "Source"),
         join(FRAMEWORK_DIR, "system", "startup"),
+        join(FRAMEWORK_DIR, "system", "CMSIS", "Core", "Include"),
+        join(FRAMEWORK_DIR, "system", "CMSIS", "DSP", "Include"),
         join(FRAMEWORK_DIR, "system", spl_series + "_firmware", "CMSIS"),
         join(FRAMEWORK_DIR, "system", spl_series + "_firmware", "CMSIS", "GD", spl_series, "Include"),
         join(FRAMEWORK_DIR, "system", spl_series + "_firmware", "CMSIS", "GD", spl_series, "Source"),
@@ -197,12 +206,13 @@ env.Append(
         "-Wl,--defsym=LD_MAX_DATA_SIZE=%d" % board_config.get("upload.maximum_ram_size"),
     ],
     LIBS=[
+        get_arm_math_lib(env.BoardConfig().get("build.cpu")),
         "c",
         "m",
         "gcc",
         "stdc++",
     ],
-    LIBPATH=[variant_dir]
+    LIBPATH=[variant_dir, join(FRAMEWORK_DIR, "system", "CMSIS", "DSP", "Lib", "GCC")],
 )
 
 env.ProcessFlags(board_config.get("build.framework_extra_flags.arduino", ""))

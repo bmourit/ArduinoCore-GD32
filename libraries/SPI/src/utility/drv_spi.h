@@ -46,7 +46,7 @@ extern "C" {
 /* SPI default speed */
 #define SPI_SPEED_DEFAULT     4000000
 
-#define SPI_CLOCK_DIV2    ((uint32_t)2U)
+#define SPI_CLOCK_DIV2    ((uint32_t)2)
 #define SPI_CLOCK_DIV4    ((uint32_t)4)
 #define SPI_CLOCK_DIV8    ((uint32_t)8)
 #define SPI_CLOCK_DIV16   ((uint32_t)16)

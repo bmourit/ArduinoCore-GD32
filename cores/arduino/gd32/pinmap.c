@@ -47,8 +47,8 @@ bool pin_in_pinmap(PinName pin, const PinMap *map)
 	return false;
 }
 
-/** Configure pin (mode, speed, reamp or af function )
- *
+/**
+ * Configure pin (mode, speed, reamp or af function)
  * @param pin gpio pin name
  * @param function gpio pin mode, speed, remap or af function
  */
@@ -178,8 +178,6 @@ void pinmap_pinout(PinName pin, const PinMap *map)
 	while (map->pin != NC) {
 		if (map->pin == pin) {
 			pin_function(pin, map->function);
-
-			//pin_mode(pin, PullNone);
 			return;
 		}
 		map++;
@@ -218,11 +216,8 @@ uint32_t pinmap_peripheral(PinName pin, const PinMap *map)
 {
 	uint32_t peripheral = NC;
 
-	if (pin == (PinName)NC) {
-		return NC;
-	}
-	peripheral = pinmap_find_peripheral(pin, map);
-	if (NC == peripheral) { // no mapping available
+	if (pin != (PinName)NC) {
+		peripheral = pinmap_find_peripheral(pin, map);
 	}
 	return peripheral;
 }
@@ -242,11 +237,8 @@ uint32_t pinmap_function(PinName pin, const PinMap *map)
 {
 		uint32_t function = NC;
 
-		if (pin == (PinName)NC) {
-				return NC;
-		}
-		function = pinmap_find_function(pin, map);
-		if (NC == function) { // no mapping available
+		if (pin != (PinName)NC) {
+			function = pinmap_find_function(pin, map);
 		}
 		return function;
 }
@@ -272,8 +264,8 @@ PinName pinmap_pin(uint32_t peripheral, const PinMap *map)
   return pin;
 }
 
-/** Enable GPIO clock
- *
+/**
+ * Enable GPIO clock
  * @param gpio_periph gpio port name
  */
 uint32_t gpio_clock_enable(uint32_t port_idx) {

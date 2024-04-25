@@ -24,6 +24,7 @@
  * SOFTWARE.
  *****************************************************************************/
 
+#define ARDUINO_MAIN
 #include "Arduino.h"
 
 #ifdef USBCON
@@ -52,15 +53,16 @@ __attribute__((constructor(101))) void premain()
 
 int main(void)
 {
-#ifdef USBCON
+#if defined(USBCON)
   // TODO: remove this and only call it when the USB is attempted to
   // be used.
   USBCore().connect();
 #endif
   setup();
 
-  while (1) {
+  for (;;) {
     loop();
+    if (arduino::serialEventRun) arduino::serialEventRun();
   }
 
   return 0;

@@ -33,11 +33,10 @@
 #ifndef SOFTWARESERIAL_H
 #define SOFTWARESERIAL_H
 
-//extern "C" {
 #include "pins_arduino.h"
 #include "PinNames.h"
 #include "HardwareTimer.h"
-//}
+
 #include <Arduino.h>
 #include <Stream.h>
 
@@ -66,17 +65,14 @@ class SoftwareSerial : public Stream
         uint32_t _transmitPinNumber;
         uint32_t _speed;
 
-        uint16_t _buffer_overflow: 1;
-        uint16_t _inverse_logic: 1;
-        uint16_t _output_pending: 1;
+        uint16_t _buffer_overflow : 1;
+        uint16_t _inverse_logic : 1;
+        uint16_t _output_pending : 1;
 
         receive_buffer _receive_buffer;
 
-        //unsigned char _receive_buffer[_SS_MAX_RX_BUFF];
-        //volatile uint8_t _receive_buffer_tail;
-        //volatile uint8_t _receive_buffer_head;
-
         /* static data */
+        //static bool initialised;
         static HardwareTimer timer;
         static SoftwareSerial *active_listener;
         static SoftwareSerial *volatile active_out;

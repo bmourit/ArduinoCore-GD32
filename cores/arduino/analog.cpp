@@ -47,7 +47,7 @@ extern "C" {
 #define PWM_NUMS  40
 
 #if defined(GD32F30x)
-#if (defined(GD32F30X_HD) || defined(GD32F30X_XD))
+#if defined(GD32F30X_HD) || defined(GD32F30X_XD)
 #define ADC_NUMS  3
 #else
 #define ADC_NUMS  2

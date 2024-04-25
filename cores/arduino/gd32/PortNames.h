@@ -28,11 +28,11 @@ OF SUCH DAMAGE.
 #ifndef _PORTNAMES_H
 #define _PORTNAMES_H
 
-#include "gd32_def.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "gd32_def.h"
 
 typedef enum {
   PORTA = 0x00,

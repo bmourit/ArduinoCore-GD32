@@ -81,7 +81,7 @@ void SysTick_Handler(void)
 */
 uint32_t getCurrentMillis(void)
 {
-  return  gd_ticks;
+  return gd_ticks;
 }
 
 /*!

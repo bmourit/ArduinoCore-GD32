@@ -91,6 +91,17 @@ void HardwarePWM::setPeriodCycle(uint32_t time, uint16_t cycle, enum timeFormat 
   pwmHandle.setPeriodCycle(&pwmDevice, &pwmPeriodCycle);
 }
 
+uint32_t HardwarePWM::getPeriod(void)
+{
+  uint32_t period = this->pwmPeriodCycle.period;
+  return period;
+}
+
+uint16_t HardwarePWM::getCycle(void)
+{
+  uint16_t cycle = this->pwmPeriodCycle.cycle;
+}
+
 /*!
   \brief      set pwm cycle time with the inital format
   \param[in]  value: period time
@@ -153,7 +164,7 @@ extern "C"
   void PWM_irqHandle(uint32_t timer, uint8_t channel)
   {
     uint32_t index = 0;
-    pwmDevice_t pwmDevice = {(void *)timer, timer, channel};
+    pwmDevice_t pwmDevice = {timer, channel};
     index = getPWMIndex(pwmDevice);
     if (pwmObj[index]) {
       pwmObj[index]->captureCompareCallback();

@@ -39,6 +39,10 @@
 #define __HXTAL         (HXTAL_VALUE)            /* high speed crystal oscillator frequency */
 #define __SYS_OSC_CLK   (__IRC8M)                /* main oscillator frequency */
 
+
+#define VECT_TAB_OFFSET  0x00000000U  /*!< Vector Table base offset field.
+                                  This value must be a multiple of 0x200. */
+
 /* select a system clock by uncommenting the following line */
 /* use IRC8M */
 //#define __SYSTEM_CLOCK_IRC8M            (uint32_t)(__IRC8M) 
@@ -150,6 +154,12 @@ void SystemInit(void)
 
   /* configure the system clock source, PLL Multiplier, AHB/APBx prescalers and Flash settings */
   system_clock_config();
+  //SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET;
+#ifdef VECT_TAB_SRAM
+  nvic_vector_table_set(NVIC_VECTTAB_RAM, VECT_TAB_OFFSET);
+#else
+  nvic_vector_table_set(NVIC_VECTTAB_FLASH, VECT_TAB_OFFSET);
+#endif
 }
 
 /*!
@@ -1010,5 +1020,5 @@ void SystemCoreClockUpdate(void)
   /* calculate AHB clock frequency */
   idx = GET_BITS(RCU_CFG0, 4, 7);
   clk_exp = ahb_exp[idx];
-  SystemCoreClock = SystemCoreClock >> clk_exp;
+  SystemCoreClock >>= clk_exp;
 }

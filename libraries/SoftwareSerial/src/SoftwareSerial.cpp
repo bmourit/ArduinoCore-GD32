@@ -36,9 +36,7 @@ http://arduiniana.org.
 
 /* default timer13 */
 #if !defined(TIMER_SERIAL)
-  #if defined(TIMER13)
-    #define TIMER_SERIAL TIMER13
-  #elif defined(TIMER6)
+  #if defined(TIMER6)
     #define TIMER_SERIAL TIMER6
   #elif defined(TIMER5)
     #define TIMER_SERIAL TIMER5
@@ -48,18 +46,18 @@ http://arduiniana.org.
     #define TIMER_SERIAL TIMER15
   #elif defined(TIMER14)
     #define TIMER_SERIAL TIMER14
+  #elif defined(TIMER13)
+    #define TIMER_SERIAL TIMER13
   #elif defined(TIMER12)
     #define TIMER_SERIAL TIMER12
-  #elif defined(TIMER11)
-    #define TIMER_SERIAL TIMER11
   #elif defined(TIMER10)
     #define TIMER_SERIAL TIMER10
   #elif defined(TIMER9)
     #define TIMER_SERIAL TIMER9
+  #elif defined(TIMER11)
+    #define TIMER_SERIAL TIMER11
   #elif defined(TIMER8)
     #define TIMER_SERIAL TIMER8
-  #elif defined(TIMER7)
-    #define TIMER_SERIAL TIMER7
   #elif defined(TIMER4)
     #define TIMER_SERIAL TIMER4
   #elif defined(TIMER3)
@@ -68,6 +66,8 @@ http://arduiniana.org.
     #define TIMER_SERIAL TIMER2
   #elif defined(TIMER1)
     #define TIMER_SERIAL TIMER1
+  #elif defined(TIMER7)
+    #define TIMER_SERIAL TIMER7
   #elif defined(TIMER0)
     #define TIMER_SERIAL TIMER0
   #else
@@ -92,8 +92,8 @@ SoftwareSerial::SoftwareSerial(uint16_t receivePin, uint16_t transmitPin,
 {
     _receivePin = receivePin;
     _transmitPin = transmitPin;
-    _transmitPinPort = DIGITAL_PIN_TO_PORT((transmitPin));
-    _receivePinPort = DIGITAL_PIN_TO_PORT((receivePin));
+    _transmitPinPort = gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(transmitPin))];
+    _receivePinPort = gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(receivePin))];
     _receivePinNumber = gpio_pin[GD_PIN_GET(DIGITAL_TO_PINNAME(receivePin))];
     _transmitPinNumber = gpio_pin[GD_PIN_GET(DIGITAL_TO_PINNAME(transmitPin))];
     _speed = 0;
@@ -123,7 +123,6 @@ void SoftwareSerial::setSpeed(uint32_t speed)
             timer.setPrescaler(pre);
             timer.setReloadValue(cmp_value);
             timer.setCounter(0);
-
             timer.attachInterrupt(&handleInterrupt);
             timer.start();
             timer.refresh();
@@ -215,8 +214,8 @@ void SoftwareSerial::begin(long speed)
 {
     _speed = speed;
     if ((_receivePin < DIGITAL_PINS_NUM) || (_transmitPin < DIGITAL_PINS_NUM)) {
-        gpio_clock_enable(GD_PORT_GET(DIGITAL_TO_PINNAME(_transmitPin)));
-        gpio_clock_enable(GD_PORT_GET(DIGITAL_TO_PINNAME(_receivePin)));
+        gpio_clock_enable(gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(_transmitPin))]);
+        gpio_clock_enable(gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(_receivePin))]);
     }
     if (_inverse_logic) {
         gpio_bit_reset(_transmitPinPort, _transmitPinNumber);

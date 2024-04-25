@@ -25,7 +25,7 @@ extern "C" {
 
 uint32_t millis(void)
 {
-  // ToDo: ensure no interrupts
+  // TODO: ensure no interrupts
   return getCurrentMillis();
 }
 
@@ -37,16 +37,23 @@ uint32_t micros(void)
 
 void delay(uint32_t ms)
 {
-  if (ms != 0) {
-    uint32_t start = getCurrentMillis();
-    do {
-      __NOP();
-    } while (getCurrentMillis() - start < ms);
+  if (ms == 0) {
+    return;
   }
+
+  uint32_t start = micros();
+
+  do {
+    __NOP();
+  } while (micros() - start < ms);
 }
 
 void delayMicroseconds(unsigned int us)
 {
+  if (us == 0) {
+    return;
+  }
+
   __IO uint32_t currentTicks = SysTick->VAL;
   /* Number of ticks per millisecond */
   const uint32_t tickPerMs = SysTick->LOAD + 1;

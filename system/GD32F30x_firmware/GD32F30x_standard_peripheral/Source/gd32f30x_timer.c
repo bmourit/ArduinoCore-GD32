@@ -1388,7 +1388,7 @@ void timer_channel_input_struct_para_init(timer_ic_parameter_struct* icpara)
     \param[out]  none
     \retval      none
 */
-void timer_input_capture_config(uint32_t timer_periph,uint16_t channel, timer_ic_parameter_struct* icpara)
+void timer_input_capture_config(uint32_t timer_periph, uint16_t channel, timer_ic_parameter_struct *icpara)
 {
     switch(channel){
     /* configure TIMER_CH_0 */

@@ -41,6 +41,7 @@ using namespace arduino;
 
 #define interrupts()      __enable_irq()
 #define noInterrupts()    __disable_irq()
+
 #define digitalPinToInterrupt(pin)  (pin)
 
 #ifdef __cplusplus

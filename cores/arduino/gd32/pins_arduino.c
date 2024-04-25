@@ -96,7 +96,7 @@ uint32_t digital_pin_to_analog(uint32_t pin)
   return ret;
 }
 
-uint32_t port_to_gpio_reg(uint32_t port)
+/*uint32_t port_to_gpio_reg(uint32_t port)
 {
   uint32_t gpio_base = GPIO_PORT_NUM;
 
@@ -144,7 +144,7 @@ uint32_t port_to_gpio_reg(uint32_t port)
 #endif
   }
   return gpio_base;
-}
+}*/
 
 #ifdef __cplusplus
 }

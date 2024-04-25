@@ -28,10 +28,10 @@ OF SUCH DAMAGE.
 #include "HardwareTimer.h"
 #include "pins_arduino.h"
 
-#define TIMERNUMS   13
+//#define TIMERNUMS   13
 #define TIMER_NUM_CHANNELS 4
 
-HardwareTimer *hardwaretimerObj[TIMERNUMS] = { NULL };
+HardwareTimer *hardwaretimerObj[TIMER_NUM] = { NULL };
 
 /*!
   \brief      HardwareTimer object construct
@@ -139,9 +139,39 @@ void HardwareTimer::setPeriodTime(uint32_t time, enum timeFormat format)
   \param[out] none
   \retval     none
 */
-void HardwareTimer::setReloadValue(uint32_t value)
+void HardwareTimer::setReloadValue(uint32_t value, enum timeFormat format)
 {
-  timer_autoreload_value_config(timerDevice, value - 1);
+  uint32_t tval;
+  uint32_t prescaler;
+  uint32_t pcycle;
+  uint32_t arv;
+
+  switch (format) {
+  case FORMAT_US:
+    pcycle = value * (getTimerClkFreq() / 1000000);
+    prescaler = (pcycle / 0x10000) + 1;
+    TIMER_PSC(timerDevice) = prescaler - 1;
+    tval = pcycle / prescaler;
+    break;
+  case FORMAT_HZ:
+    pcycle = getTimerClkFreq() / value;
+    prescaler = (pcycle / 0x10000) + 1;
+    TIMER_PSC(timerDevice) = prescaler - 1;
+    tval = pcycle / prescaler;
+    break;
+  case FORMAT_TICK:
+  default:
+    tval = value;
+    break;
+  }
+
+  if (tval > 0) {
+    arv = tval - 1;
+  } else {
+    arv = 0;
+  }
+
+  timer_autoreload_value_config(timerDevice, arv);
 }
 
 /*!
@@ -242,7 +272,7 @@ void HardwareTimer::setCaptureMode(uint32_t ulpin, uint8_t channel, captureMode 
   uint32_t remap  = GD_PIN_REMAP_GET(function);
   uint32_t port = gpio_port[GD_PORT_GET(pinname)];
   uint32_t pin = gpio_pin[GD_PIN_GET(pinname)];
-  gpio_clock_enable(GD_PORT_GET(pinname));
+  gpio_clock_enable(port);
 #if defined(GD32F30x)
   rcu_periph_clock_enable(RCU_AF);
   gpio_init(port, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, pin);

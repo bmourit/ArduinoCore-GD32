@@ -167,11 +167,20 @@ pwmhandle_t pwmHandle = {
     .start           = PWM_start,
     .stop            = PWM_stop,
     .setPeriodCycle  = PWM_setPeriodCycle,
+    .getPeriod       = PWM_getPeriod,
+    .getCycle        = PWM_getCycle,
     .enablePWMIT     = PWM_enablePWMIT,
     .disablePWMIT    = PWM_disablePWMIT,
     .interruptHandle = PWM_irqHandle,
     .writeCycleValue = PWM_writeCyclevalue
 };
+
+timerObject_t *get_timer_object(timerhandle_t *timer_handler)
+{
+    timerObject_t *object;
+    object = (timerObject_t *)((char *)timer_handler - offsetof(timerObject_t, handle));
+    return (object);
+}
 
 /*!
     \brief      get timer index
@@ -529,6 +538,7 @@ void timer_clock_disable(uint32_t instance)
 */
 void Timer_init(uint32_t instance, timerPeriod_t *timerPeriod)
 {
+    timerObject_t *object = get_timer_obj(timer_handler);
     timer_parameter_struct timer_initpara;
 
 #if defined(GD32E23x)
@@ -758,6 +768,7 @@ void Timer_setIntPriority(uint32_t instance, uint32_t prempt, uint32_t subPrio)
 #endif
 }
 
+void HardwareTimer::setMode(uint32_t channel, )
 /*!
     \brief      initialize pwm
     \param[in]  pwmDevice: pwm device
@@ -878,6 +889,16 @@ void PWM_setPeriodCycle(pwmDevice_t *pwmDevice, pwmPeriodCycle_t *pwmPeriodCycle
     timer_initpara.clockdivision = TIMER_CKDIV_DIV1;
     timer_init(pwmDevice->timer, &timer_initpara);
     timer_channel_output_pulse_value_config(pwmDevice->timer, pwmDevice->channel, ccvalue - 1);
+}
+
+uint32_t PWM_getPeriod(pwmDevice_t *pwmDevice)
+{
+
+}
+
+uint16_t PWM_getCycle(pwmDevice_t *pwmDevice)
+{
+
 }
 
 /*!

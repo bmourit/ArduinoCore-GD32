@@ -24,14 +24,14 @@ extern "C" {
 extern void randomSeed(uint32_t dwSeed)
 {
   if (dwSeed != 0) {
-    srand(dwSeed) ;
+    srand(dwSeed);
   }
 }
 
 extern long random(long howbig)
 {
   if (howbig == 0) {
-    return 0 ;
+    return 0;
   }
 
   return rand() % howbig;

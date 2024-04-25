@@ -53,30 +53,31 @@ void pinMode(pin_size_t ulPin, PinMode ulMode)
     }
 }
 
-void digitalWrite(pin_size_t ulPin, PinStatus status)
+void digitalWrite(pin_size_t pin, PinStatus status)
 {
-    PinName pinname = DIGITAL_TO_PINNAME(ulPin);
-    uint32_t pin =  gpio_pin[GD_PIN_GET(pinname)];
+    PinName pinname = DIGITAL_TO_PINNAME(pin);
+    uint32_t gpiopin =  gpio_pin[GD_PIN_GET(pinname)];
     uint32_t port = gpio_port[GD_PORT_GET(pinname)];
-    gpio_bit_write(port, pin, (bit_status)status);
+    gpio_bit_write(port, gpiopin, (bit_status)status);
 }
 
-PinStatus digitalRead(pin_size_t ulPin)
+PinStatus digitalRead(pin_size_t pin)
 {
-    PinName pinname = DIGITAL_TO_PINNAME(ulPin);
-    uint32_t pin =  gpio_pin[GD_PIN_GET(pinname)];
+    PinName pinname = DIGITAL_TO_PINNAME(pin);
+    uint32_t gpiopin =  gpio_pin[GD_PIN_GET(pinname)];
     uint32_t port = gpio_port[GD_PORT_GET(pinname)];
-    return (int)gpio_input_bit_get(port, pin);
+    return (FlagStatus)gpio_input_bit_get(port, gpiopin);
 }
 
-void digitalToggle(pin_size_t ulPin)
+void digitalToggle(pin_size_t pin)
 {
-    PinName pinname = DIGITAL_TO_PINNAME(ulPin);
-    uint32_t pin =  gpio_pin[GD_PIN_GET(pinname)];
+    PinName pinname = DIGITAL_TO_PINNAME(pin);
+    uint32_t gpiopin =  gpio_pin[GD_PIN_GET(pinname)];
     uint32_t port = gpio_port[GD_PORT_GET(pinname)];
-    gpio_bit_write(port, pin, (bit_status)(1 - (int)gpio_input_bit_get(port, pin)));
+    gpio_bit_write(port, gpiopin, (bit_status)(1 - (FlagStatus)gpio_input_bit_get(port, gpiopin)));
 }
 
+/* converts PORTx to GPIOx that correspond to the register base addresses */
 const uint32_t gpio_port[] = {
 #ifdef GPIOA
     GPIOA,
@@ -125,6 +126,7 @@ const uint32_t gpio_port[] = {
 #endif
 };
 
+/* converts pinname to gpio pin bit location in register */
 const uint32_t gpio_pin[] = {
     GPIO_PIN_0,
     GPIO_PIN_1,

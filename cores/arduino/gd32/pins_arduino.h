@@ -48,10 +48,12 @@ enum {
 };
 
 /* configure periphera pins */
-static const uint8_t SS   = PIN_SPI_SS;
+static const uint8_t SS = PIN_SPI_SS;
+static const uint8_t SS1 = PIN_SPI_SS1;
+static const uint8_t SS2 = PIN_SPI_SS2;
 static const uint8_t MOSI = PIN_SPI_MOSI;
 static const uint8_t MISO = PIN_SPI_MISO;
-static const uint8_t SCK  = PIN_SPI_SCK;
+static const uint8_t SCK = PIN_SPI_SCK;
 
 #ifdef HAVE_I2C
 static const uint8_t SDA = PIN_WIRE_SDA;
@@ -164,99 +166,132 @@ static const uint8_t TX4 = SERIAL4_TX;
 #endif
 
 #if ANALOG_PINS_NUM > 0
-static const uint8_t A0 = ANALOG_PIN_NUM_BASE;
+  #define PIN_A0  ANALOG_PIN_NUM_BASE
+  static const uint8_t A0 = PIN_A0;
+#endif
 #if ANALOG_PINS_NUM > 1
-static const uint8_t A1 = ANALOG_PIN_NUM_BASE + 1;
+  #define PIN_A1  (PIN_A0 + 1)
+  static const uint8_t A1 = PIN_A1;
 #endif
 #if ANALOG_PINS_NUM > 2
-static const uint8_t A2 = ANALOG_PIN_NUM_BASE + 2;
+  #define PIN_A2  (PIN_A1 + 1)
+  static const uint8_t A2 = PIN_A2;
 #endif
 #if ANALOG_PINS_NUM > 3
-static const uint8_t A3 = ANALOG_PIN_NUM_BASE + 3;
+  #define PIN_A3  (PIN_A2 + 1)
+  static const uint8_t A3 = PIN_A3;
 #endif
 #if ANALOG_PINS_NUM > 4
-static const uint8_t A4 = ANALOG_PIN_NUM_BASE + 4;
+  #define PIN_A4  (PIN_A3 + 1)
+  static const uint8_t A4 = PIN_A4;
 #endif
 #if ANALOG_PINS_NUM > 5
-static const uint8_t A5 = ANALOG_PIN_NUM_BASE + 5;
+  #define PIN_A5  (PIN_A4 + 1)
+  static const uint8_t A5 = PIN_A5;
 #endif
 #if ANALOG_PINS_NUM > 6
-static const uint8_t A6 = ANALOG_PIN_NUM_BASE + 6;
+  #define PIN_A6  (PIN_A5 + 1)
+  static const uint8_t A6 = PIN_A6;
 #endif
 #if ANALOG_PINS_NUM > 7
-static const uint8_t A7 = ANALOG_PIN_NUM_BASE + 7;
+  #define PIN_A7  (PIN_A6 + 1)
+  static const uint8_t A7 = PIN_A7;
 #endif
 #if ANALOG_PINS_NUM > 8
-static const uint8_t A8 = ANALOG_PIN_NUM_BASE + 8;
+  #define PIN_A8  (PIN_A7 + 1)
+  static const uint8_t A8 = PIN_A8;
 #endif
 #if ANALOG_PINS_NUM > 9
-static const uint8_t A9 = ANALOG_PIN_NUM_BASE + 9;
+  #define PIN_A9  (PIN_A8 + 1)
+  static const uint8_t A9 = PIN_A9;
 #endif
 #if ANALOG_PINS_NUM > 10
-static const uint8_t A10 = ANALOG_PIN_NUM_BASE + 10;
+  #define PIN_A10  (PIN_A9 + 1)
+  static const uint8_t A10 = PIN_A10;
 #endif
 #if ANALOG_PINS_NUM > 11
-static const uint8_t A11 = ANALOG_PIN_NUM_BASE + 11;
+  #define PIN_A11  (PIN_A10 + 1)
+  static const uint8_t A11 = PIN_A11;
 #endif
 #if ANALOG_PINS_NUM > 12
-static const uint8_t A12 = ANALOG_PIN_NUM_BASE + 12;
+  #define PIN_A12  (PIN_A11 + 1)
+  static const uint8_t A12 = PIN_A12;
 #endif
 #if ANALOG_PINS_NUM > 13
-static const uint8_t A13 = ANALOG_PIN_NUM_BASE + 13;
+  #define PIN_A13  (PIN_A12 + 1)
+  static const uint8_t A13 = PIN_A13;
 #endif
 #if ANALOG_PINS_NUM > 14
-static const uint8_t A14 = ANALOG_PIN_NUM_BASE + 14;
+  #define PIN_A14  (PIN_A13 + 1)
+  static const uint8_t A14 = PIN_A14;
 #endif
 #if ANALOG_PINS_NUM > 15
-static const uint8_t A15 = ANALOG_PIN_NUM_BASE + 15;
+  #define PIN_A15  (PIN_A14 + 1)
+  static const uint8_t A15 = PIN_A15;
 #endif
 #if ANALOG_PINS_NUM > 16
-static const uint8_t A16 = ANALOG_PIN_NUM_BASE + 16;
+  #define PIN_A16  (PIN_A15 + 1)
+  static const uint8_t A16 = PIN_A16;
 #endif
 #if ANALOG_PINS_NUM > 17
-static const uint8_t A17 = ANALOG_PIN_NUM_BASE + 17;
+  #define PIN_A17  (PIN_A16 + 1)
+  static const uint8_t A17 = PIN_A17;
 #endif
 #if ANALOG_PINS_NUM > 18
-static const uint8_t A18 = ANALOG_PIN_NUM_BASE + 18;
+  #define PIN_A18  (PIN_A17 + 1)
+  static const uint8_t A18 = PIN_A18;
 #endif
 #if ANALOG_PINS_NUM > 19
-static const uint8_t A19 = ANALOG_PIN_NUM_BASE + 19;
+  #define PIN_A19  (PIN_A18 + 1)
+  static const uint8_t A19 = PIN_A19;
 #endif
 #if ANALOG_PINS_NUM > 20
-static const uint8_t A20 = ANALOG_PIN_NUM_BASE + 20;
+  #define PIN_A20  (PIN_A19 + 1)
+  static const uint8_t A20 = PIN_A20;
 #endif
 #if ANALOG_PINS_NUM > 21
-static const uint8_t A21 = ANALOG_PIN_NUM_BASE + 21;
+  #define PIN_A21  (PIN_A20 + 1)
+  static const uint8_t A21 = PIN_A21;
 #endif
 #if ANALOG_PINS_NUM > 22
-static const uint8_t A22 = ANALOG_PIN_NUM_BASE + 22;
+  #define PIN_A22  (PIN_A21 + 1)
+  static const uint8_t A22 = PIN_A22;
 #endif
 #if ANALOG_PINS_NUM > 23
-static const uint8_t A23 = ANALOG_PIN_NUM_BASE + 23;
+  #define PIN_A23  (PIN_A22 + 1)
+  static const uint8_t A23 = PIN_A23;
 #endif
 #if ANALOG_PINS_NUM > 24
-static const uint8_t A24 = ANALOG_PIN_NUM_BASE + 24;
+  #define PIN_A24  (PIN_A23 + 1)
+  static const uint8_t A24 = PIN_A24;
 #endif
 #if ANALOG_PINS_NUM > 25
-static const uint8_t A25 = ANALOG_PIN_NUM_BASE + 25;
+  #define PIN_A25  (PIN_A24 + 1)
+  static const uint8_t A25 = PIN_A25;
 #endif
 #if ANALOG_PINS_NUM > 26
-static const uint8_t A26 = ANALOG_PIN_NUM_BASE + 26;
+  #define PIN_A26  (PIN_A25 + 1)
+  static const uint8_t A26 = PIN_A26;
 #endif
 #if ANALOG_PINS_NUM > 27
-static const uint8_t A27 = ANALOG_PIN_NUM_BASE + 27;
+  #define PIN_A27  (PIN_A26 + 1)
+  static const uint8_t A27 = PIN_A27;
 #endif
 #if ANALOG_PINS_NUM > 28
-static const uint8_t A28 = ANALOG_PIN_NUM_BASE + 28;
+  #define PIN_A28  (PIN_A27 + 1)
+  static const uint8_t A28 = PIN_A28;
 #endif
 #if ANALOG_PINS_NUM > 29
-static const uint8_t A29 = ANALOG_PIN_NUM_BASE + 29;
+  #define PIN_A29  (PIN_A28 + 1)
+  static const uint8_t A29 = PIN_A29;
 #endif
 #if ANALOG_PINS_NUM > 30
-static const uint8_t A30 = ANALOG_PIN_NUM_BASE + 20;
+  #define PIN_A30  (PIN_A29 + 1)
+  static const uint8_t A30 = PIN_A20;
 #endif
 #if ANALOG_PINS_NUM > 31
-static const uint8_t A31 = ANALOG_PIN_NUM_BASE + 31;
+  #define PIN_A31  (PIN_A30 + 1)
+  static const uint8_t A31 = PIN_A31;
 #endif
 
 #define ANALOG_PINS_MAX 32
@@ -268,9 +303,6 @@ static const uint8_t A31 = ANALOG_PIN_NUM_BASE + 31;
 extern "C" {
 #endif
 
-/* map the ports the to GPIOx register */
-uint32_t port_to_gpio_reg(uint32_t port);
-
 extern const PinName digital_pins[];
 extern const uint32_t analog_pins[];
 
@@ -278,8 +310,6 @@ extern const uint32_t gpio_port[];
 extern const uint32_t gpio_pin[];
 
 #define NOT_INTERRUPT (uint32_t)NC
-
-#define GD_PORT_GET(X)  (port_to_gpio_reg(((uint32_t)(X) >> 4) & 0xF))
 
 /* Convert a digital pin to a PinName */
 #if ANALOG_PINS_NUM > 0
@@ -328,26 +358,27 @@ PinName analog_pin_to_PinName(uint32_t pin);
                                 pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_SSEL))
 
 
-#define DIGITAL_PIN_TO_PORT(p)      ((GD_PORT_GET(DIGITAL_TO_PINNAME(p)) < GPIO_PORT_NUM) ? gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(p))] : (uint32_t )NULL)
+//#define DIGITAL_PIN_TO_PORT(p)      ((GD_PORT_GET(DIGITAL_TO_PINNAME(p)) < GPIO_PORT_NUM) ? gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(p))] : (uint32_t )NULL)
+#define DIGITAL_PIN_TO_PORT(p)      (gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(p))])
 #define DIGITAL_PIN_TO_BIT_MASK(p)  ((uint16_t)(1 << GD_PIN_GET(DIGITAL_TO_PINNAME(p))))
 
 #define ANALOG_PINS_TO_BIT(p) ((uint16_t)(1 << GD_PIN_GET(DIGITAL_TO_PINNAME(p))))
-#define PORT_OUTPUT_REG(p)    (GPIO_OCTL(port_to_gpio_reg(p)))
-#define PORT_INPUT_REG(p)     (GPIO_ISTAT(port_to_gpio_reg(p)))
-#define PORT_SET_REG(p)       (GPIO_BOP(port_to_gpio_reg(p)))
+#define PORT_OUTPUT_REG(p)    (GPIO_OCTL(p))
+#define PORT_INPUT_REG(p)     (GPIO_ISTAT(p))
+#define PORT_SET_REG(p)       (GPIO_BOP(p))
 #if defined(GD32F4xx)
 /* GPIO register definitions */
-#define PORT_CLEAR_REG(p)   (GPIO_BOP(port_to_gpio_reg(p)))
+#define PORT_CLEAR_REG(p)   (GPIO_BOP(p))
 #else
-#define PORT_CLEAR_REG(p)   (GPIO_BC(port_to_gpio_reg(p)))
+#define PORT_CLEAR_REG(p)   (GPIO_BC(p))
 #endif
 
 #if defined(GD32F30x)
-#define PORT_CTL_REG(p)     (GPIO_CTL0(port_to_gpio_reg(p)))
+#define PORT_CTL_REG(p)     (GPIO_CTL0(p))
 #else
-#define PORT_CTL_REG(p)     (GPIO_CTL(port_to_gpio_reg(p)))
+#define PORT_CTL_REG(p)     (GPIO_CTL(p))
 #endif
-#define PORT_CFG_REG(p)     (PORT_CTL_REG(port_to_gpio_reg(p)))
+#define PORT_CFG_REG(p)     (PORT_CTL_REG(p))
 
 /* some pins could be duplicated in digital_pins[] */
 /* return first occurence of linked PinName (PYx) */

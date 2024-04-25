@@ -19,11 +19,11 @@
 #ifndef PERIPHERALNAMES_H
 #define PERIPHERALNAMES_H
 
-#include "gd32f30x.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "gd32f30x.h"
 
 typedef enum {
     ADC_0 = (int)ADC0,

@@ -88,7 +88,7 @@ class SPIClass
   private:
     void config(SPISettings settings);
 
-    SPISettings spisettings;
+    SPISettings spiSettings;
     bool initialized;
     spi_t _spi;
 };

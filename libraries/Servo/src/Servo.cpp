@@ -1,39 +1,44 @@
 /*
   Copyright (c) 2017 Arduino LLC. All right reserved.
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
   version 2.1 of the License, or (at your option) any later version.
+
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
   Lesser General Public License for more details.
+
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-/* this file is adapted from https://github.com/stm32duino/Arduino_Core_STM32/blob/master/libraries/Servo/src/stm32/Servo.cpp
- * for GigaDevice devices.
-*/
+/**
+ * this file is adapted from https://github.com/stm32duino/Arduino_Core_STM32/blob/master/libraries/Servo/src/stm32/Servo.cpp
+ * for GigaDevice GD32 devices.
+ */
 
 #include <Arduino.h>
 #include <Servo.h>
 #include "HardwareTimer.h"
 
-static servo_t servos[MAX_SERVOS];                      // static array of servo structures
+static servo_t servos[MAX_SERVOS];                          // static array of servo structures
+static volatile int8_t timerChannel[_Nbr_16timers] = {-1};  // counter for the servo being pulsed for each timer (or -1 if refresh interval)
 
-// counter for the servo being pulsed for each timer (or -1 if refresh interval)
-static volatile int8_t timerChannel[_Nbr_16timers] = {-1};
 static HardwareTimer TimerServo(TIMER_SERVO);
-uint8_t ServoCount = 0;                                 // the total number of attached servos
 
-#define SERVO_MIN() (MIN_PULSE_WIDTH - this->min * 4)   // minimum value in uS for this servo
-#define SERVO_MAX() (MAX_PULSE_WIDTH - this->max * 4)   // maximum value in uS for this servo
+uint8_t ServoCount = 0;                                     // the total number of attached servos
+
+#define SERVO_MIN() (MIN_PULSE_WIDTH - this->min * 4)       // minimum value in uS for this servo
+#define SERVO_MAX() (MAX_PULSE_WIDTH - this->max * 4)       // maximum value in uS for this servo
 
 #define SERVO_TIMER(_timer_id)  ((timer16_Sequence_t)(_timer_id))
 
 /* static functions common to all instances */
+
 volatile uint32_t CumulativeCountSinceRefresh = 0;
 
 // Servo period callback handle
@@ -45,23 +50,26 @@ static void Servo_PeriodElapsedCallback()
     CumulativeCountSinceRefresh = 0;
   } else {
     if (timerChannel[timer_id] < ServoCount && servos[timerChannel[timer_id]].Pin.isActive == true) {
-      digitalWrite(servos[timerChannel[timer_id]].Pin.nbr, LOW);
+      digitalWrite(servos[timerChannel[timer_id]].Pin.nbr, LOW);  // pulse this channel low if activated
     }
   }
-  timerChannel[timer_id]++;
+  timerChannel[timer_id]++;   // increment to the next channel
   if (timerChannel[timer_id] < ServoCount && timerChannel[timer_id] < SERVOS_PER_TIMER) {
     TimerServo.setReloadValue(servos[timerChannel[timer_id]].ticks);
     CumulativeCountSinceRefresh += servos[timerChannel[timer_id]].ticks;
     if (servos[timerChannel[timer_id]].Pin.isActive == true) {
-      digitalWrite(servos[timerChannel[timer_id]].Pin.nbr, HIGH);
+      digitalWrite(servos[timerChannel[timer_id]].Pin.nbr, HIGH);   // its an active channel so pulse it high
     }
   } else {
+    // finished all channels so wait for the refresh period to expire before starting over
     if (CumulativeCountSinceRefresh + 4 < REFRESH_INTERVAL) {
+      // allow a few ticks to ensure the next OCR1A not missed
       TimerServo.setReloadValue(REFRESH_INTERVAL - CumulativeCountSinceRefresh);
     } else {
+      // generate update to restart immediately from the beginning with the 1st servo
       TimerServo.refresh();
     }
-    timerChannel[timer_id] = -1;
+    timerChannel[timer_id] = -1;  // this will get incremented at the end of the refresh period to start again at the first channel
   }
 }
 
@@ -71,8 +79,9 @@ static void TimerServoInit()
   uint32_t freq = TimerServo.getTimerClkFreq();
 
   TimerServo.setPrescaler(freq / 1000000 - 1);
-  TimerServo.setReloadValue(20000);
+  TimerServo.setReloadValue(REFRESH_INTERVAL);
   TimerServo.attachInterrupt(Servo_PeriodElapsedCallback);
+  TimerServo.setPreloadARSEnable(false);
   TimerServo.start();
 }
 
@@ -84,26 +93,26 @@ static bool isTimerActive()
       return true;
     }
   }
-
   return false;
 }
 
 /* servo class functions */
+
 Servo::Servo()
 {
   if (ServoCount < MAX_SERVOS) {
-    this->servoIndex = ServoCount++;
-    servos[this->servoIndex].ticks = DEFAULT_PULSE_WIDTH;
+    this->servoIndex = ServoCount++;                      // assign a servo index to this instance
+    servos[this->servoIndex].ticks = DEFAULT_PULSE_WIDTH; // store default values
   } else {
-    this->servoIndex = INVALID_SERVO;
+    this->servoIndex = INVALID_SERVO;                     // too many servos
   }
 }
 
 // Servo attach a digital pin
-// uint8_t Servo::attach(int pin)
-// {
-//   return this->attach(pin, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
-// }
+uint8_t Servo::attach(int pin)
+{
+   return this->attach(pin, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
+}
 
 // Servo attach a digital pin
 uint8_t Servo::attach(int pin, int min, int max)
@@ -112,8 +121,8 @@ uint8_t Servo::attach(int pin, int min, int max)
     pinMode(pin, OUTPUT);                      // set servo pin to output
     servos[this->servoIndex].Pin.nbr = pin;
     servos[this->servoIndex].ticks = DEFAULT_PULSE_WIDTH;
-    // todo min/max check: abs(min - MIN_PULSE_WIDTH) /4 < 128
-    this->min  = (MIN_PULSE_WIDTH - min) / 4; //resolution of min/max is 4 uS
+    // todo min/max check: abs(min - MIN_PULSE_WIDTH) / 4 < 128
+    this->min  = (MIN_PULSE_WIDTH - min) / 4; // resolution of min/max is 4 uS
     this->max  = (MAX_PULSE_WIDTH - max) / 4;
     // initialize the timer if it has not already been initialized
     if (isTimerActive() == false) {
@@ -137,6 +146,7 @@ void Servo::detach()
 // write an angle to servo
 void Servo::write(int value)
 {
+  // treat values less than 544 as angles in degrees (valid values in microseconds are handled as microseconds)
   if (value < MIN_PULSE_WIDTH) {
     if (value < 0) {
       value = 0;
@@ -151,9 +161,10 @@ void Servo::write(int value)
 // write Microseconds to servo
 void Servo::writeMicroseconds(int value)
 {
+  // calculate and store the values for the given channel
   byte channel = this->servoIndex;
-  if ((channel < MAX_SERVOS)) {
-    if (value < SERVO_MIN()) {
+  if ((channel < MAX_SERVOS)) {     // ensure channel is valid
+    if (value < SERVO_MIN()) {      // ensure pulse width is valid
       value = SERVO_MIN();
     } else if (value > SERVO_MAX()) {
       value = SERVO_MAX();
@@ -180,7 +191,7 @@ int Servo::readMicroseconds()
   return pulsewidth;
 }
 
-// Check Timer  active status
+// Check Timer active status
 bool Servo::attached()
 {
   return servos[this->servoIndex].Pin.isActive;

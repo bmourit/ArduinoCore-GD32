@@ -8,7 +8,6 @@ extern "C" {
 #endif
 
 void analogReadResolution(int res);
-
 void analogWriteResolution(int res);
 void analogWriteFrequency(uint32_t freq_hz);
 

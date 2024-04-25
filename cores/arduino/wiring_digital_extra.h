@@ -10,8 +10,7 @@ extern "C" {
 
 void digitalToggle(pin_size_t ulPin);
 
-
-#if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
+#if defined(GD32F30x) || defined(GD32F10x) || defined(GD32E50X)
 /******************************************************************************
  * The MIT License
  *
@@ -41,16 +40,16 @@ void digitalToggle(pin_size_t ulPin);
 typedef enum afio_debug_cfg {
     /** Full Serial Wire and JTAG debug */
 #if defined(GD32F30x) || defined(GD32F10x)
-    AFIO_DEBUG_FULL_SWJ          = ((uint32_t)0x00300000U | (AFIO_PCF0_SWJ_CFG >> 16)),
+    AFIO_DEBUG_FULL_SWJ = ((uint32_t)0x00300000U | (AFIO_PCF0_SWJ_CFG >> 16)),
 #else
-    AFIO_DEBUG_FULL_SWJ          = ((uint32_t)0x00300000U | (PCF0_SWJ_CFG(0) >> 16)),
+    AFIO_DEBUG_FULL_SWJ = ((uint32_t)0x00300000U | (PCF0_SWJ_CFG(0) >> 16)),
 #endif
     /** Full Serial Wire and JTAG, but no NJTRST. */
     AFIO_DEBUG_FULL_SWJ_NO_NJRST = GPIO_SWJ_NONJTRST_REMAP,
     /** Serial Wire debug only (JTAG-DP disabled, SW-DP enabled) */
-    AFIO_DEBUG_SW_ONLY           = GPIO_SWJ_SWDPENABLE_REMAP,
+    AFIO_DEBUG_SW_ONLY = GPIO_SWJ_SWDPENABLE_REMAP,
     /** No debug; all JTAG and SW pins are free for use as GPIOs. */
-    AFIO_DEBUG_NONE              = GPIO_SWJ_DISABLE_REMAP,
+    AFIO_DEBUG_NONE = GPIO_SWJ_DISABLE_REMAP,
 } afio_debug_cfg;
 
 static inline void afio_cfg_debug_ports(afio_debug_cfg config) {

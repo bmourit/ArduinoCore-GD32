@@ -20,9 +20,9 @@
   Boston, MA  02111-1307  USA
 */
 
-#ifndef WiringPrivate_h
-#define WiringPrivate_h
+#pragma once
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdarg.h>
 

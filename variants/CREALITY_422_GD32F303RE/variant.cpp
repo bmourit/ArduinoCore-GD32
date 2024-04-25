@@ -96,6 +96,11 @@ const uint32_t analog_pins[] = {
   37  // A15, PC5
 };
 
+WEAK void SystemClock_Config(void)
+{
+  
+}
+
 #ifdef __cplusplus
 }
 #endif

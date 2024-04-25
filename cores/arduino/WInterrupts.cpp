@@ -41,11 +41,11 @@ void attachInterrupt(pin_size_t pin, voidFuncPtr callback, PinStatus mode)
             it_mode = EXTI_TRIG_RISING;
             break;
     }
-    gpio_interrupt_enable(GD_PORT_GET(pinname), GD_PIN_GET(pinname), callback, it_mode);
+    gpio_interrupt_enable(gpio_port[GD_PORT_GET(pinname)], gpio_pin[GD_PIN_GET(pinname)], callback, it_mode);
 }
 
 void detachInterrupt(pin_size_t pin)
 {
     PinName pinname = DIGITAL_TO_PINNAME(pin);
-    gpio_interrupt_disable(GD_PIN_GET(pinname));
+    gpio_interrupt_disable(gpio_pin[GD_PIN_GET(pinname)]);
 }

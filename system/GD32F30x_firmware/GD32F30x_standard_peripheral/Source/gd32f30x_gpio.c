@@ -246,11 +246,11 @@ void gpio_bit_reset(uint32_t gpio_periph,uint32_t pin)
     \param[out] none
     \retval     none
 */
-void gpio_bit_write(uint32_t gpio_periph,uint32_t pin,bit_status bit_value)
+void gpio_bit_write(uint32_t gpio_periph, uint32_t pin, bit_status bit_value)
 {
-    if(RESET != bit_value){
+    if (RESET != bit_value) {
         GPIO_BOP(gpio_periph) = (uint32_t)pin;
-    }else{
+    } else {
         GPIO_BC(gpio_periph) = (uint32_t)pin;
     }
 }
@@ -276,11 +276,11 @@ void gpio_port_write(uint32_t gpio_periph,uint16_t data)
     \param[out] none
     \retval     input status of gpio pin: SET or RESET
 */
-FlagStatus gpio_input_bit_get(uint32_t gpio_periph,uint32_t pin)
+FlagStatus gpio_input_bit_get(uint32_t gpio_periph, uint32_t pin)
 {
-    if((uint32_t)RESET != (GPIO_ISTAT(gpio_periph)&(pin))){
+    if ((uint32_t)RESET != (GPIO_ISTAT(gpio_periph) & (pin))) {
         return SET; 
-    }else{
+    } else {
         return RESET;
     }
 }

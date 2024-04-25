@@ -31,15 +31,15 @@ OF SUCH DAMAGE.
 #define UART_H
 
 /* Includes */
-#include "gd32xxyy.h"
 #include "PinNames.h"
 #include "PeripheralNames.h"
-#include "pinmap.h"
-#include "PeripheralPins.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include "gd32xxyy.h"
+#include "PeripheralPins.h"
+#include "pinmap.h"
 
 #ifndef UART_IRQ_PRIORITY
 #define UART_IRQ_PRIORITY     1
