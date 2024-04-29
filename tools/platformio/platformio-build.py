@@ -137,6 +137,7 @@ def configure_application_offset(mcu, upload_protocol):
 machine_flags = [
     "-mcpu=%s" % board_config.get("build.cpu"),
     "-mthumb",
+    "-masm-syntax-unified",
 ]
 
 # Some GD32F303RET6 chips shipped without FPU support. There is no easy way to check this
@@ -153,7 +154,9 @@ env.Append(
     ASFLAGS=machine_flags
     + ["-x", "assembler-with-cpp"],
     ASPPFLAGS=["-x", "assembler-with-cpp"],
-    CFLAGS=["-std=gnu17"],
+    CFLAGS=[
+        "-std=gnu17",
+    ],
     CXXFLAGS=[
         "-std=gnu++17",
         "-fno-threadsafe-statics",
@@ -163,6 +166,7 @@ env.Append(
     ],
     CCFLAGS=machine_flags
     + [
+        "-c",
         "-Os",  # optimize for size
         "-ffunction-sections",  # place each function in its own section
         "-fdata-sections",
@@ -170,6 +174,7 @@ env.Append(
         "-nostdlib",
         "--param",
         "max-inline-insns-single=500",
+        "-MMD",
     ],
     CPPDEFINES=[
         series,

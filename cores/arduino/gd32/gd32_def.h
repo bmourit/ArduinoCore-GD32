@@ -38,12 +38,12 @@ OF SUCH DAMAGE.
 #define GD32_CORE_VERSION_PATCH    (0x00U) /*!< [7:0]  patch version */
 #define GD32_CORE_VERSION          ((GD32_CORE_VERSION_MAJOR << 16U) \
                                     | (GD32_CORE_VERSION_MINOR << 8U) \
-                                    | (GD32_CORE_VERSION_PATCH )
+                                    | (GD32_CORE_VERSION_PATCH))
 /**
  * Libc porting layers
  */
-#if defined (  __GNUC__  ) /* GCC CS3 */
-#define WEAK __attribute__ ((weak))
+#if defined(  __GNUC__  ) /* GCC CS3 */
+#define WEAK __attribute__((weak))
 #endif
 
 #ifdef __cplusplus
@@ -51,6 +51,7 @@ extern "C" {
 #endif
 
 void _Error_Handler(const char *, int);
+
 #define Error_Handler() _Error_Handler(__FILE__, __LINE__)
 
 #ifdef __cplusplus

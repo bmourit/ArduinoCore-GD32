@@ -182,7 +182,7 @@ typedef enum {
 /* Initialize the serial peripheral. It sets the default parameters for serial peripheral, and configures its specifieds pins. */
 void serial_init(serial_t *obj, PinName pin_rx, PinName pin_tx);
 /* Enable serial peripheral after init or init + format. */
-void serial_enable(struct serial_s *obj_s);
+void serial_enable(serial_t *obj);
 /* Release the serial peripheral, not currently invoked. It requires further resource management. */
 void serial_free(serial_t *obj);
 /* Configure the baud rate */
@@ -211,7 +211,6 @@ void uart_attach_rx_callback(serial_t *obj, void(*callback)(serial_t *));
 int serial_transmit(serial_t *obj, const uint8_t *tx, size_t tx_length);
 /* Begin asynchronous RX transfer (enable interrupt for data collecting) */
 void serial_receive(serial_t *obj, const uint8_t *rx, size_t rx_length);
-
 
 /* non-blocking */
 //gd_status_enum serial_transmit_nb(serial_t *obj, const uint8_t *txData, size_t txSize);

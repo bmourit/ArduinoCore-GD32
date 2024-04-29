@@ -58,11 +58,15 @@ static rcu_periph_enum usart_clk[UART_NUM] = {
 #ifdef USART2
   RCU_USART2,
 #endif
-#ifdef USART3
+#ifdef UART3
   RCU_UART3,
+#elif USART3
+  RCU_USART3,
 #endif
-#ifdef USART4
+#ifdef UART4
   RCU_UART4
+#elif USART4
+  RCU_USART4
 #endif
 };
 
@@ -72,15 +76,19 @@ static IRQn_Type usart_irq_n[UART_NUM] = {
 #ifdef USART2
 	USART2_IRQn,
 #endif
-#ifdef USART3
+#ifdef UART3
 	UART3_IRQn,
+#elif USART3
+	USART3_IRQn,
 #endif
-#ifdef USART4
+#ifdef UART4
 	UART4_IRQn
+#elif USART4
+	USART4_IRQn
 #endif
 };
 
-#define GET_SERIAL_S(obj) (obj)
+#define GET_SERIAL_S(obj) (obj_s_buf[(obj->index)])
 
 /**
  * Initialize the USART peripheral.
@@ -108,16 +116,17 @@ static void usart_init(struct serial_s *obj_s)
  * @param[in] obj : serial object pointer
  * @retval    none
  */
-void serial_enable(struct serial_s *obj_s)
+void serial_enable(serial_t *obj)
 {
-	usart_receive_config(obj_s->uart, USART_RECEIVE_ENABLE);
-  usart_transmit_config(obj_s->uart, USART_TRANSMIT_ENABLE);
-  usart_enable(obj_s->uart);
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
+	usart_receive_config(p_obj->uart, USART_RECEIVE_ENABLE);
+  usart_transmit_config(p_obj->uart, USART_TRANSMIT_ENABLE);
+  usart_enable(p_obj->uart);
 }
 
 /**
  * Initialize the serial peripheral. It sets the default parameters for serial
- * peripheral, and configures its specifieds pins.
+ * peripheral, and configures the specified pins.
  *
  * @param obj The serial object
  * @param tx  The TX pin name
@@ -125,67 +134,65 @@ void serial_enable(struct serial_s *obj_s)
  */
 void serial_init(serial_t *obj, PinName tx, PinName rx)
 {
-  struct serial_s *p_obj = GET_SERIAL_S(obj);
-
-  if (p_obj == NULL) {
+  //struct serial_s *p_obj = obj; //GET_SERIAL_S(obj);
+  if (obj == NULL) {
     return;
   }
 
 	UARTName uart_tx = (UARTName)pinmap_peripheral(tx, PinMap_UART_TX);
 	UARTName uart_rx = (UARTName)pinmap_peripheral(rx, PinMap_UART_RX);
 
-	p_obj->uart = (UARTName)pinmap_merge(uart_tx, uart_rx);
+	obj->uart = (UARTName)pinmap_merge(uart_tx, uart_rx);
 
 	/* set uart index */
-	switch (p_obj->uart) {
+	switch (obj->uart) {
 #if defined(USART0)
 		case USART0:
-			p_obj->index = UART0_INDEX;
+			obj->index = UART0_INDEX;
 			break;
 #endif
 #if defined(USART1)
 		case USART1:
-			p_obj->index = UART1_INDEX;
+			obj->index = UART1_INDEX;
 			break;
 #endif
 #if defined(USART2)
 		case USART2:
-			p_obj->index = UART2_INDEX;
+			obj->index = UART2_INDEX;
 			break;
 #endif
 #if defined(UART3)
 		case UART3:
-			p_obj->index = UART3_INDEX;
+			obj->index = UART3_INDEX;
 			break;
 #endif
 #if defined(UART4)
 		case UART4:
-			p_obj->index = UART4_INDEX;
+			obj->index = UART4_INDEX;
 			break;
 #endif
 	}
 
 	/* reset and enable UART peripheral clock */
-  usart_deinit(p_obj->uart);
-	rcu_periph_clock_enable(usart_clk[p_obj->index]);
+  usart_deinit(obj->uart);
+	rcu_periph_clock_enable(usart_clk[obj->index]);
 
 	/* configure the pins */
 	pinmap_pinout(tx, PinMap_UART_TX);
   pinmap_pinout(rx, PinMap_UART_RX);
 
-	p_obj->baudrate = 9600U;
-	p_obj->databits = USART_WL_8BIT;
-	p_obj->stopbits = USART_STB_1BIT;
-	p_obj->parity = USART_PM_NONE;
+	obj->baudrate = 9600U;
+	obj->databits = USART_WL_8BIT;
+	obj->stopbits = USART_STB_1BIT;
+	obj->parity = USART_PM_NONE;
+	obj->pin_tx = tx;
+	obj->pin_rx = rx;
+	obj->tx_state = OP_STATE_BUSY;
+	obj->rx_state = OP_STATE_BUSY;
 
-	p_obj->pin_tx = tx;
-	p_obj->pin_rx = rx;
-
-	p_obj->tx_state = OP_STATE_BUSY;
-	p_obj->rx_state = OP_STATE_BUSY;
-
+	obj_s_buf[obj->index] = obj;
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
 	usart_init(p_obj);
-	obj_s_buf[p_obj->index] = p_obj;
 
 	p_obj->tx_state = OP_STATE_READY;
 	p_obj->rx_state = OP_STATE_READY;
@@ -424,11 +431,11 @@ void uart_attach_tx_callback(serial_t *obj, void(*callback)(serial_t *))
 	if (obj == NULL) {
 		return;
 	}
-
-	if (serial_tx_active(obj)) {
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
+	if (serial_tx_active(p_obj)) {
 		return;
 	}
-	obj->tx_callback = callback;
+	p_obj->tx_callback = callback;
 }
 
 /**
@@ -442,12 +449,13 @@ void uart_attach_rx_callback(serial_t *obj, void(*callback)(serial_t *))
 	if (obj == NULL) {
 		return;
 	}
+	struct serial_s *p_obj = GET_SERIAL_S(obj);
 
 	/* Exit if a reception is already on-going */
-	if (serial_rx_active(obj)) {
+	if (serial_rx_active(p_obj)) {
 		return;
 	}
-	obj->rx_callback = callback;
+	p_obj->rx_callback = callback;
 }
 
 /**

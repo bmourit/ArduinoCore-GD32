@@ -32,8 +32,6 @@ extern const int GD_GPIO_REMAP[];
 extern const int GD_GPIO_AF[];
 #endif
 
-uint32_t gpio_clock_enable(uint32_t port_idx);
-
 bool pin_in_pinmap(PinName pin, const PinMap *map)
 {
 	if (pin != (PinName)NC) {
@@ -48,16 +46,18 @@ bool pin_in_pinmap(PinName pin, const PinMap *map)
 }
 
 /**
- * Configure pin (mode, speed, reamp or af function)
+ * Configure pin (mode, speed, remap or af function)
  * @param pin gpio pin name
  * @param function gpio pin mode, speed, remap or af function
  */
 void pin_function(PinName pin, int function)
 {
 	uint32_t remap = GD_PIN_REMAP_GET(function);
-	uint32_t speed = GD_PIN_SPEED_GET(function);
+	//uint32_t speed = GD_PIN_SPEED_GET(function);
+	/* since we dont encode the speed in the function, we can simply set it to MAX here */
+	uint32_t speed = GPIO_OSPEED_MAX;
 	uint32_t port = GD_PORT_GET(pin);
-	uint32_t gd_pin = 1 << GD_PIN_GET(pin);
+	uint32_t gd_pin = gpio_pin[GD_PIN_GET(pin)];
 
 	uint32_t spl_mode = GPIO_MODE_IN_FLOATING;
 
@@ -124,12 +124,12 @@ void pin_function(PinName pin, int function)
 		spl_mode = GPIO_MODE_AIN;
 		break;
 	case PIN_MODE_INPUT:
-		if (pull == PIN_PUPD_NONE) {
-			spl_mode = GPIO_MODE_IN_FLOATING;
-		} else if (pull == PIN_PUPD_PULLUP) {
+		if (pull == PIN_PUPD_PULLUP) {
 			spl_mode = GPIO_MODE_IPU;
 		} else if (pull == PIN_PUPD_PULLDOWN) {
 			spl_mode = GPIO_MODE_IPD;
+		} else {
+			spl_mode = GPIO_MODE_IN_FLOATING;
 		}
 		break;
 	case PIN_MODE_AF:
@@ -151,20 +151,24 @@ void pin_function(PinName pin, int function)
 	}
 #endif
 
-	uint32_t gpio = gpio_clock_enable(port);
+	uint32_t gpio = gpio_port[port];
+	gpio_clock_enable(gpio);
 
 #if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
-	gpio_init(gpio, spl_mode, GD_GPIO_SPEED[speed], gd_pin);
 	if (remap != 0) {
-		/* MSB is disable */
+		/* MSB is disabled */
 		bool disable = remap & ~(PIN_REMAP_MASK >> 1);
 		remap &= PIN_REMAP_MASK >> 1;
 		rcu_periph_clock_enable(RCU_AF);
 		gpio_pin_remap_config(GD_GPIO_REMAP[remap], disable ? DISABLE : ENABLE);
+		gpio_debug_disconnect(pin);
+		gpio_compensation_config(GPIO_COMPENSATION_ENABLE);
+		gpio_init(gpio, spl_mode, speed, gd_pin);
 	}
 #elif defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32F4xx) || defined(GD32E23x)
 	gpio_af_set(gpio, GD_GPIO_AF[af], gd_pin);
 	gpio_mode_set(gpio, spl_mode, spl_pull, gd_pin);
+	gpio_debug_disconnect(pin);
 	if (spl_mode == GPIO_MODE_OUTPUT || spl_mode == GPIO_MODE_AF)
 		gpio_output_options_set(gpio, spl_output, GD_GPIO_SPEED[speed], gd_pin);
 #endif
@@ -191,14 +195,14 @@ uint32_t pinmap_merge(uint32_t a, uint32_t b)
 		return a;
 	}
 	// one (or both) is not connected
-	if (a == NC) {
+	if (a == NP) {
 		return b;
 	}
-	if (b == NC) {
+	if (b == NP) {
 		return a;
 	}
 	// mis-match error case
-	return NC;
+	return NP;
 }
 
 uint32_t pinmap_find_peripheral(PinName pin, const PinMap *map)
@@ -209,12 +213,12 @@ uint32_t pinmap_find_peripheral(PinName pin, const PinMap *map)
 		}
 		map++;
 	}
-	return NC;
+	return NP;
 }
 
 uint32_t pinmap_peripheral(PinName pin, const PinMap *map)
 {
-	uint32_t peripheral = NC;
+	uint32_t peripheral = NP;
 
 	if (pin != (PinName)NC) {
 		peripheral = pinmap_find_peripheral(pin, map);
@@ -245,7 +249,7 @@ uint32_t pinmap_function(PinName pin, const PinMap *map)
 
 PinName pinmap_find_pin(uint32_t peripheral, const PinMap *map)
 {
-  while (map->peripheral != NC) {
+  while (map->peripheral != NP) {
     if (map->peripheral == peripheral) {
       return map->pin;
     }
@@ -258,7 +262,7 @@ PinName pinmap_pin(uint32_t peripheral, const PinMap *map)
 {
   PinName pin = (PinName)NC;
 
-  if (peripheral != NC) {
+  if (peripheral != NP) {
     pin = pinmap_find_pin(peripheral, map);
   }
   return pin;
@@ -268,42 +272,35 @@ PinName pinmap_pin(uint32_t peripheral, const PinMap *map)
  * Enable GPIO clock
  * @param gpio_periph gpio port name
  */
-uint32_t gpio_clock_enable(uint32_t port_idx) {
-	uint32_t gpio_add = 0;
-	switch (port_idx) {
-	case PORTA:
-		gpio_add = GPIOA;
+void gpio_clock_enable(uint32_t gpio_port)
+{
+	switch (gpio_port) {
+	case GPIOA:
 		rcu_periph_clock_enable(RCU_GPIOA);
 		break;
-	case PORTB:
-		gpio_add = GPIOB;
+	case GPIOB:
 		rcu_periph_clock_enable(RCU_GPIOB);
 		break;
-	case PORTC:
-		gpio_add = GPIOC;
+	case GPIOC:
 		rcu_periph_clock_enable(RCU_GPIOC);
 		break;
 #ifdef GPIOD
-	case PORTD:
-		gpio_add = GPIOD;
+	case GPIOD:
 		rcu_periph_clock_enable(RCU_GPIOD);
 		break;
 #endif
 #ifdef GPIOE
-	case PORTE:
-		gpio_add = GPIOE;
+	case GPIOE:
 		rcu_periph_clock_enable(RCU_GPIOE);
 		break;
 #endif
 #ifdef GPIOF
-	case PORTF:
-		gpio_add = GPIOF;
+	case GPIOF:
 		rcu_periph_clock_enable(RCU_GPIOF);
 		break;
 #endif
 #ifdef GPIOG
-	case PORTG:
-		gpio_add = GPIOG;
+	case GPIOG:
 		rcu_periph_clock_enable(RCU_GPIOG);
 		break;
 #endif
@@ -311,5 +308,4 @@ uint32_t gpio_clock_enable(uint32_t port_idx) {
 		gd_debug("port number does not exist");
 		break;
 	}
-	return gpio_add;
 }

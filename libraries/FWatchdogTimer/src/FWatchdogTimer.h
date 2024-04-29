@@ -50,4 +50,5 @@ class FWatchdogTimerClass {
 };
 
 extern FWatchdogTimerClass FWatchdogTimer;
-#endif /* __IWATCHDOG_H__ */
+
+#endif /* __FWATCHDOGTIMER_H__ */

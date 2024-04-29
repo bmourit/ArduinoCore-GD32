@@ -1,4 +1,5 @@
 #include "gd32_def.h"
+#include "gd_debug.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,9 +12,11 @@ extern "C" {
   */
 WEAK void _Error_Handler(const char *msg, int val)
 {
-  (void) msg;
-  (void) val;
-  /* User can add his own implementation to report the SPL error return state */
+  /**
+   * User can add their own implementation to report the SPL error return state
+   * by replacing the default gd_debug
+   */
+  gd_debug("Error: %s (%i)\n", msg, val);
   while (1) {
   }
 }

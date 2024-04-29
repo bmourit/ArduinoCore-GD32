@@ -24,12 +24,15 @@
 extern "C" {
 #endif
 
+/* adds functionality by providing a list of configured IOs */
+uint32_t gpioOutputPinIsConfigured[GPIO_PORT_NUM] = { 0 };
+
 #define MAX_PWM_RESOLUTION  16
 #define MAX_ADC_RESOLUTION  12
 
 static uint32_t analogRead_resolution = ADC_RESOLUTION;
 static uint32_t analogWrite_resolution = PWM_RESOLUTION;
-static uint32_t _ADCResolution = MAX_ADC_RESOLUTION
+static uint32_t _ADCResolution = MAX_ADC_RESOLUTION;
 static uint32_t internalAnalogOut_resolution = (PWM_RESOLUTION > MAX_PWM_RESOLUTION) ? MAX_PWM_RESOLUTION : PWM_RESOLUTION;
 static uint32_t analogOut_period_us = PWM_FREQUENCY;
 
@@ -88,33 +91,43 @@ int analogRead(pin_size_t pin)
 // to digital output.
 void analogWrite(pin_size_t pin, int value)
 {
+  uint8_t needs_init = 0;
   uint32_t ulValue;
-  PinName pinname = DIGITAL_TO_PINNAME(pin);
-  if (pin_in_pinmap(pinname, PinMap_DAC)) {
-    ulValue = mapResolution(value, analogWrite_resolution, DAC_RESOLUTION);
-    set_dac_value(pinname, ulValue);
-  } else if (pin_in_pinmap(pinname, PinMap_PWM)) {
-    ulValue = mapResolution(value, analogWrite_resolution, internalAnalogOut_resolution);
-    /* handle special cases: 100% off and 100% on */
-    if (ulValue == 0) {
-      stop_pwm(pin);
-      pinMode(pin, OUTPUT);
-      digitalWrite(pin, LOW);
-    } else if (ulValue == UINT16_MAX) {
-      stop_pwm(pin);
-      pinMode(pin, OUTPUT);
-      digitalWrite(pin, HIGH);
+  PinName pn = DIGITAL_TO_PINNAME(pin);
+  if (pn != NC) {
+    if (pin_in_pinmap(pn, PinMap_DAC)) {
+      if (PIN_IS_CONFIG(pn, gpioOutputPinIsConfigured) == false) {
+        needs_init = 1;
+        SET_PIN_CONFIG(pn, gpioOutputPinIsConfigured);
+      }
+      ulValue = mapResolution(value, analogWrite_resolution, DAC_RESOLUTION);
+      set_dac_value(pn, ulValue, needs_init);
+    } else if (pin_in_pinmap(pn, PinMap_PWM)) {
+      if (PIN_IS_CONFIG(pn, gpioOutputPinIsConfigured) == false) {
+        SET_PIN_CONFIG(pn, gpioOutputPinIsConfigured);
+      }
+      ulValue = mapResolution(value, analogWrite_resolution, internalAnalogOut_resolution);
+      /* handle special cases: 100% off and 100% on */
+      if (ulValue == 0) {
+        stop_pwm(pin);
+        pinMode(pin, OUTPUT);
+        digitalWrite(pin, LOW);
+      } else if (ulValue == UINT16_MAX) {
+        stop_pwm(pin);
+        pinMode(pin, OUTPUT);
+        digitalWrite(pin, HIGH);
+      } else {
+        set_pwm_value_with_base_period(pin, analogOut_period_us, ulValue);
+      }
     } else {
-      set_pwm_value_with_base_period(pin, analogOut_period_us, ulValue);
-    }
-  } else {
-    /* default to digital write */
-    pinMode(pin, OUTPUT);
-    ulValue = mapResolution(value, analogWrite_resolution, 8);
-    if (ulValue < 128) {
-      digitalWrite(pin, LOW);
-    } else {
-      digitalWrite(pin, HIGH);
+      /* default to digital write */
+      pinMode(pin, OUTPUT);
+      ulValue = mapResolution(value, analogWrite_resolution, 8);
+      if (ulValue < 128) {
+        digitalWrite(pin, LOW);
+      } else {
+        digitalWrite(pin, HIGH);
+      }
     }
   }
 }
@@ -125,11 +138,11 @@ void analogReadResolution(int res)
   if ((res > 0) && (res < 16)) {
     analogRead_resolution = res;
     if (res > 10) {
-      _ADC_Resolution = 12;
+      _ADCResolution = 12;
     } else if (res > 8) {
-      _ADC_Resolution = 10;
+      _ADCResolution = 10;
     } else {
-      _ADC_Resolution = 8;
+      _ADCResolution = 8;
     }
   } else {
     analogRead_resolution = 8;

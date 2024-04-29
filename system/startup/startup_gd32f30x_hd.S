@@ -21,7 +21,7 @@
 
 /* reset Handler */
 Reset_Handler:
-  ldr sp, =_sp        /* Atollic update: set stack pointer */
+/*  ldr sp, =_sp */       /* Atollic update: set stack pointer */
 
 /* Copy the data segment initializers from flash to SRAM */
   movs r1, #0
@@ -44,8 +44,9 @@ DataInit:
 
 FillZerobss:
   movs r3, #0
-  str r3, [r2], #4
-    
+  str r3, [r2]
+  adds r2, r2, #4
+
 Zerobss:
   ldr r3, = _ebss
   cmp r2, r3

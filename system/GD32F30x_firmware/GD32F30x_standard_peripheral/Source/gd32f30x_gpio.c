@@ -55,7 +55,7 @@ OF SUCH DAMAGE.
 */
 void gpio_deinit(uint32_t gpio_periph)
 {
-    switch(gpio_periph){
+    switch (gpio_periph) {
     case GPIOA:
         /* reset GPIOA */
         rcu_periph_reset_enable(RCU_GPIOARST);
@@ -151,7 +151,7 @@ void gpio_init(uint32_t gpio_periph, uint32_t mode, uint32_t speed, uint32_t pin
             /* set the corresponding SPD bit */
             GPIOx_SPD(gpio_periph) |= (uint32_t)pin;
         } else {
-            /* output mode max speed:10MHz,2MHz,50MHz */
+            /* output mode max speed: 10MHz, 2MHz, 50MHz */
             temp_mode |= (uint32_t)speed;
         }
     }
@@ -160,19 +160,17 @@ void gpio_init(uint32_t gpio_periph, uint32_t mode, uint32_t speed, uint32_t pin
     for (i = 0U; i < 8U; i++) {
         if ((1U << i) & pin) {
             reg = GPIO_CTL0(gpio_periph);
-            
             /* clear the specified pin mode bits */
             reg &= ~GPIO_MODE_MASK(i);
             /* set the specified pin mode bits */
             reg |= GPIO_MODE_SET(i, temp_mode);
-            
             /* set IPD or IPU */
             if (GPIO_MODE_IPD == mode) {
                 /* reset the corresponding OCTL bit */
                 GPIO_BC(gpio_periph) = (uint32_t)((1U << i) & pin);
             } else {
                 /* set the corresponding OCTL bit */
-                if(GPIO_MODE_IPU == mode){
+                if (GPIO_MODE_IPU == mode) {
                     GPIO_BOP(gpio_periph) = (uint32_t)((1U << i) & pin);
                 }
             }
@@ -181,22 +179,20 @@ void gpio_init(uint32_t gpio_periph, uint32_t mode, uint32_t speed, uint32_t pin
         }
     }
     /* configure the eight high port pins with GPIO_CTL1 */
-    for(i = 8U;i < 16U;i++){
-        if((1U << i) & pin){
+    for (i = 8U; i < 16U; i++) {
+        if ((1U << i) & pin) {
             reg = GPIO_CTL1(gpio_periph);
-            
             /* clear the specified pin mode bits */
             reg &= ~GPIO_MODE_MASK(i - 8U);
             /* set the specified pin mode bits */
             reg |= GPIO_MODE_SET(i - 8U, temp_mode);
-            
             /* set IPD or IPU */
-            if(GPIO_MODE_IPD == mode){
+            if (GPIO_MODE_IPD == mode) {
                 /* reset the corresponding OCTL bit */
                 GPIO_BC(gpio_periph) = (uint32_t)((1U << i) & pin);
-            }else{
+            } else {
                 /* set the corresponding OCTL bit */
-                if(GPIO_MODE_IPU == mode){
+                if (GPIO_MODE_IPU == mode) {
                     GPIO_BOP(gpio_periph) = (uint32_t)((1U << i) & pin);
                 }
             }
@@ -215,7 +211,7 @@ void gpio_init(uint32_t gpio_periph, uint32_t mode, uint32_t speed, uint32_t pin
     \param[out] none
     \retval     none
 */
-void gpio_bit_set(uint32_t gpio_periph,uint32_t pin)
+void gpio_bit_set(uint32_t gpio_periph, uint32_t pin)
 {
     GPIO_BOP(gpio_periph) = (uint32_t)pin;
 }
@@ -229,7 +225,7 @@ void gpio_bit_set(uint32_t gpio_periph,uint32_t pin)
     \param[out] none
     \retval     none
 */
-void gpio_bit_reset(uint32_t gpio_periph,uint32_t pin)
+void gpio_bit_reset(uint32_t gpio_periph, uint32_t pin)
 {
     GPIO_BC(gpio_periph) = (uint32_t)pin;
 }
@@ -262,7 +258,7 @@ void gpio_bit_write(uint32_t gpio_periph, uint32_t pin, bit_status bit_value)
     \param[out] none
     \retval     none
 */
-void gpio_port_write(uint32_t gpio_periph,uint16_t data)
+void gpio_port_write(uint32_t gpio_periph, uint16_t data)
 {
     GPIO_OCTL(gpio_periph) = (uint32_t)data;
 }
@@ -377,10 +373,10 @@ void gpio_pin_remap_config(uint32_t remap, ControlStatus newvalue)
 {
     uint32_t remap1 = 0U, remap2 = 0U, temp_reg = 0U, temp_mask = 0U;
 
-    if(((uint32_t)0x80000000U) == (remap & 0x80000000U)){
+    if (((uint32_t)0x80000000U) == (remap & 0x80000000U)) {
         /* get AFIO_PCF1 regiter value */
         temp_reg = AFIO_PCF1;
-    }else{
+    } else {
         /* get AFIO_PCF0 regiter value */
         temp_reg = AFIO_PCF0;
     }
@@ -389,27 +385,27 @@ void gpio_pin_remap_config(uint32_t remap, ControlStatus newvalue)
     remap1 = remap & LSB_16BIT_MASK;
 
     /* judge pin remap type */
-    if((PCF_LOCATION1_MASK | PCF_LOCATION2_MASK) == (remap & (PCF_LOCATION1_MASK | PCF_LOCATION2_MASK))){
+    if ((PCF_LOCATION1_MASK | PCF_LOCATION2_MASK) == (remap & (PCF_LOCATION1_MASK | PCF_LOCATION2_MASK))) {
         temp_reg &= PCF_SWJCFG_MASK;
         AFIO_PCF0 &= PCF_SWJCFG_MASK;
-    }else if(PCF_LOCATION2_MASK == (remap & PCF_LOCATION2_MASK)){
+    } else if (PCF_LOCATION2_MASK == (remap & PCF_LOCATION2_MASK)) {
         remap2 = ((uint32_t)0x03U) << temp_mask;
         temp_reg &= ~remap2;
         temp_reg |= ~PCF_SWJCFG_MASK;
-    }else{
-        temp_reg &= ~(remap1 << ((remap >> 0x15U)*0x10U));
+    } else {
+        temp_reg &= ~(remap1 << ((remap >> 0x15U) * 0x10U));
         temp_reg |= ~PCF_SWJCFG_MASK;
     }
-    
+
     /* set pin remap value */
-    if(DISABLE != newvalue){
-        temp_reg |= (remap1 << ((remap >> 0x15U)*0x10U));
+    if (DISABLE != newvalue) {
+        temp_reg |= (remap1 << ((remap >> 0x15U) * 0x10U));
     }
-    
-    if(AFIO_PCF1_FIELDS == (remap & AFIO_PCF1_FIELDS)){
+
+    if (AFIO_PCF1_FIELDS == (remap & AFIO_PCF1_FIELDS)) {
         /* set AFIO_PCF1 regiter value */
         AFIO_PCF1 = temp_reg;
-    }else{
+    } else {
         /* set AFIO_PCF0 regiter value */
         AFIO_PCF0 = temp_reg;
     }
@@ -457,19 +453,19 @@ void gpio_exti_source_select(uint8_t output_port, uint8_t output_pin)
     source = ((uint32_t)0x0FU) << (AFIO_EXTI_SOURCE_FIELDS * (output_pin & AFIO_EXTI_SOURCE_MASK));
 
     /* select EXTI sources */
-    if(GPIO_PIN_SOURCE_4 > output_pin){
+    if (GPIO_PIN_SOURCE_4 > output_pin) {
         /* select EXTI0/EXTI1/EXTI2/EXTI3 */
         AFIO_EXTISS0 &= ~source;
         AFIO_EXTISS0 |= (((uint32_t)output_port) << (AFIO_EXTI_SOURCE_FIELDS * (output_pin & AFIO_EXTI_SOURCE_MASK)));
-    }else if(GPIO_PIN_SOURCE_8 > output_pin){
+    } else if (GPIO_PIN_SOURCE_8 > output_pin) {
         /* select EXTI4/EXTI5/EXTI6/EXTI7 */
         AFIO_EXTISS1 &= ~source;
         AFIO_EXTISS1 |= (((uint32_t)output_port) << (AFIO_EXTI_SOURCE_FIELDS * (output_pin & AFIO_EXTI_SOURCE_MASK)));
-    }else if(GPIO_PIN_SOURCE_12 > output_pin){
+    } else if (GPIO_PIN_SOURCE_12 > output_pin) {
         /* select EXTI8/EXTI9/EXTI10/EXTI11 */
         AFIO_EXTISS2 &= ~source;
         AFIO_EXTISS2 |= (((uint32_t)output_port) << (AFIO_EXTI_SOURCE_FIELDS * (output_pin & AFIO_EXTI_SOURCE_MASK)));
-    }else{
+    } else {
         /* select EXTI12/EXTI13/EXTI14/EXTI15 */
         AFIO_EXTISS3 &= ~source;
         AFIO_EXTISS3 |= (((uint32_t)output_port) << (AFIO_EXTI_SOURCE_FIELDS * (output_pin & AFIO_EXTI_SOURCE_MASK)));
@@ -495,13 +491,12 @@ void gpio_event_output_config(uint8_t output_port, uint8_t output_pin)
 {
     uint32_t reg = 0U;
     reg = AFIO_EC;
-    
+
     /* clear AFIO_EC_PORT and AFIO_EC_PIN bits */
-    reg &= (uint32_t)(~(AFIO_EC_PORT|AFIO_EC_PIN));
-    
+    reg &= (uint32_t)(~(AFIO_EC_PORT | AFIO_EC_PIN));
     reg |= (uint32_t)((uint32_t)output_port << GPIO_OUTPUT_PORT_OFFSET);
     reg |= (uint32_t)output_pin;
-    
+
     AFIO_EC = reg;
 }
 
@@ -576,9 +571,9 @@ void gpio_compensation_config(uint32_t compensation)
   */
 FlagStatus gpio_compensation_flag_get(void)
 {
-    if(((uint32_t)RESET) != (AFIO_CPSCTL & AFIO_CPSCTL_CPS_RDY)){
+    if (((uint32_t)RESET) != (AFIO_CPSCTL & AFIO_CPSCTL_CPS_RDY)) {
         return SET;
-    }else{
+    } else {
         return RESET;
     }
 }

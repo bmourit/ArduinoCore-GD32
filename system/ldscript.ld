@@ -12,7 +12,7 @@
  * after both scripts have been read.
  *
  * Note that parsing of linker scripts is a bit peculiar, e.g. INSERT
- * does not textually inserts, it inserts any generated output sections.
+ * does not textually insert, it inserts any generated output sections.
  * Also, because this script is read *first*, we cannot refer to things
  * in the default script. In particular, it would make sense to add >
  * RAM to the output section below to ensure that the section is mapped

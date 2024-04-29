@@ -17,11 +17,13 @@
 */
 #ifndef _PINS_ARDUINO_H_
 #define _PINS_ARDUINO_H_
+
 #include <stdbool.h>
 #include <stdlib.h>
+
+#include "PortNames.h"
 #include "variant.h"
 #include "PinNames.h"
-#include "PortNames.h"
 
 /* Arduino digital pins alias */
 enum {
@@ -47,90 +49,6 @@ enum {
   D190, D191, DMAX
 };
 
-/* configure periphera pins */
-static const uint8_t SS = PIN_SPI_SS;
-static const uint8_t SS1 = PIN_SPI_SS1;
-static const uint8_t SS2 = PIN_SPI_SS2;
-static const uint8_t MOSI = PIN_SPI_MOSI;
-static const uint8_t MISO = PIN_SPI_MISO;
-static const uint8_t SCK = PIN_SPI_SCK;
-
-#ifdef HAVE_I2C
-static const uint8_t SDA = PIN_WIRE_SDA;
-static const uint8_t SCL = PIN_WIRE_SCL;
-#endif
-
-#ifdef HAVE_I2C1
-static const uint8_t SDA1 = PIN_WIRE1_SDA;
-static const uint8_t SCL1 = PIN_WIRE1_SCL;
-#endif
-
-#ifdef HAVE_I2C2
-static const uint8_t SDA2 = PIN_WIRE2_SDA;
-static const uint8_t SCL2 = PIN_WIRE2_SCL;
-#endif
-
-/* the PIN_SERIAL_TX/RX definitions point to the default Serial's pins */
-#if DEFAULT_HWSERIAL_INSTANCE == 1
-#define PIN_SERIAL_RX       SERIAL0_RX
-#define PIN_SERIAL_TX       SERIAL0_TX
-#elif DEFAULT_HWSERIAL_INSTANCE == 2
-#define PIN_SERIAL_RX       SERIAL1_RX
-#define PIN_SERIAL_TX       SERIAL1_TX
-#elif DEFAULT_HWSERIAL_INSTANCE == 3
-#define PIN_SERIAL_RX       SERIAL2_RX
-#define PIN_SERIAL_TX       SERIAL2_TX
-#elif DEFAULT_HWSERIAL_INSTANCE == 4
-#define PIN_SERIAL_RX       SERIAL3_RX
-#define PIN_SERIAL_TX       SERIAL3_TX
-#elif DEFAULT_HWSERIAL_INSTANCE == 5
-#define PIN_SERIAL_RX       SERIAL4_RX
-#define PIN_SERIAL_TX       SERIAL4_TX
-#endif
-
-static const uint8_t TX = PIN_SERIAL_TX;
-static const uint8_t RX = PIN_SERIAL_RX;
-
-#if defined(SERIAL0_RX)
-static const uint8_t RX0 = SERIAL0_RX;
-#endif
-
-#if defined(SERIAL0_TX)
-static const uint8_t TX0 = SERIAL0_TX;
-#endif
-
-#if defined(SERIAL1_RX)
-static const uint8_t RX1 = SERIAL1_RX;
-#endif
-
-#if defined(SERIAL1_TX)
-static const uint8_t TX1 = SERIAL1_TX;
-#endif
-
-#if defined(SERIAL2_RX)
-static const uint8_t RX2 = SERIAL2_RX;
-#endif
-
-#if defined(SERIAL2_TX)
-static const uint8_t TX2 = SERIAL2_TX;
-#endif
-
-#if defined(SERIAL3_RX)
-static const uint8_t RX3 = SERIAL3_RX;
-#endif
-
-#if defined(SERIAL3_TX)
-static const uint8_t TX3 = SERIAL3_TX;
-#endif
-
-#if defined(SERIAL4_RX)
-static const uint8_t RX4 = SERIAL4_RX;
-#endif
-
-#if defined(SERIAL4_TX)
-static const uint8_t TX4 = SERIAL4_TX;
-#endif
-
 /* configure analog pins */
 #define PIN_NUM_MASK    0xff
 /*
@@ -139,7 +57,7 @@ static const uint8_t TX4 = SERIAL4_TX;
  * ((pin & ANALOG_PIN_NUM_BASE) == ANALOG_PIN_NUM_BASE)
  * if true then pin is an analog pin number
  */
-#define ANALOG_PIN_NUM_BASE 0xc0
+#define ANALOG_PIN_NUM_BASE   0xc0
 
 /*
  * Pin number Analog index
@@ -147,23 +65,26 @@ static const uint8_t TX4 = SERIAL4_TX;
  * when used with the above base
  * (p & ANALOG_PIN_NUM_INDEX)
  */
-#define ANALOG_PIN_NUM_INDEX  0x3f
+#define ANALOG_PIN_NUM_INDEX    0x3f
 
 #ifndef ANALOG_PINS_NUM
-#define ANALOG_PINS_NUM 0
+#define ANALOG_PINS_NUM   0
 #endif
 
 /* these need to go last, so after the analog pins */
-#define ANALOG_INTERNAL_START      (ANALOG_PIN_NUM_BASE + ANALOG_PINS_NUM)
+#define ANALOG_INTERNAL_START   (ANALOG_PIN_NUM_BASE + ANALOG_PINS_NUM)
 
 /* ADC internal channels */
 /* uonly sed for analogRead() */
 #if defined(ADC_CHANNEL_TEMPSENSOR) || defined(ADC_CHANNEL_TEMPSENSOR_ADC1)
-#define ATEMP        (ANALOG_INTERNAL_START)
+#define ATEMP   (ANALOG_INTERNAL_START)
 #endif
 #ifdef ADC_CHANNEL_VREFINT
-#define AVREF        (ANALOG_INTERNAL_START + 1)
+#define AVREF   (ANALOG_INTERNAL_START + 1)
 #endif
+
+#if ANALOG_PINS_NUM > 0
+#define ANALOG_PINS_MAX 32
 
 #if ANALOG_PINS_NUM > 0
   #define PIN_A0  ANALOG_PIN_NUM_BASE
@@ -293,11 +214,91 @@ static const uint8_t TX4 = SERIAL4_TX;
   #define PIN_A31  (PIN_A30 + 1)
   static const uint8_t A31 = PIN_A31;
 #endif
-
-#define ANALOG_PINS_MAX 32
 #else
 #define ANALOG_PINS_MAX 0
 #endif /* ANALOG_PINS_NUM > 0 */
+
+/* configure periphera pins */
+static const uint8_t SS = PIN_SPI_SS;
+static const uint8_t MOSI = PIN_SPI_MOSI;
+static const uint8_t MISO = PIN_SPI_MISO;
+static const uint8_t SCK = PIN_SPI_SCK;
+
+#ifdef HAVE_I2C
+static const uint8_t SDA = PIN_WIRE_SDA;
+static const uint8_t SCL = PIN_WIRE_SCL;
+#endif
+
+#ifdef HAVE_I2C1
+static const uint8_t SDA1 = PIN_WIRE1_SDA;
+static const uint8_t SCL1 = PIN_WIRE1_SCL;
+#endif
+
+#ifdef HAVE_I2C2
+static const uint8_t SDA2 = PIN_WIRE2_SDA;
+static const uint8_t SCL2 = PIN_WIRE2_SCL;
+#endif
+
+/* the PIN_SERIAL_TX/RX definitions point to the default Serial's pins */
+#if DEFAULT_HWSERIAL_INSTANCE == 1
+#define PIN_SERIAL_RX       SERIAL0_RX
+#define PIN_SERIAL_TX       SERIAL0_TX
+#elif DEFAULT_HWSERIAL_INSTANCE == 2
+#define PIN_SERIAL_RX       SERIAL1_RX
+#define PIN_SERIAL_TX       SERIAL1_TX
+#elif DEFAULT_HWSERIAL_INSTANCE == 3
+#define PIN_SERIAL_RX       SERIAL2_RX
+#define PIN_SERIAL_TX       SERIAL2_TX
+#elif DEFAULT_HWSERIAL_INSTANCE == 4
+#define PIN_SERIAL_RX       SERIAL3_RX
+#define PIN_SERIAL_TX       SERIAL3_TX
+#elif DEFAULT_HWSERIAL_INSTANCE == 5
+#define PIN_SERIAL_RX       SERIAL4_RX
+#define PIN_SERIAL_TX       SERIAL4_TX
+#endif
+
+static const uint8_t TX = PIN_SERIAL_TX;
+static const uint8_t RX = PIN_SERIAL_RX;
+
+#if defined(SERIAL0_RX)
+static const uint8_t RX0 = SERIAL0_RX;
+#endif
+
+#if defined(SERIAL0_TX)
+static const uint8_t TX0 = SERIAL0_TX;
+#endif
+
+#if defined(SERIAL1_RX)
+static const uint8_t RX1 = SERIAL1_RX;
+#endif
+
+#if defined(SERIAL1_TX)
+static const uint8_t TX1 = SERIAL1_TX;
+#endif
+
+#if defined(SERIAL2_RX)
+static const uint8_t RX2 = SERIAL2_RX;
+#endif
+
+#if defined(SERIAL2_TX)
+static const uint8_t TX2 = SERIAL2_TX;
+#endif
+
+#if defined(SERIAL3_RX)
+static const uint8_t RX3 = SERIAL3_RX;
+#endif
+
+#if defined(SERIAL3_TX)
+static const uint8_t TX3 = SERIAL3_TX;
+#endif
+
+#if defined(SERIAL4_RX)
+static const uint8_t RX4 = SERIAL4_RX;
+#endif
+
+#if defined(SERIAL4_TX)
+static const uint8_t TX4 = SERIAL4_TX;
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -305,22 +306,21 @@ extern "C" {
 
 extern const PinName digital_pins[];
 extern const uint32_t analog_pins[];
-
 extern const uint32_t gpio_port[];
 extern const uint32_t gpio_pin[];
 
-#define NOT_INTERRUPT (uint32_t)NC
+#define NOT_INTERRUPT   NC
 
 /* Convert a digital pin to a PinName */
 #if ANALOG_PINS_NUM > 0
 #define DIGITAL_TO_PINNAME(p) ((((uint32_t)(p) & PIN_NUM_MASK) < DIGITAL_PINS_NUM) ? \
-          (PinName)(digital_pins[(uint32_t)(p) & PIN_NUM_MASK] | ((p) & ALTMASK)) : \
-                    (((uint32_t)(p) & ANALOG_PIN_NUM_BASE) == ANALOG_PIN_NUM_BASE) && \
-                    (((uint32_t)(p) & PIN_NUM_MASK) < ANALOG_INTERNAL_START) ? \
-                    (PinName)(digital_pins[analog_pins[(p) & ANALOG_PIN_NUM_INDEX]] | ((p) & ALTMASK)) : NC)
+                                (PinName)(digital_pins[(uint32_t)(p) & PIN_NUM_MASK] | ((p) & ALTMASK)) : \
+                                (((uint32_t)(p) & ANALOG_PIN_NUM_BASE) == ANALOG_PIN_NUM_BASE) && \
+                                (((uint32_t)(p) & PIN_NUM_MASK) < ANALOG_INTERNAL_START) ? \
+                                (PinName)(digital_pins[analog_pins[(p) & ANALOG_PIN_NUM_INDEX]] | ((p) & ALTMASK)) : NC)
 #else
 #define DIGITAL_TO_PINNAME(p) ((((uint32_t)(p) & PIN_NUM_MASK) < DIGITAL_PINS_NUM) ? \
-          (PinName)(digital_pins[(uint32_t)(p) & PIN_NUM_MASK] | ((p) & ALTMASK)) : NC)
+                                (PinName)(digital_pins[(uint32_t)(p) & PIN_NUM_MASK] | ((p) & ALTMASK)) : NC)
 #endif /* ANALOG_PINS_NUM > 0 */
 
 /* Convert a PinName to a digital pin */
@@ -330,76 +330,77 @@ uint32_t PinName_to_digital(PinName p);
 #if ANALOG_PINS_NUM > 0
 /* used by analogRead api to have A0 == 0 */
 /* non-contiguous analog pins definition in digital_pins array */
-#define ANALOG_PINS_TO_DIGITAL(p) ( \
-                    (((uint32_t)(p) & PIN_NUM_MASK) < ANALOG_PINS_NUM) ? \
-                    analog_pins[(uint32_t)(p) & PIN_NUM_MASK] | ((uint32_t)(p) & ALTMASK) : \
-                    (((uint32_t)(p) & ANALOG_PIN_NUM_BASE) == ANALOG_PIN_NUM_BASE) && \
-                    (((uint32_t)(p) & PIN_NUM_MASK) < ANALOG_INTERNAL_START) ? \
-                    analog_pins[(p) & ANALOG_PIN_NUM_INDEX] | ((uint32_t)(p) & ALTMASK) : (uint32_t)NC)
+#define ANALOG_PINS_TO_DIGITAL(p) ((((uint32_t)(p) & PIN_NUM_MASK) < ANALOG_PINS_NUM) ? \
+                                    analog_pins[(uint32_t)(p) & PIN_NUM_MASK] | ((uint32_t)(p) & ALTMASK) : \
+                                    (((uint32_t)(p) & ANALOG_PIN_NUM_BASE) == ANALOG_PIN_NUM_BASE) && \
+                                    (((uint32_t)(p) & PIN_NUM_MASK) < ANALOG_INTERNAL_START) ? \
+                                    analog_pins[(p) & ANALOG_PIN_NUM_INDEX] | ((uint32_t)(p) & ALTMASK) : (uint32_t)NC)
 #else /* No analog pin defined */
-#define ANALOG_PINS_TO_DIGITAL(p) (DIGITAL_PINS_NUM)
+#define ANALOG_PINS_TO_DIGITAL(p)   (DIGITAL_PINS_NUM)
 #endif /* ANALOG_PINS_NUM > 0 */
 
 /* Convert an analog pin to a PinName */
 PinName analog_pin_to_PinName(uint32_t pin);
 
 /* All pins could manage EXTI */
-#define DIGITAL_PIN_VALID(p)  (DIGITAL_TO_PINNAME(p) != NC)
-#define DIGITAL_PIN_TO_INT(p) (DIGITAL_PIN_VALID(p) ? p : NOT_INTERRUPT)
+#define DIGITAL_PIN_VALID(p)    (DIGITAL_TO_PINNAME(p) != NC)
+#define DIGITAL_PIN_TO_INT(p)   (DIGITAL_PIN_VALID(p) ? p : NOT_INTERRUPT)
 
-#define DIGITAL_PIN_I2C(p)    (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_I2C_SDA) || \
-                                pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_I2C_SCL))
-#define DIGITAL_PIN_PWM(p)    (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_PWM))
-#define DIGITAL_PIN_SERIAL(p) (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_UART_RX) || \
-                                pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_UART_TX))
-#define DIGITAL_PIN_SPI(p)    (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_MOSI) || \
-                                pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_MISO) || \
-                                pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_SCLK) || \
-                                pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_SSEL))
+#define DIGITAL_PIN_I2C(p)      (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_I2C_SDA) || \
+                                  pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_I2C_SCL))
+#define DIGITAL_PIN_PWM(p)      (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_PWM))
+#define DIGITAL_PIN_SERIAL(p)   (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_UART_RX) || \
+                                  pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_UART_TX))
+#define DIGITAL_PIN_SPI(p)      (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_MOSI) || \
+                                  pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_MISO) || \
+                                  pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_SCLK) || \
+                                  pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_SSEL))
 
-
-//#define DIGITAL_PIN_TO_PORT(p)      ((GD_PORT_GET(DIGITAL_TO_PINNAME(p)) < GPIO_PORT_NUM) ? gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(p))] : (uint32_t )NULL)
-#define DIGITAL_PIN_TO_PORT(p)      (gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(p))])
-#define DIGITAL_PIN_TO_BIT_MASK(p)  ((uint16_t)(1 << GD_PIN_GET(DIGITAL_TO_PINNAME(p))))
-
-#define ANALOG_PINS_TO_BIT(p) ((uint16_t)(1 << GD_PIN_GET(DIGITAL_TO_PINNAME(p))))
-#define PORT_OUTPUT_REG(p)    (GPIO_OCTL(p))
-#define PORT_INPUT_REG(p)     (GPIO_ISTAT(p))
-#define PORT_SET_REG(p)       (GPIO_BOP(p))
+#define DIGITAL_PIN_TO_PORT(p)      ((GD_PORT_GET(DIGITAL_TO_PINNAME(p)) < GPIO_PORT_NUM) ? gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(p))] : (uint32_t )NULL)
+#define DIGITAL_PIN_TO_BIT_MASK(p)  (gpio_pin[GD_PIN_GET(DIGITAL_TO_PINNAME(p))])
+#define ANALOG_PINS_TO_BIT(p)       (gpio_pin[GD_PIN_GET(DIGITAL_TO_PINNAME(p))])
+#define PORT_OUTPUT_REG(port)       (GPIO_OCTL(port))
+#define PORT_INPUT_REG(port)        (GPIO_ISTAT(port))
+#define PORT_SET_REG(port)          (GPIO_BOP(port))
 #if defined(GD32F4xx)
 /* GPIO register definitions */
-#define PORT_CLEAR_REG(p)   (GPIO_BOP(p))
+#define PORT_CLEAR_REG(port)        (GPIO_BOP(port))
 #else
-#define PORT_CLEAR_REG(p)   (GPIO_BC(p))
+#define PORT_CLEAR_REG(port)        (GPIO_BC(port))
 #endif
 
-#if defined(GD32F30x)
-#define PORT_CTL_REG(p)     (GPIO_CTL0(p))
+#if defined(GD32F30x) || defined(GD32F10x)
+// Config bits split across two registers:
+// CTL0: pin 0..7
+// CTL1: pin 8..15
+// Return only CTL0
+#define PORT_CTL_REG(port)          (GPIO_CTL0(port))
 #else
-#define PORT_CTL_REG(p)     (GPIO_CTL(p))
+#define PORT_CTL_REG(port)          (GPIO_CTL(port))
 #endif
-#define PORT_CFG_REG(p)     (PORT_CTL_REG(p))
+#define PORT_CFG_REG(port)          (PORT_CTL_REG(port))
 
-/* some pins could be duplicated in digital_pins[] */
-/* return first occurence of linked PinName (PYx) */
+/* since some pins could be duplicated in digital_pins[] */
+/* return the first occurence of linked PinName (PYx) */
 #define ANALOG_PINS_FIRST_LINK(p)   (PinName_to_digital(DIGITAL_TO_PINNAME(p)))
 
 /* ensure pin is not one of the serial pins */
 #if defined(PIN_SERIAL_RX) && defined(PIN_SERIAL_TX)
-#define PIN_IS_SERIAL(p)  ((ANALOG_PINS_FIRST_LINK(p) == (PIN_SERIAL_RX & PIN_NUM_MASK)) || \
-          (ANALOG_PINS_FIRST_LINK(p) == (PIN_SERIAL_TX & PIN_NUM_MASK)))
+#define PIN_IS_SERIAL(p)            ((ANALOG_PINS_FIRST_LINK(p) == (PIN_SERIAL_RX & PIN_NUM_MASK)) || \
+                                      (ANALOG_PINS_FIRST_LINK(p) == (PIN_SERIAL_TX & PIN_NUM_MASK)))
 #endif
+
 /* Convert a digital pin to an analog pin */
 bool pin_in_analog_pins(uint32_t pin);
 uint32_t digital_pin_to_analog(uint32_t pin);
 
 /* macros for Arduino compatibility */
-#define digitalPinToPinName(P) (DIGITAL_TO_PINNAME(P))
-#define digitalPinToPort(P) (DIGITAL_PIN_TO_PORT(P))
-#define digitalPinToBitMask(P) (DIGITAL_PIN_TO_BIT_MASK(P))
-#define portInputRegister(PORT) (&PORT_INPUT_REG(PORT))
-#define portOutputRegister(PORT) (&PORT_OUTPUT_REG(PORT))
-#define portModeRegister(PORT) (&PORT_CTL_REG(PORT))
+#define digitalPinToPinName(P)      (DIGITAL_TO_PINNAME(P))
+#define digitalPinToPort(P)         (DIGITAL_PIN_TO_PORT(P))
+#define digitalPinToBitMask(P)      (DIGITAL_PIN_TO_BIT_MASK(P))
+#define portInputRegister(PORT)     (&PORT_INPUT_REG(PORT))
+#define portOutputRegister(PORT)    (&PORT_OUTPUT_REG(PORT))
+#define portModeRegister(PORT)      (&PORT_CTL_REG(PORT))
 
 #ifdef __cplusplus
 }
@@ -407,19 +408,19 @@ uint32_t digital_pin_to_analog(uint32_t pin);
 
 /* default values can be overridden by variants */
 #ifndef ADC_RESOLUTION
-  #define ADC_RESOLUTION  10
+  #define ADC_RESOLUTION        10
 #endif
 #ifndef PWM_RESOLUTION
-  #define PWM_RESOLUTION  8
+  #define PWM_RESOLUTION        8
 #endif
 
-#define DAC_RESOLUTION    12
+#define DAC_RESOLUTION          12
 
 #ifndef PWM_FREQUENCY
-  #define PWM_FREQUENCY   1000    // 1000µS = 1ms = 1kHz
+  #define PWM_FREQUENCY         1000      // 1000µS = 1ms = 1kHz
 #endif
 #ifndef PWM_MAX_DUTY_CYCLE
-  #define PWM_MAX_DUTY_CYCLE  4095
+  #define PWM_MAX_DUTY_CYCLE    4095
 #endif
 
 #endif /*_PINS_ARDUINO_H_*/

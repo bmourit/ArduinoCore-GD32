@@ -36,6 +36,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
+#include "backup_domain.h"
 #include "systick.h"
 
 volatile uint32_t gd_ticks;
@@ -49,17 +50,18 @@ volatile uint32_t gd_ticks;
 void systick_config(void)
 {
   /* setup systick timer for 1000Hz interrupts */
-  if (SysTick_Config(SystemCoreClock / 1000U)) {
+  if (SysTick_Config(SystemCoreClock / 1000U) > 0U) {
     /* capture error */
-    while (1) {
-    }
+    //while (1) {
+    //}
+    return;
   }
   /* configure the systick handler priority */
   NVIC_SetPriority(SysTick_IRQn, 0x00U);
 }
 
-void noOsSystickHandler() {}
-void osSystickHandler()   __attribute__((weak, alias("noOsSystickHandler")));
+void noOsSystickHandler(){}
+void osSystickHandler() __attribute__((weak, alias("noOsSystickHandler")));
 
 /*!
   \brief      this function handles SysTick exception
@@ -96,6 +98,75 @@ uint32_t getCurrentMicros(void)
   uint32_t systick_value = SysTick->VAL;
   uint32_t systick_load = SysTick->LOAD + 1;
   uint32_t us = ((systick_load - systick_value) * 1000) / systick_load;
-
   return (ms * 1000 + us);
+}
+
+static FlagStatus rcu_osci_state_get(rcu_osci_type_enum osci)
+{
+  FlagStatus status = RESET;
+
+  switch(osci) {
+  case RCU_PLL_CK:
+    status = rcu_flag_get(RCU_FLAG_PLLSTB)
+  }
+}
+
+void clockEnable(clock_source_t clock_source)
+{
+  FlagStatus status = RESET;
+  rcu_osci_type_enum osci;
+  backup_domain_enable();
+
+  switch(source) {
+  case SOURCE_PLL_CK:
+    if (rcu_flag_get(RCU_FLAG_PLLSTB) == RESET) {
+      osci = RCU_PLL_CK;
+    }
+    break;
+#ifdef GD32F30X_CL
+  case SOURCE_PLL1_CK:
+    if (rcu_flag_get(RCU_FLAG_PLL1STB) == RESET) {
+      osci = RCU_PLL1_CK;
+    }
+    break;
+  case SOURCE_PLL2_CK:
+    if (rcu_flag_get(RCU_FLAG_PLL2STB) == RESET) {
+      osci = RCU_PLL2_CK;
+    }
+    break;
+#endif
+  case SOURCE_IRC40K:
+    if (rcu_flag_get(RCU_FLAG_IRC40KSTB) == RESET) {
+      osci = RCU_IRC40K;
+    }
+    break;
+  case SOURCE_IRC48M:
+    if (rcu_flag_get(RCU_FLAG_IRC48MSTB) == RESET) {
+      osci = RCU_IRC48M;
+    }
+    break;
+  case SOURCE_IRC8M:
+    if (rcu_flag_get(RCU_FLAG_IRC8MSTB) == RESET) {
+      osci = RCU_IRC8M;
+    }
+    break;
+  case SOURCE_LXTAL:
+    if (rcu_flag_get(RCU_FLAG_LXTALSTB) == RESET) {
+      osci = RCU_LXTAL;
+    }
+    break;
+  case SOURCE_HXTAL:
+    if (rcu_flag_get(RCU_FLAG_HXTALSTB) == RESET) {
+      osci = RCU_HXTAL;
+    }
+    break;
+  default:
+    break;
+  }
+
+  rcu_osci_on(osci);
+
+  if (rcu_osci_stab_wait(osci) != SUCCESS) {
+    Error_Handler();
+  }
 }

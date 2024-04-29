@@ -42,9 +42,32 @@ OF SUCH DAMAGE.
 #include <stdint.h>
 #include "gd32xxyy.h"
 
+#ifdef __cplusplus
+extern "c" {
+#endif
+
+typedef enum {
+  SOURCE_PLL_CK,
+#ifdef GD32F30X_CL
+  SOURCE_PLL1_CK,
+  SOURCE_PLL2_CK,
+#endif
+  SOURCE_IRC40K,
+  SOURCE_IRC48M,
+  SOURCE_IRC8M,
+  SOURCE_LXTAL,
+  SOURCE_HXTAL,
+} clock_source_t;
+
 /* configure systick */
 void systick_config(void);
 uint32_t getCurrentMillis(void);
 uint32_t getCurrentMicros(void);
+
+void clockEnable(clock_source_t clock_source);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SYSTICK_H */

@@ -24,14 +24,14 @@ extern "C" {
 #endif
 
 /* GPIO pins definitions */
-#define PA0                     PIN_A0
-#define PA1                     PIN_A1
-#define PA2                     PIN_A2
-#define PA3                     PIN_A3
-#define PA4                     PIN_A4
-#define PA5                     PIN_A5
-#define PA6                     PIN_A6
-#define PA7                     PIN_A7
+#define PA0                     A0
+#define PA1                     A1
+#define PA2                     A2
+#define PA3                     A3
+#define PA4                     A4
+#define PA5                     A5
+#define PA6                     A6
+#define PA7                     A7
 #define PA8                     8
 #define PA9                     9
 #define PA10                    10
@@ -40,8 +40,8 @@ extern "C" {
 #define PA13                    13
 #define PA14                    14
 #define PA15                    15
-#define PB0                     PIN_A8
-#define PB1                     PIN_A9
+#define PB0                     A8
+#define PB1                     A9
 #define PB2                     18
 #define PB3                     19
 #define PB4                     20
@@ -56,12 +56,12 @@ extern "C" {
 #define PB13                    29
 #define PB14                    30
 #define PB15                    31
-#define PC0                     PIN_A10
-#define PC1                     PIN_A11
-#define PC2                     PIN_A12
-#define PC3                     PIN_A13
-#define PC4                     PIN_A14
-#define PC5                     PIN_A15
+#define PC0                     A10
+#define PC1                     A11
+#define PC2                     A12
+#define PC3                     A13
+#define PC4                     A14
+#define PC5                     A15
 #define PC6                     38
 #define PC7                     39
 #define PC8                     40

@@ -40,8 +40,8 @@
 #define __SYS_OSC_CLK   (__IRC8M)                /* main oscillator frequency */
 
 
-#define VECT_TAB_OFFSET  0x00000000U  /*!< Vector Table base offset field.
-                                  This value must be a multiple of 0x200. */
+//#define VECT_TAB_OFFSET  0x00000000U  /*!< Vector Table base offset field.
+                                  //This value must be a multiple of 0x200. */
 
 /* select a system clock by uncommenting the following line */
 /* use IRC8M */

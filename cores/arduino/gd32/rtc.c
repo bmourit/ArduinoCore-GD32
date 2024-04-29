@@ -87,6 +87,34 @@ uint32_t rtc_counter_get()
 }
 #endif
 
+static void rtc_clock_init(clock_source_t clock_source)
+{
+  if (clock_source != SOURCE_LXTAL) {
+    clock_source = SOURCE_LXTAL;
+  }
+  if (clock_source == SOURCE_LXTAL) {
+    clockEnable(SOURCE_LXTAL)
+    /* select RCU_LXTAL as RTC clock source */
+    rcu_rtc_clock_config(RCU_RTCSRC_LXTAL);
+    /* enable RTC Clock */
+    rcu_periph_clock_enable(RCU_RTC);
+    /* wait for RTC registers synchronization */
+    rtc_register_sync_wait();
+#if defined(GD32F30x) || defined(GD32E50X)
+    /* wait until last write operation on RTC registers has finished */
+    rtc_lwoff_wait();
+#endif
+    /* set RTC prescaler: set RTC period to 1s */
+    rtc_prescaler_set(32767);
+#if defined(GD32F30x) || defined(GD32E50X)
+    /* wait until last write operation on RTC registers has finished */
+    rtc_lwoff_wait();
+#endif
+  } else {
+    Error_Handler();
+  }
+}
+
 /*!
   \brief      rtc init
   \param[in]  none
@@ -104,42 +132,12 @@ void rtc_Init(void)
 #endif 
 #if defined(GD32F30x) || defined(GD32E50X)
   nvic_irq_enable(RTC_ALARM_IRQn, 2, 0);
-  /* enable PMU and BKPI clocks */
-  rcu_periph_clock_enable(RCU_BKPI);
 #endif
-  rcu_periph_clock_enable(RCU_PMU);
-  /* allow access to BKP domain */
-  pmu_backup_write_enable();
+  backup_domain_enable();
 #if defined(KILL_RTC_BACKUP_DOMAIN_ON_RESTART)
-  /* reset backup domain */
-#if defined(GD32F30x) || defined(GD32E50X)
-  bkp_deinit();
-#elif defined(GD32F3x0) || defined(GD32F1x0)
-  rcu_bkp_reset_enable();
-  rcu_bkp_reset_disable();
+  backup_domain_kill();
 #endif
-#endif
-  /* enable LXTAL */
-  rcu_osci_on(RCU_LXTAL);
-  /* wait till LXTAL is ready */
-  rcu_osci_stab_wait(RCU_LXTAL);
-  /* select RCU_LXTAL as RTC clock source */
-  rcu_rtc_clock_config(RCU_RTCSRC_LXTAL);
-  /* enable RTC Clock */
-  rcu_periph_clock_enable(RCU_RTC);
-  /* wait for RTC registers synchronization */
-  rtc_register_sync_wait();
-
-#if defined(GD32F30x) || defined(GD32E50X)
-  /* wait until last write operation on RTC registers has finished */
-  rtc_lwoff_wait();
-#endif
-  /* set RTC prescaler: set RTC period to 1s */
-  rtc_prescaler_set(32767);
-#if defined(GD32F30x) || defined(GD32E50X)
-  /* wait until last write operation on RTC registers has finished */
-  rtc_lwoff_wait();
-#endif
+  rtc_clock_init(RCU_LXTAL);
 }
 
 /*!

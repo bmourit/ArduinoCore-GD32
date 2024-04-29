@@ -54,4 +54,10 @@ extern const PinMap PinMap_SPI_SSEL[];
 extern const PinMap PinMap_CAN_RD[];
 extern const PinMap PinMap_CAN_TD[];
 
+/* USB */
+extern const PinMap PinMap_USB[];
+
+/* SDIO */
+extern const PinMap PinMap_SD[];
+
 #endif

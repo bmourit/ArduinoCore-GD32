@@ -24,126 +24,123 @@
 extern "C" {
 #endif
 
-void pinMode(pin_size_t ulPin, PinMode ulMode)
+extern uint32_t gpioOutputPinIsConfigured[GPIO_PORT_NUM];
+
+void pinMode(pin_size_t pin, PinMode ulMode)
 {
-    PinName p = DIGITAL_TO_PINNAME(ulPin);
+  PinName p = DIGITAL_TO_PINNAME(pin);
+
+  if (p != NC) {
+    if (PIN_IS_CONFIG(p, gpioOutputPinIsConfigured)) {
+      if (pin_in_pinmap(p, PinMap_DAC)) {
+        dac_stop(p);
+      } else if (pin_in_pinmap(p, PinMap_PWM)) {
+        stop_pwm(p);
+      }
+      RESET_PIN_CONFIG(p, gpioOutputPinIsConfigured);
+    }
     switch (ulMode) {
-        case INPUT:
-            pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT, PIN_MODE_INPUT_FLOATING, 0));
-            break;
-        case INPUT_PULLUP:
-            pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT, PIN_MODE_INPUT_PU, 0));
-            break;
-        case INPUT_PULLDOWN:
-            pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT, PIN_MODE_INPUT_PD, 0));
-            break;
-        case OUTPUT:
-            pin_function(p, GD_PIN_DATA(PIN_MODE_OUTPUT, PIN_MODE_OUT_PP, 0));
-            break;
-#pragma GCC diagnostic ignored "-Wswitch"
-        case INPUT_ANALOG: // From PinModeExtension
-            pin_function(p, GD_PIN_DATA(PIN_MODE_ANALOG, PIN_MODE_INPUT_FLOATING, 0));
+      case INPUT:
+        pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT, PIN_MODE_INPUT_FLOATING, 0));
+        break;
+      case INPUT_PULLUP:
+        pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT, PIN_MODE_INPUT_PU, 0));
+        break;
+      case INPUT_PULLDOWN:
+        pin_function(p, GD_PIN_DATA(PIN_MODE_INPUT, PIN_MODE_INPUT_PD, 0));
+        break;
+      case OUTPUT:
+        pin_function(p, GD_PIN_DATA(PIN_MODE_OUTPUT, PIN_MODE_OUT_PP, 0));
         break;
 #pragma GCC diagnostic ignored "-Wswitch"
-        case OUTPUT_OPEN_DRAIN: // From PinModeExtension
-            pin_function(p, GD_PIN_DATA(PIN_MODE_OUTPUT, PIN_MODE_OUT_OD, 0));
-            break;
-        default:
-            break;
+      case INPUT_ANALOG: // From PinModeExtension
+        pin_function(p, GD_PIN_DATA(PIN_MODE_ANALOG, PIN_MODE_INPUT_FLOATING, 0));
+      break;
+#pragma GCC diagnostic ignored "-Wswitch"
+      case OUTPUT_OPEN_DRAIN: // From PinModeExtension
+        pin_function(p, GD_PIN_DATA(PIN_MODE_OUTPUT, PIN_MODE_OUT_OD, 0));
+        break;
+      default:
+        Error_Handler();
+        break;
     }
+  }
 }
 
 void digitalWrite(pin_size_t pin, PinStatus status)
 {
-    PinName pinname = DIGITAL_TO_PINNAME(pin);
-    uint32_t gpiopin =  gpio_pin[GD_PIN_GET(pinname)];
-    uint32_t port = gpio_port[GD_PORT_GET(pinname)];
-    gpio_bit_write(port, gpiopin, (bit_status)status);
+  PinName pinname = DIGITAL_TO_PINNAME(pin);
+  uint32_t gpiopin =  gpio_pin[GD_PIN_GET(pinname)];
+  uint32_t port = gpio_port[GD_PORT_GET(pinname)];
+  gpio_bit_write(port, gpiopin, (bit_status)status);
 }
 
 PinStatus digitalRead(pin_size_t pin)
 {
-    PinName pinname = DIGITAL_TO_PINNAME(pin);
-    uint32_t gpiopin =  gpio_pin[GD_PIN_GET(pinname)];
-    uint32_t port = gpio_port[GD_PORT_GET(pinname)];
-    return (FlagStatus)gpio_input_bit_get(port, gpiopin);
+  PinName pinname = DIGITAL_TO_PINNAME(pin);
+  uint32_t gpiopin =  gpio_pin[GD_PIN_GET(pinname)];
+  uint32_t port = gpio_port[GD_PORT_GET(pinname)];
+  return (FlagStatus)gpio_input_bit_get(port, gpiopin);
 }
 
 void digitalToggle(pin_size_t pin)
 {
-    PinName pinname = DIGITAL_TO_PINNAME(pin);
-    uint32_t gpiopin =  gpio_pin[GD_PIN_GET(pinname)];
-    uint32_t port = gpio_port[GD_PORT_GET(pinname)];
-    gpio_bit_write(port, gpiopin, (bit_status)(1 - (FlagStatus)gpio_input_bit_get(port, gpiopin)));
+  PinName pinname = DIGITAL_TO_PINNAME(pin);
+  uint32_t gpiopin =  gpio_pin[GD_PIN_GET(pinname)];
+  uint32_t port = gpio_port[GD_PORT_GET(pinname)];
+  gpio_bit_write(port, gpiopin, (bit_status)(1 - (FlagStatus)gpio_input_bit_get(port, gpiopin)));
 }
 
-/* converts PORTx to GPIOx that correspond to the register base addresses */
+/**
+ * converts PORTx to GPIOx that correspond to the register base addresses
+ * 
+ * Problem: These are defined per mcu family in the header file, which means
+ * they could be defined even if the specific mcu chip doesn't have them
+ * 
+ * TODO: consider adding a file for undefining these beforehand on a per-chip basis.
+ */
 const uint32_t gpio_port[] = {
-#ifdef GPIOA
-    GPIOA,
-#else
-    0,
-#endif
-#ifdef GPIOB
-    GPIOB,
-#else
-    0,
-#endif
-#ifdef GPIOC
-    GPIOC,
-#else
-    0,
-#endif
+  GPIOA,
+  GPIOB,
+  GPIOC,
 #ifdef GPIOD
-    GPIOD,
-#else
-    0,
+  GPIOD,
 #endif
 #ifdef GPIOE
-    GPIOE,
-#else
-    0,
+  GPIOE,
 #endif
 #ifdef GPIOF
-    GPIOF,
-#else
-    0,
+  GPIOF,
 #endif
 #ifdef GPIOG
-    GPIOG,
-#else
-    0,
+  GPIOG,
 #endif
 #ifdef GPIOH
-    GPIOH,
-#else
-    0,
+  GPIOH,
 #endif
 #ifdef GPIOI
-    GPIOI
-#else
-    0
+  GPIOI
 #endif
 };
 
 /* converts pinname to gpio pin bit location in register */
 const uint32_t gpio_pin[] = {
-    GPIO_PIN_0,
-    GPIO_PIN_1,
-    GPIO_PIN_2,
-    GPIO_PIN_3,
-    GPIO_PIN_4,
-    GPIO_PIN_5,
-    GPIO_PIN_6,
-    GPIO_PIN_7,
-    GPIO_PIN_8,
-    GPIO_PIN_9,
-    GPIO_PIN_10,
-    GPIO_PIN_11,
-    GPIO_PIN_12,
-    GPIO_PIN_13,
-    GPIO_PIN_14,
-    GPIO_PIN_15
+  GPIO_PIN_0,
+  GPIO_PIN_1,
+  GPIO_PIN_2,
+  GPIO_PIN_3,
+  GPIO_PIN_4,
+  GPIO_PIN_5,
+  GPIO_PIN_6,
+  GPIO_PIN_7,
+  GPIO_PIN_8,
+  GPIO_PIN_9,
+  GPIO_PIN_10,
+  GPIO_PIN_11,
+  GPIO_PIN_12,
+  GPIO_PIN_13,
+  GPIO_PIN_14,
+  GPIO_PIN_15
 };
 
 #ifdef __cplusplus

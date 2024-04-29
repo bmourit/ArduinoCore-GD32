@@ -221,8 +221,6 @@ typedef struct pwmhandle {
 	void (*start)(pwmDevice_t *pwmDevice);
 	void (*stop)(pwmDevice_t *pwmDevice);
 	void (*setPeriodCycle)(pwmDevice_t *pwmDevice, pwmPeriodCycle_t *pwmPeriodCycle);
-	uint32_t (*getPeriod)(pwmDevice_t *pwmDevice);
-	uint16_t (*getCycle)(pwmDevice_t *pwmDevice);
 	void (*writeCycleValue)(pwmDevice_t *pwmDevice, pwmPeriodCycle_t *pwmPeriodCycle);
 	void (*enablePWMIT)(pwmDevice_t *pwmDevice);
 	void (*disablePWMIT)(pwmDevice_t *pwmDevice);

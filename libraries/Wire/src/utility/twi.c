@@ -219,7 +219,7 @@ i2c_status_enum i2c_byte_write(i2c_t *obj, int data)
  *
  * @param obj The I2C object
  */
-i2c_status_enum  i2c_stop(i2c_t *obj)
+i2c_status_enum i2c_stop(i2c_t *obj)
 {
   struct i2c_s *obj_s = I2C_S(obj);
 
@@ -304,8 +304,8 @@ i2c_status_enum i2c_master_transmit(i2c_t *obj, uint8_t address, uint8_t *data, 
   return ret;
 }
 
-/** Read one byte
- *
+/**
+ * Read one byte
  * @param obj  The I2C object
  * @param last Acknowledge
  * @return The read byte
@@ -329,11 +329,12 @@ static int i2c_byte_read(i2c_t *obj, int last)
       return -1;
     }
   }
+
   return (int)I2C_DATA(obj_s->i2c);
 }
 
-/** read bytes in master mode at a given address
- *
+/** 
+ * read bytes in master mode at a given address
  * @param obj     The I2C object
  * @param address 7-bit address (last bit is 1)
  * @param data    The buffer for receiving
