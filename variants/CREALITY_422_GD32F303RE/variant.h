@@ -181,7 +181,6 @@ extern "C" {
 #define SERIAL0_TX      PA9
 #define SERIAL0_RX      PA10
 
-
 #ifdef __cplusplus
 } // extern "C"
 #endif

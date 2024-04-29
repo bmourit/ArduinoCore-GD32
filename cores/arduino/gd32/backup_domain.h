@@ -103,7 +103,7 @@ static inline void backup_register_set(bkp_data_register_enum index, uint16_t va
 {
 #if defined(HAVE_PMU_BACKUP_DOMAIN)
 	bkp_write_data(index, value);
-#else
+#endif
 }
 
 static inline uint16_t backup_rergister_get(bkp_data_register_enum index)
@@ -116,5 +116,7 @@ static inline uint16_t backup_rergister_get(bkp_data_register_enum index)
 }
 
 #ifdef __cplusplus
-{
+}
 #endif	/* __cplusplus */
+
+#endif /* _BACKUP_H_ */

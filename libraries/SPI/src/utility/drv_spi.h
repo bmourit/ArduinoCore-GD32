@@ -33,6 +33,7 @@ OF SUCH DAMAGE.
 #include "PinNames.h"
 #include "PeripheralPins.h"
 #include "PeripheralNames.h"
+#include "gd_debug.h"
 
 #ifdef __cplusplus
 extern "C" {

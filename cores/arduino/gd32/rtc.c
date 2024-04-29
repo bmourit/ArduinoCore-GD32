@@ -93,7 +93,7 @@ static void rtc_clock_init(clock_source_t clock_source)
     clock_source = SOURCE_LXTAL;
   }
   if (clock_source == SOURCE_LXTAL) {
-    clockEnable(SOURCE_LXTAL)
+    clockEnable(SOURCE_LXTAL);
     /* select RCU_LXTAL as RTC clock source */
     rcu_rtc_clock_config(RCU_RTCSRC_LXTAL);
     /* enable RTC Clock */
@@ -137,7 +137,7 @@ void rtc_Init(void)
 #if defined(KILL_RTC_BACKUP_DOMAIN_ON_RESTART)
   backup_domain_kill();
 #endif
-  rtc_clock_init(RCU_LXTAL);
+  rtc_clock_init(SOURCE_LXTAL);
 }
 
 /*!

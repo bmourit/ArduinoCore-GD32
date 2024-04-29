@@ -29,6 +29,7 @@ OF SUCH DAMAGE.
 #define _GD_RTC_H_
 
 #include "gd32xxyy.h"
+#include "systick.h"
 #include "backup_domain.h"
 
 #ifdef __cplusplus

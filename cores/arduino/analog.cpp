@@ -75,7 +75,7 @@ analog_t ADC_[ADC_NUMS] = { 0 };
  * ADC_SAMPLETIME to the desired ADC sample time
  */
 #ifndef ADC_SAMPLETIME
-#elif defined(ADC_SAMPLETIME_7POINT5)
+#if defined(ADC_SAMPLETIME_7POINT5)
 #define ADC_SAMPLETIME      ADC_SAMPLETIME_7POINT5
 #elif defined(ADC_SAMPLETIME_13POINT5)
 #define ADC_SAMPLETIME      ADC_SAMPLETIME_13POINT5
@@ -101,9 +101,9 @@ analog_t ADC_[ADC_NUMS] = { 0 };
 #endif /* !ADC_SAMPLETIME_INTERNAL */
 
 #ifndef ADC_PRESCALE_DIV
-#elif RCU_CKADC_CKAPB2_DIV6
+#if defined(RCU_CKADC_CKAPB2_DIV6)
 #define ADC_PRESCALE_DIV      RCU_CKADC_CKAPB2_DIV6
-#ifdef RCU_CKADC_CKAPB2_DIV4
+#elif defined(RCU_CKADC_CKAPB2_DIV4)
 #define ADC_PRESCALE_DIV      RCU_CKADC_CKAPB2_DIV4
 #endif
 #endif
@@ -265,7 +265,7 @@ uint16_t get_adc_value(PinName pn)
   }
 #if defined(GD32F30x) || defined(GD32E50X)
   adc_regular_channel_config(adc_periph, 0U, channel, sampling_time);
-  if (pn == ADC_TEMP || ADC_VREF) {
+  if (pn == ADC_TEMP || pn == ADC_VREF) {
     adc_tempsensor_vrefint_enable();
     delay(1U);
   }
@@ -275,7 +275,7 @@ uint16_t get_adc_value(PinName pn)
   value = adc_regular_data_read(adc_periph);
 #elif defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32E23x)
   adc_regular_channel_config(0U, channel, sampling_time);
-  if (pn == ADC_TEMP || ADC_VREF) {
+  if (pn == ADC_TEMP || pn == ADC_VREF) {
     adc_tempsensor_vrefint_enable();
     delay(1U);
   }

@@ -101,23 +101,12 @@ uint32_t getCurrentMicros(void)
   return (ms * 1000 + us);
 }
 
-static FlagStatus rcu_osci_state_get(rcu_osci_type_enum osci)
-{
-  FlagStatus status = RESET;
-
-  switch(osci) {
-  case RCU_PLL_CK:
-    status = rcu_flag_get(RCU_FLAG_PLLSTB)
-  }
-}
-
 void clockEnable(clock_source_t clock_source)
 {
-  FlagStatus status = RESET;
-  rcu_osci_type_enum osci;
+  rcu_osci_type_enum osci = RCU_IRC8M;
   backup_domain_enable();
 
-  switch(source) {
+  switch(clock_source) {
   case SOURCE_PLL_CK:
     if (rcu_flag_get(RCU_FLAG_PLLSTB) == RESET) {
       osci = RCU_PLL_CK;

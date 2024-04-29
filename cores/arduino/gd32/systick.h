@@ -43,7 +43,7 @@ OF SUCH DAMAGE.
 #include "gd32xxyy.h"
 
 #ifdef __cplusplus
-extern "c" {
+extern "C" {
 #endif
 
 typedef enum {
