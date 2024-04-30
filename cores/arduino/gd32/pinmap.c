@@ -46,46 +46,44 @@ bool pin_in_pinmap(PinName pin, const PinMap *map)
 }
 
 /**
- * Configure pin (mode, speed, remap or af function)
- * @param pin gpio pin name
- * @param function gpio pin mode, speed, remap or af function
+ * Configure pin (mode, speed, output type and pull-up/pull-down)
+ * @param pin pin name
+ * @param function bits to decode
  */
 void pin_function(PinName pin, int function)
 {
-	uint32_t remap = GD_PIN_REMAP_GET(function);
-	//uint32_t speed = GD_PIN_SPEED_GET(function);
-	/* since we dont encode the speed in the function, we can simply set it to MAX here */
-	uint32_t speed = GPIO_OSPEED_MAX;
-	uint32_t port = GD_PORT_GET(pin);
-	uint32_t gd_pin = gpio_pin[GD_PIN_GET(pin)];
-
-	uint32_t spl_mode = GPIO_MODE_IN_FLOATING;
-
 	uint32_t mode = GD_PIN_MODE_GET(function);
-	uint32_t output = GD_PIN_OUTPUT_MODE_GET(function);
-	uint32_t pull = GD_PIN_PULL_STATE_GET(function);
+	uint32_t af = GD_PIN_AF_GET(function);
+	uint32_t port = GD_PORT_GET(pin);
+	uint32_t spl_pin = gpio_pin[GD_PIN_GET(pin)];
+	uint32_t spl_mode = 0;
+	uint32_t output = GD_PIN_OUTPUT_OD_GET(function);
+	uint32_t pull = GD_PIN_PULL_UD_GET(function);
+	/**
+	 * since we dont encode the speed in the function,
+	 * we can simply set it to MAX here
+	 */
+	uint32_t speed = GPIO_OSPEED_MAX;
 
-	if ((PinName)NC == pin) {
-		gd_debug("pin name does not exist");
-		while (1);
+	if (pin == (PinName)NC) {
+		Error_Handler();
 	}
 
 #if defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32F4xx) || defined(GD32E23x)
-	uint32_t af = GD_PIN_AF_GET(function);
 	uint32_t spl_output = 0;
 	uint32_t spl_pull = 0;
 
 	switch (mode) {
-	case PIN_MODE_ANALOG:
+	case GD_PIN_ANALOG:
 		spl_mode = GPIO_MODE_ANALOG;
 		break;
-	case PIN_MODE_INPUT:
+	case GD_PIN_INPUT:
 		spl_mode = GPIO_MODE_INPUT;
 		break;
-	case PIN_MODE_AF:
+	case GD_PIN_AF:
 		spl_mode = GPIO_MODE_AF;
 		break;
-	case PIN_MODE_OUTPUT:
+	case GD_PIN_OUTPUT:
 		spl_mode = GPIO_MODE_OUTPUT;
 		break;
 	default:
@@ -120,10 +118,10 @@ void pin_function(PinName pin, int function)
 #elif defined(GD32F30x) || defined(GD32F10x) || defined(GD32E50X)
 
 	switch (mode) {
-	case PIN_MODE_ANALOG:
+	case GD_PIN_ANALOG:
 		spl_mode = GPIO_MODE_AIN;
 		break;
-	case PIN_MODE_INPUT:
+	case GD_PIN_INPUT:
 		if (pull == PIN_PUPD_PULLUP) {
 			spl_mode = GPIO_MODE_IPU;
 		} else if (pull == PIN_PUPD_PULLDOWN) {
@@ -132,14 +130,14 @@ void pin_function(PinName pin, int function)
 			spl_mode = GPIO_MODE_IN_FLOATING;
 		}
 		break;
-	case PIN_MODE_AF:
+	case GD_PIN_AF:
 		if (output == PIN_OTYPE_OD) {
 			spl_mode = GPIO_MODE_AF_OD;
 		} else {
 			spl_mode = GPIO_MODE_AF_PP;
 		}
 		break;
-	case PIN_MODE_OUTPUT:
+	case GD_PIN_OUTPUT:
 		if (output == PIN_OTYPE_OD) {
 			spl_mode = GPIO_MODE_OUT_OD;
 		} else {
@@ -155,22 +153,22 @@ void pin_function(PinName pin, int function)
 	gpio_clock_enable(gpio);
 
 #if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
-	if (remap != 0) {
+	if (af != 0) {
 		/* MSB is disabled */
-		bool disable = remap & ~(PIN_REMAP_MASK >> 1);
-		remap &= PIN_REMAP_MASK >> 1;
+		bool disable = af & ~(PIN_AF_MASK >> 1);
+		af &= PIN_AF_MASK >> 1;
 		rcu_periph_clock_enable(RCU_AF);
-		gpio_pin_remap_config(GD_GPIO_REMAP[remap], disable ? DISABLE : ENABLE);
+		gpio_pin_remap_config(GD_GPIO_REMAP[af], disable ? DISABLE : ENABLE);
 		gpio_debug_disconnect(pin);
 		gpio_compensation_config(GPIO_COMPENSATION_ENABLE);
-		gpio_init(gpio, spl_mode, speed, gd_pin);
+		gpio_init(gpio, spl_mode, speed, spl_pin);
 	}
 #elif defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32F4xx) || defined(GD32E23x)
-	gpio_af_set(gpio, GD_GPIO_AF[af], gd_pin);
-	gpio_mode_set(gpio, spl_mode, spl_pull, gd_pin);
+	gpio_af_set(gpio, GD_GPIO_AF[af], spl_pin);
+	gpio_mode_set(gpio, spl_mode, spl_pull, spl_pin);
 	gpio_debug_disconnect(pin);
 	if (spl_mode == GPIO_MODE_OUTPUT || spl_mode == GPIO_MODE_AF)
-		gpio_output_options_set(gpio, spl_output, GD_GPIO_SPEED[speed], gd_pin);
+		gpio_output_options_set(gpio, spl_output, speed, spl_pin);
 #endif
 }
 

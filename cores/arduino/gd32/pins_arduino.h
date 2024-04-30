@@ -343,18 +343,18 @@ uint32_t PinName_to_digital(PinName p);
 PinName analog_pin_to_PinName(uint32_t pin);
 
 /* All pins could manage EXTI */
-#define DIGITAL_PIN_VALID(p)    (DIGITAL_TO_PINNAME(p) != NC)
-#define DIGITAL_PIN_TO_INT(p)   (DIGITAL_PIN_VALID(p) ? p : NOT_INTERRUPT)
+#define DIGITAL_PIN_VALID(p)        (DIGITAL_TO_PINNAME(p) != NC)
+#define DIGITAL_PIN_TO_INT(p)       (DIGITAL_PIN_VALID(p) ? p : NOT_INTERRUPT)
 
-#define DIGITAL_PIN_I2C(p)      (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_I2C_SDA) || \
-                                  pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_I2C_SCL))
-#define DIGITAL_PIN_PWM(p)      (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_PWM))
-#define DIGITAL_PIN_SERIAL(p)   (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_UART_RX) || \
-                                  pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_UART_TX))
-#define DIGITAL_PIN_SPI(p)      (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_MOSI) || \
-                                  pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_MISO) || \
-                                  pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_SCLK) || \
-                                  pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_SSEL))
+#define DIGITAL_PIN_I2C(p)          (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_I2C_SDA) || \
+                                      pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_I2C_SCL))
+#define DIGITAL_PIN_PWM(p)          (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_PWM))
+#define DIGITAL_PIN_SERIAL(p)       (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_UART_RX) || \
+                                      pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_UART_TX))
+#define DIGITAL_PIN_SPI(p)          (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_MOSI) || \
+                                      pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_MISO) || \
+                                      pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_SCLK) || \
+                                      pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_SSEL))
 
 #define DIGITAL_PIN_TO_PORT(p)      ((GD_PORT_GET(DIGITAL_TO_PINNAME(p)) < GPIO_PORT_NUM) ? gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(p))] : (uint32_t )NULL)
 #define DIGITAL_PIN_TO_BIT_MASK(p)  (gpio_pin[GD_PIN_GET(DIGITAL_TO_PINNAME(p))])
@@ -413,11 +413,11 @@ uint32_t digital_pin_to_analog(uint32_t pin);
 #ifndef PWM_RESOLUTION
   #define PWM_RESOLUTION        8
 #endif
-
-#define DAC_RESOLUTION          12
-
+#ifndef DAC_RESOLUTION
+  #define DAC_RESOLUTION        12
+#endif
 #ifndef PWM_FREQUENCY
-  #define PWM_FREQUENCY         1000      // 1000µS = 1ms = 1kHz
+  #define PWM_FREQUENCY         1000  // 1000µS = 1ms = 1kHz
 #endif
 #ifndef PWM_MAX_DUTY_CYCLE
   #define PWM_MAX_DUTY_CYCLE    4095

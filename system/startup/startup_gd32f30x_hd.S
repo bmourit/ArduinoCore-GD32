@@ -44,19 +44,20 @@ DataInit:
 
 FillZerobss:
   movs r3, #0
-  str r3, [r2]
-  adds r2, r2, #4
+  str r3, [r2] #4
 
 Zerobss:
   ldr r3, = _ebss
   cmp r2, r3
   bcc FillZerobss
 
-/* Call SystemInit function */
+  /* Call SystemInit function */
   bl  SystemInit
-/* Call static constructors */
+
+  /* Call static constructors */
   bl __libc_init_array
-/* Call the main function (entry point) */
+
+  /* Call the main function (entry point) */
   bl main
   bx lr
 .size Reset_Handler, .-Reset_Handler
