@@ -160,7 +160,7 @@ void pin_function(PinName pin, int function)
 	gpio_debug_disconnect(pin);
 	gpio_compensation_config(GPIO_COMPENSATION_ENABLE);
 	gpio_init(gpio, spl_mode, speed, spl_pin);
-	}
+
 #elif defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32F4xx) || defined(GD32E23x)
 	gpio_af_set(gpio, GD_GPIO_AF[af], spl_pin);
 	gpio_mode_set(gpio, spl_mode, spl_pull, spl_pin);
