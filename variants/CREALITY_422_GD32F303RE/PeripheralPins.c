@@ -30,17 +30,14 @@ const int GD_GPIO_REMAP[] = {
 #endif
 };
 
-enum GD_GPIO_REMAP_NAME {
-  REMAP_NONE = 0U,
-#if __has_include("gd32f30x_remap.h")
-#define __REMAP_NAME__(remap) remap,
-#include "gd32f30x_remap.h"
-#undef __REMAP_NAME__
-#define __REMAP_NAME__(remap) DISABLE_ ## remap = GPIO_ ## remap | (1U << 6),
-#include "gd32f30x_remap.h"
-#undef __REMAP_NAME__
-#endif
-};
+//enum GD_GPIO_REMAP_NAME {
+//  REMAP_NONE = 0U,
+//#if __has_include("gd32f30x_remap.h")
+//#define __REMAP_NAME__(remap) remap,
+//#include "gd32f30x_remap.h"
+//#undef __REMAP_NAME__
+//#endif
+//};
 
 /* GPIO MODE */
 const int GD_GPIO_MODE[] = {
