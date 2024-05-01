@@ -19,6 +19,7 @@
 
 #include "PinNames.h"
 #include "pins_arduino.h"
+#include "PeripheralPins.h"
 #include <stdbool.h>
 #include <string.h>
 
