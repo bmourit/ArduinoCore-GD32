@@ -19,7 +19,6 @@
 
 #include "PinNames.h"
 #include "pins_arduino.h"
-#include "PeripheralPins.h"
 #include <stdbool.h>
 #include <string.h>
 
@@ -30,6 +29,15 @@ extern "C" {
 extern const uint32_t bare_pin_map[16];
 
 #define GD_BARE_GPIO_PIN(X) (bare_pin_map[GD_PIN_GET(X)])
+
+enum GD_GPIO_REMAP_NAME {
+  REMAP_NONE = 0U,
+#if __has_include("gd32f30x_remap.h")
+#define __REMAP_NAME__(remap) remap,
+#include "gd32f30x_remap.h"
+#undef __REMAP_NAME__
+#endif
+};
 
 /* provide a way to distiguish between No Peripheral and No Pin */
 #define NP      0U

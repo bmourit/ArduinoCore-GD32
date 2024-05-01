@@ -60,13 +60,4 @@ extern const PinMap PinMap_USB[];
 /* SDIO */
 extern const PinMap PinMap_SD[];
 
-enum GD_GPIO_REMAP_NAME {
-  REMAP_NONE = 0U,
-#if __has_include("gd32f30x_remap.h")
-#define __REMAP_NAME__(remap) remap,
-#include "gd32f30x_remap.h"
-#undef __REMAP_NAME__
-#endif
-};
-
 #endif
