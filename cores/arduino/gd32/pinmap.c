@@ -153,15 +153,13 @@ void pin_function(PinName pin, int function)
 	gpio_clock_enable(gpio);
 
 #if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
-	if (af != 0) {
-		/* MSB is disabled */
-		bool disable = af & ~(PIN_AF_MASK >> 1);
-		af &= PIN_AF_MASK >> 1;
-		rcu_periph_clock_enable(RCU_AF);
-		gpio_pin_remap_config(GD_GPIO_REMAP[af], disable ? DISABLE : ENABLE);
-		gpio_debug_disconnect(pin);
-		gpio_compensation_config(GPIO_COMPENSATION_ENABLE);
-		gpio_init(gpio, spl_mode, speed, spl_pin);
+	rcu_periph_clock_enable(RCU_AF);
+	if (af != REMAP_NONE) {
+		gpio_pin_remap_config(GD_GPIO_REMAP[af], ENABLE);
+	}
+	gpio_debug_disconnect(pin);
+	gpio_compensation_config(GPIO_COMPENSATION_ENABLE);
+	gpio_init(gpio, spl_mode, speed, spl_pin);
 	}
 #elif defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32F4xx) || defined(GD32E23x)
 	gpio_af_set(gpio, GD_GPIO_AF[af], spl_pin);

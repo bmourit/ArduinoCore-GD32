@@ -36,7 +36,7 @@ extern "C" {
 
 #define ALTMASK 0x700
 
-typedef enum : uint32_t {
+typedef enum {
 #if defined GPIOA
   PORTA_0  = (PORTA << 4) + 0x00,
   PORTA_1  = (PORTA << 4) + 0x01,
@@ -208,7 +208,7 @@ typedef enum : uint32_t {
 #if __has_include("PinNamesVar.h")
 #include "PinNamesVar.h"
 #endif
-  NC = (int)0xFFFFFFFF
+  NC = 0xFFFFFFFF
 } PinName;
 
 /* pin mode */

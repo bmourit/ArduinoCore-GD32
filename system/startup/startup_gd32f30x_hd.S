@@ -44,7 +44,7 @@ DataInit:
 
 FillZerobss:
   movs r3, #0
-  str r3, [r2] #4
+  str r3, [r2], #4
 
 Zerobss:
   ldr r3, = _ebss

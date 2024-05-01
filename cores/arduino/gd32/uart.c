@@ -221,8 +221,8 @@ void serial_free(serial_t *obj)
 
 	/* reset the gpio state */
 #if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
-	pin_function(p_obj->pin_tx, PIN_MODE_INPUT_FLOATING);
-	pin_function(p_obj->pin_rx, PIN_MODE_INPUT_FLOATING);
+	pin_function(p_obj->pin_tx, PIN_PUPD_NONE);
+	pin_function(p_obj->pin_rx, PIN_PUPD_NONE);
 #else
 	pin_function(p_obj->pin_tx, PIN_MODE_INPUT);
 	pin_function(p_obj->pin_rx, PIN_MODE_INPUT);

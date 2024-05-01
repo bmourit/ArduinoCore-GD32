@@ -269,15 +269,15 @@ void HardwareTimer::setCaptureMode(uint32_t ulpin, uint8_t channel, captureMode 
 
   PinName pinname = DIGITAL_TO_PINNAME(ulpin);
   uint32_t function = pinmap_find_function(pinname, PinMap_PWM);
-  uint32_t remap  = GD_PIN_REMAP_GET(function);
+  uint32_t af  = GD_PIN_AF_GET(function);
   uint32_t port = gpio_port[GD_PORT_GET(pinname)];
   uint32_t pin = gpio_pin[GD_PIN_GET(pinname)];
   gpio_clock_enable(port);
 #if defined(GD32F30x)
   rcu_periph_clock_enable(RCU_AF);
   gpio_init(port, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, pin);
-  if (0 != remap) {
-    gpio_pin_remap_config(GD_GPIO_REMAP[remap], ENABLE);
+  if (af != 0) {
+    gpio_pin_remap_config(GD_GPIO_REMAP[af], ENABLE);
   }
 #elif defined(GD32F3x0) || defined(GD32F1x0)
   /* !!TODO!! */
