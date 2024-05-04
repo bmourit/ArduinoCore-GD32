@@ -30,7 +30,7 @@ extern int errno;
 
 __attribute__((weak))caddr_t _sbrk(int incr)
 {
-  extern char _estack;          /* Defined in the linker script */
+  extern char _sp;              /* Defined in the linker script */
   extern char _Min_Stack_Size;  /* Defined in the linker script */
   extern char _end;             /* Defined by the linker */
   static char *heap_end = &_end;
