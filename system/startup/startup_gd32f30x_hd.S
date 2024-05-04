@@ -21,7 +21,7 @@
 
 /* reset Handler */
 Reset_Handler:
-/*  ldr sp, =_sp */       /* Atollic update: set stack pointer */
+/*  ldr sp, =_estack */       /* Atollic update: set stack pointer */
 
 /* Copy the data segment initializers from flash to SRAM */
   movs r1, #0
