@@ -28,7 +28,6 @@ OF SUCH DAMAGE.
 */
 
 #include "utility/drv_spi.h"
-#include "gd32yyxx_spi.h"
 
 #ifdef __cplusplus
 extern "C" {

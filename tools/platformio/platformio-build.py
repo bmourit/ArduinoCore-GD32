@@ -191,6 +191,7 @@ env.Append(
         ("ARDUINO_UPLOAD_MAXIMUM_SIZE", board_config.get("upload.maximum_size")),
     ],
     CPPPATH=[
+        join(FRAMEWORK_DIR, "cores", "arduino", "api"),
         join(FRAMEWORK_DIR, "cores", "arduino", "api", "deprecated"),
         join(FRAMEWORK_DIR, "cores", "arduino", "api", "deprecated-avr-comp"),
         join(FRAMEWORK_DIR, "cores", "arduino", "gd32"),
