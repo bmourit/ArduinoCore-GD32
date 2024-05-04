@@ -21,7 +21,7 @@
 #define _BACKUP_H_
 
 #include "gd32_def.h"
-#include "gd32xxyy_rtc.h"
+#include "gd32yyxx_rtc.h"
 
 #ifdef __cplusplus
 extern "C" {
