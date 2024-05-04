@@ -139,12 +139,6 @@ void HardwarePWM::detachInterrupt(void)
   pwmHandle.disablePWMIT(&pwmDevice);
 }
 
-void HardwarePWM::setTimerFrequency(uint32_t frequency)
-{
-    // Implement the logic to set the timer frequency here
-    // You can use this information to set the timer frequency
-}
-
 /*!
   \brief      capture/compare callback handler
   \param[in]  none

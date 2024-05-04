@@ -73,7 +73,7 @@ Infinite_Loop:
    .size __gVectors, .-__gVectors
 
 __gVectors:
-                    .word _estack                        /* Top of Stack */
+                    .word _sp                            /* Top of Stack */
                     .word Reset_Handler                  /* 1:Reset Handler */
                     .word NMI_Handler                    /* 2:NMI Handler */
                     .word HardFault_Handler              /* 3:Hard Fault Handler */

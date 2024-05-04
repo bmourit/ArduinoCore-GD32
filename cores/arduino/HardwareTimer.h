@@ -77,7 +77,7 @@ class HardwareTimer
     captureMode _ChannelMode[4];
 };
 
-//extern HardwareTimer *hardwaretimerObj[];
+extern HardwareTimer *hardwaretimerObj[];
 extern timerhandle_t timerHandle;
 extern timer_index_t get_timer_index(uint32_t htimer);
 

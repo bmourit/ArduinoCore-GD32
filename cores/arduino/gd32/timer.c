@@ -25,7 +25,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
-#include "gd_debug.h"
 #include "timer.h"
 
 #if defined(GD32F1x0) || defined(GD32F3x0) || defined(GD32E50X) || defined(GD32EPRT)
@@ -1056,7 +1055,6 @@ uint32_t getTimerClkFrequency(uint32_t instance)
                 APBx_PSC = (RCU_CFG0 & RCU_CFG0_APB1PSC) >> 8;
                 break;
             default:
-                _Error_Handler("TIMER: Unknown timer instance", (int)instance);
                 break;
         }
     }
@@ -1074,12 +1072,12 @@ uint32_t getTimerClkFrequency(uint32_t instance)
     \param[out] none
     \retval     timer update IRQn
 */
-IRQn_Type getTimerUpIrq(uint32_t timer)
+IRQn_Type getTimerUpIrq(uint32_t tim)
 {
     IRQn_Type IRQn = NonMaskableInt_IRQn;
 
-    if (timer != (uint32_t)NC) {
-        switch ((uint32_t)timer) {
+    if (tim != (uint32_t)NC) {
+        switch ((uint32_t)tim) {
 #if defined(TIMER0)
             case (uint32_t)TIMER0:
                 //differing update interrupt for Timer0 on some devices
@@ -1156,7 +1154,6 @@ IRQn_Type getTimerUpIrq(uint32_t timer)
                 break;
 #endif
             default:
-                _Error_Handler("TIMER: Unknown timer IRQn", (int)timer);
                 break;
         }
     }
@@ -1165,16 +1162,16 @@ IRQn_Type getTimerUpIrq(uint32_t timer)
 
 /*!
     \brief      get timer capture/compare IRQn
-    \param[in]  timer: TIMERx(x=0..13)
+    \param[in]  tim: TIMERx(x=0..13)
     \param[out] none
     \retval     timer capture/compare IRQn
 */
-IRQn_Type getTimerCCIrq(uint32_t timer)
+IRQn_Type getTimerCCIrq(uint32_t tim)
 {
     IRQn_Type IRQn = NonMaskableInt_IRQn;
 
-    if (timer != (uint32_t)NC) {
-        switch ((uint32_t)timer) {
+    if (tim != (uint32_t)NC) {
+        switch ((uint32_t)tim) {
 #if defined(TIMER0)
             case (uint32_t)TIMER0:
                 IRQn = TIMER0_Channel_IRQn;
@@ -1261,7 +1258,6 @@ IRQn_Type getTimerCCIrq(uint32_t timer)
                 break;
 #endif
             default:
-                _Error_Handler("TIMER: Unknown timer IRQn", (int)timer);
                 break;
         }
     }

@@ -28,10 +28,10 @@ OF SUCH DAMAGE.
 #include "HardwareTimer.h"
 #include "pins_arduino.h"
 
-#define TIMERNUMS   14
+//#define TIMERNUMS   13
 #define TIMER_NUM_CHANNELS 4
 
-HardwareTimer *hardwaretimerObj[TIMERNUMS] = {NULL};
+HardwareTimer *hardwaretimerObj[TIMER_NUM] = { NULL };
 
 /*!
   \brief      HardwareTimer object construct
