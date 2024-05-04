@@ -29,7 +29,6 @@ OF SUCH DAMAGE.
 #define HARDWARETIMER_H
 
 #include "timer.h"
-#include "gd32yyxx_timer.h"
 
 // Copied from 1.0.x firmware library for compatibility, but this is
 // unspecified in the data sheet. Being able to use both edges is not
