@@ -29,7 +29,6 @@ OF SUCH DAMAGE.
 
 #include "utility/twi.h"
 #include "pinmap.h"
-#include "twi.h"
 
 typedef enum {
 #if defined(I2C0)

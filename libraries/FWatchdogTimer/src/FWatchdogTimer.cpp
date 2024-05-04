@@ -18,14 +18,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "FWatchdogTimer.h"
-
-#if defined(GD32F30x)
-#include "gd32f30x_fwdgt.h"
-#include "gd32f30x_rcu.h"
-#elif defined(GD32F10x)
-#include "gd32f10x_fwdgt.h"
-#include "gd32f10x_rcu.h"
-#endif
+#include "gd32yyxx_fwdgt.h"
+#include "gd32yyxx_rcu.h"
 
 // Initialize static variable
 bool FWatchdogTimerClass::_enabled = false;
