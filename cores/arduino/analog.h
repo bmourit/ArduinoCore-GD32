@@ -31,11 +31,7 @@ OF SUCH DAMAGE.
 #ifndef __ANALOG_H
 #define __ANALOG_H
 
-#include "gd32xxyy.h"
-
-#include "PinNames.h"
-#include "PeripheralPins.h"
-#include "api/ArduinoAPI.h"
+#include "Arduino.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,7 +1,7 @@
 #ifndef _GD_HARDWARERTC_H_
 #define _GD_HARDWARERTC_H_
 
-#include "rtc.h"
+#include "Arduino.h"
 
 extern class HWRTC rtc;
 

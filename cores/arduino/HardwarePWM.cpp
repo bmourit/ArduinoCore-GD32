@@ -26,7 +26,7 @@ OF SUCH DAMAGE.
 */
 
 #include "pins_arduino.h"
-#include "HardwarePWM.h"
+#include "Arduino.h"
 
 #define PWMNUMS   56
 

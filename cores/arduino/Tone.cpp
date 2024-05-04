@@ -1,6 +1,5 @@
 
 #include "Arduino.h"
-#include "HardwareTimer.h"
 
 #define MAX_FREQ  65535
 

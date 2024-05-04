@@ -68,7 +68,8 @@ void setup();
 void loop();
 
 #include "variant.h"
-#include "HardwareSerial.h"
+#include "api/HardwareSerial.h"
+
 #ifdef USBD_USE_CDC
 #include "CDCACM.h"
 #endif

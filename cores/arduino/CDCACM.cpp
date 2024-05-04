@@ -1,5 +1,5 @@
 #ifdef USBD_USE_CDC
-#include "CDCACM.h"
+#include "Arduino.h"
 
 #include "USBCore.h"
 

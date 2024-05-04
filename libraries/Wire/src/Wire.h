@@ -22,7 +22,6 @@
 #ifndef TwoWire_h
 #define TwoWire_h
 
-#include "api/Stream.h"
 #include "Arduino.h"
 #include "utility/twi.h"
 

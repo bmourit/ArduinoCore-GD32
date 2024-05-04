@@ -23,7 +23,6 @@
 */
 
 #include <stdio.h>
-#include "Arduino.h"
 #include "SerialUart.h"
 
 //#if defined(HAVE_HWSERIAL1) || defined(HAVE_HWSERIAL2) || defined(HAVE_HWSERIAL3) || defined(HAVE_HWSERIAL4)

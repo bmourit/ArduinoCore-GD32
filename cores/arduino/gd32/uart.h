@@ -37,6 +37,7 @@ OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 #include "gd32xxyy.h"
 #include "PeripheralPins.h"
 #include "pinmap.h"
