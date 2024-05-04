@@ -21,7 +21,7 @@
 
 /* reset Handler */
 Reset_Handler:
-/*  ldr sp, =_sp */       /* Atollic update: set stack pointer */
+/*  ldr sp, =_estack */       /* Atollic update: set stack pointer */
 
 /* Copy the data segment initializers from flash to SRAM */
   movs r1, #0
@@ -73,7 +73,7 @@ Infinite_Loop:
    .size __gVectors, .-__gVectors
 
 __gVectors:
-                    .word _sp                            /* Top of Stack */
+                    .word _estack                        /* Top of Stack */
                     .word Reset_Handler                  /* 1:Reset Handler */
                     .word NMI_Handler                    /* 2:NMI Handler */
                     .word HardFault_Handler              /* 3:Hard Fault Handler */
