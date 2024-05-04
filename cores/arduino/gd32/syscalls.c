@@ -44,7 +44,7 @@ __attribute__((weak))caddr_t _sbrk(int incr)
   }
 
   /* Ensure to keep minimum stack size defined in the linker script */
-  if (heap_end + incr >= (char *)(&_sp - &_Min_Stack_Size)) {
+  if (heap_end + incr >= (char *)(&_estack - &_Min_Stack_Size)) {
     errno = ENOMEM;
     return (caddr_t)-1;
   }
