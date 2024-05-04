@@ -28,9 +28,11 @@ OF SUCH DAMAGE.
   Based on mbed-os/targets/TARGET_GigaDevice/TARGET_GD32F30X/analogout_api.c
 */
 
+#include "gd32_def.h"
 #include "analog.h"
 #include "HardwarePWM.h"
 #include "gd_debug.h"
+#include "gd32yyxx_adc.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,7 +1,7 @@
 
 ENTRY(Reset_Handler)
 
-_sp = 0x20000000 + LD_MAX_DATA_SIZE;
+_estack = 0x20000000 + LD_MAX_DATA_SIZE;
 _Min_Heap_Size = 0x400;      /* required amount of heap  */
 _Min_Stack_Size = 0x400;     /* required amount of stack */
 

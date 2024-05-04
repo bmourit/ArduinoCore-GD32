@@ -1,0 +1,40 @@
+#ifndef _GD32YYXX_SPL_H_
+#define _GD32YYXX_SPL_H_
+/* SPL raised several warnings, ignore them */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+
+#include "gd32yyxx_adc.h"
+#include "gd32yyxx_bkp.h"
+#include "gd32yyxx_can.h"
+#include "gd32yyxx_cec.h"
+#include "gd32yyxx_cmp.h"
+#include "gd32yyxx_crc.h"
+#include "gd32yyxx_ctc.h"
+#include "gd32yyxx_dac.h"
+#include "gd32yyxx_dbg.h"
+#include "gd32yyxx_dma.h"
+#include "gd32yyxx_enet.h"
+#include "gd32yyxx_exmc.h"
+#include "gd32yyxx_exti.h"
+#include "gd32yyxx_fmc.h"
+#include "gd32yyxx_fwdgt.h"
+#include "gd32yyxx_gpioc.h"
+#include "gd32yyxx_i2c.h"
+#include "gd32yyxx_misc.h"
+#include "gd32yyxx_pmu.h"
+#include "gd32yyxx_rcu.h"
+#include "gd32yyxx_rtc.h"
+#include "gd32yyxx_sdio.h"
+#include "gd32yyxx_shrtimer.h"
+#include "gd32yyxx_spi.h"
+#include "gd32yyxx_sqpi.h"
+#include "gd32yyxx_syscfg.h"
+#include "gd32yyxx_timer.h"
+#include "gd32yyxx_tmu.h"
+#include "gd32yyxx_tsi.h"
+#include "gd32yyxx_usart.h"
+#include "gd32yyxx_wwdgt.h"
+#pragma GCC diagnostic pop
+#endif /* _GD32YYXX_SPL_H_ */

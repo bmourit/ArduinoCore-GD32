@@ -128,6 +128,10 @@ def configure_application_offset(mcu, upload_protocol):
                 offset = 0x2000
             env.Append(CPPDEFINES=["BL_LEGACY_LEAF"])
 
+    else:
+        offset = 0x7000;
+        env.Append(CPPDEFINES=["BL_LEGACY_LEAF"])
+
     if offset != 0:
         env.Append(CPPDEFINES=[("VECT_TAB_OFFSET", "%s" % hex(offset))],)
 
@@ -187,10 +191,11 @@ env.Append(
         ("ARDUINO_UPLOAD_MAXIMUM_SIZE", board_config.get("upload.maximum_size")),
     ],
     CPPPATH=[
+        join(FRAMEWORK_DIR, "cores", "arduino", "api"),
         join(FRAMEWORK_DIR, "cores", "arduino", "api", "deprecated"),
         join(FRAMEWORK_DIR, "cores", "arduino", "api", "deprecated-avr-comp"),
         join(FRAMEWORK_DIR, "cores", "arduino", "gd32"),
-        join(FRAMEWORK_DIR, "cores", "arduino", "gd32", "Source"),
+        join(FRAMEWORK_DIR, "cores", "arduino", "gd32", "SPL"),
         join(FRAMEWORK_DIR, "system", "startup"),
         join(FRAMEWORK_DIR, "system", "CMSIS", "Core", "Include"),
         join(FRAMEWORK_DIR, "system", "CMSIS", "DSP", "Include"),
