@@ -25,8 +25,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
+#include "HardwareTimer.h"
 #include "pins_arduino.h"
-#include "Arduino.h"
 
 //#define TIMERNUMS   13
 #define TIMER_NUM_CHANNELS 4

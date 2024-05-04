@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include "SerialUart.h"
 
 // Place each serial in its own .cpp file so that the linker cleans it up

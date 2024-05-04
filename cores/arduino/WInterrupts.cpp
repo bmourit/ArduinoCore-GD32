@@ -17,6 +17,8 @@
 */
 
 #include "Arduino.h"
+#include <api/Interrupts.h>
+#include "gpio_interrupt.h"
 
 void attachInterrupt(pin_size_t pin, voidFuncPtr callback, PinStatus mode)
 {

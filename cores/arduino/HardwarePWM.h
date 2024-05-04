@@ -28,6 +28,8 @@ OF SUCH DAMAGE.
 #ifndef HARDWAREPWM_H
 #define PARDWAREPWM_H
 
+#include "timer.h"
+
 typedef void(*pwmCallback_t)(void);
 
 class HardwarePWM {

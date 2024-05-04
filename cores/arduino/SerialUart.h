@@ -26,7 +26,7 @@
 
 #include <inttypes.h>
 
-#include "Arduino.h"
+#include "api/HardwareSerial.h"
 #include "uart.h"
 
 

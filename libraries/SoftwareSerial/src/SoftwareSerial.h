@@ -38,6 +38,7 @@
 #include "HardwareTimer.h"
 
 #include <Arduino.h>
+#include <Stream.h>
 
 #ifndef _SS_MAX_RX_BUFF
 #define _SS_MAX_RX_BUFF   64    // RX buffer size

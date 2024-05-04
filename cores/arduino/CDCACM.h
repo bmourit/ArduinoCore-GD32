@@ -2,7 +2,7 @@
 
 #ifdef USBD_USE_CDC
 
-#include "Arduino.h"
+#include "api/ArduinoAPI.h"
 #include "USBDefs.h"
 
 /*

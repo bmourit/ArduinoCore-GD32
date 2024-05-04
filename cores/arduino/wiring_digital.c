@@ -17,6 +17,8 @@
 */
 
 #include "Arduino.h"
+#include "gd32/PinConfigured.h"
+#include "gd32/PinNames.h"
 
 #ifdef __cplusplus
 extern "C" {
