@@ -46,6 +46,7 @@ using namespace arduino;
 
 #ifdef __cplusplus
 #include "HardwarePWM.h"
+#include "HardwareTimer.h"
 
 extern "C" {
 #endif /* __cplusplus */
