@@ -20,6 +20,7 @@
 #include "pinmap.h"
 //#include "PortNames.h"
 #include <gd_debug.h>
+#include <gd32f30x_gpio.h>
 
 //extern const int GD_GPIO_MODE[];
 extern const int GD_GPIO_SPEED[];

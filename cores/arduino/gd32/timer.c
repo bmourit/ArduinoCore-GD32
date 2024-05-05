@@ -26,6 +26,15 @@ OF SUCH DAMAGE.
 */
 
 #include "timer.h"
+#ifdef GD32E50x
+#include <gd32e50x_rcu.h>
+#include <gd32e50x_timer.h>
+#endif
+#ifdef GD32F30x
+#include <gd32f30x_timer.h>
+#include <gd32f30x_rcu.h>
+#endif
+
 
 #if defined(GD32F1x0) || defined(GD32F3x0) || defined(GD32E50X) || defined(GD32EPRT)
 #define TIMER5_IRQ_Name TIMER5_DAC_IRQn

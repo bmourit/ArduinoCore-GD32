@@ -22,6 +22,7 @@
 
 #include "gd32_def.h"
 #include "gd32xxyy.h"
+#include "gd32f30x_bkp.h"
 
 #ifdef __cplusplus
 extern "C" {
