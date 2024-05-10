@@ -28,6 +28,7 @@ OF SUCH DAMAGE.
 #ifndef HARDWARETIMER_H
 #define HARDWARETIMER_H
 
+#include "Arduino.h"
 #include "timer.h"
 
 // Copied from 1.0.x firmware library for compatibility, but this is
@@ -38,47 +39,88 @@ OF SUCH DAMAGE.
 #define TIMER_IC_POLARITY_BOTH_EDGE         ((uint16_t)0x000AU)                     /*!< input capture both edge(not for timer1..6) */
 #endif
 
-typedef void(*timerCallback_t)(void);
+#define TIMER_NUM_CHANNELS 4
+
+#ifdef __cplusplus
+
+#include <functional>
+//typedef void(*timerCallback_t)(void);
+using timerCallback_t = std::function<void(void)>;
 
 class HardwareTimer
 {
   public:
     HardwareTimer(void) {};                                                   //default construct
     HardwareTimer(uint32_t instance);                                         //HardwareTimer construct
-    void start(void);                                                         //start timer
-    void stop(void);                                                          //stop timer
-    void refresh(void);                                                       //update some registers to restart counters
+
+    void timerStart(void);                                                    //start or resume timer
+    void timerStop(void);                                                     //stop timer
+    void startChannel(uint8_t channel);                                      //start or resume a timer channel
+    void stopChannel(uint8_t channel);                                       //stop or pause a timer channel (leaves timer running but channel output/interrupt is disabled
+
     void setPrescaler(uint16_t prescaler);                                    //set prescaler
-    void setCounter(uint16_t count);                                          //set counter
-    uint32_t getCounter(void);                                                //get counter
-    void setRepetitionValue(uint16_t repetition);                             //set repetition value
-    void setPeriodTime(uint32_t time, enum timeFormat format = FORMAT_MS);    //set timer period with the inital format
-    void setReloadValue(uint32_t value, enum timeFormat format = FORMAT_TICK);//set reload value (overflow)
-    uint32_t getReloadValue(void);                                            //get reload value (overflow)
-    void attachInterrupt(timerCallback_t callback, uint8_t channel = 0xff);   //attach callback for period/capture interrupt
-    void detachInterrupt(uint8_t channel = 0xff);                             //detach callback for period/capture interrupt
-    bool hasInterrupt(uint8_t channel);                                       //returns true if a timer rollover interrupt has already been set
-    bool hasInterrupt(void);                                                  //returns true if a timer rollover interrupt has already been set
-    void periodCallback(void);                                                //period callback handler
-    void captureCallback(uint8_t channel);                                    //capture callback handler
-    void setCaptureMode(uint32_t ulpin, uint8_t channel, captureMode mode);   //set cc mode
-    captureMode getCaptureMode(uint8_t channel);                              //get cc mode
+    uint32_t getPrescaler(void);                                               //get prescaler
+
+    void setAutoReloadValue(uint32_t value, enum timeFormat format = FORMAT_TICK);  //set reload value (overflow)
+    uint32_t getAutoReloadValue(enum timeFormat format = FORMAT_TICK);              //get reload value (overflow)
+
+    void setPWM(uint8_t channel, PinName pin, uint32_t freq,
+            uint32_t dutycycle, timerCallback_t PeriodCallback = nullptr,
+            timerCallback_t CompareCallback = nullptr);                       //set freq in Hz, dutycycle in percentage including both interrups in one function
+    void setPWM(uint8_t channel, uint32_t pin, uint32_t freq,
+            uint32_t dutycycle, timerCallback_t PeriodCallback = nullptr,
+            timerCallback_t CompareCallback = nullptr);                       //set freq in Hz, dutycycle in percentage including both interrups in one function
+
+    void setCounter(uint16_t count, enum timeFormat format = FORMAT_TICK);    //set counter
+    uint32_t getCounter(enum timeFormat format = FORMAT_TICK);                //get counter
+
+    void setChannelMode(uint8_t channel, captureMode mode, PinName pin = NC);
+    void setChannelMode(uint8_t channel, captureMode mode, uint32_t pin);
+
+    captureMode getChannelMode(uint8_t channel);
+
     void setPreloadARSEnable(bool val);                                       //set preload enable (ARSE) 
-    uint32_t getCaptureValue(uint8_t channel);                                //get timer channel capture value
-    uint32_t getTimerClkFreq(void);                                           //get timer clock frequency
-    void setInterruptPriority(uint32_t prePriority, uint32_t subPriority);    //set timer priority
+
+    uint32_t getCaptureCompare(uint8_t channel, enum captureCompareFormat format = CC_FORMAT_TICK);                              //get cc mode
+    void setCaptureCompare(uint8_t channel, uint32_t cvalue, enum captureCompareFormat format = CC_FORMAT_TICK);                  //set cc mode
+
+    void setInterruptPriority(uint32_t preemptPriority, uint32_t subPriority);  //set timer priority
+
+    /* update interrupt */
+    void attachInterrupt(timerCallback_t callback);                           //attach callback for update interrupt
+    void detachInterrupt(void);                                               //detach callback for update interrupt
+    bool hasInterrupt(void);                                                  //returns true if a timer interrupt has been set for update
+    /* capture/compare interrupt */
+    void attachInterrupt(timerCallback_t callback, uint8_t channel);   //attach callback for capture/compare interrupt
+    void detachInterrupt(uint8_t channel);                             //detach callback for capture/compare interrupt
+    bool hasInterrupt(uint8_t channel);                                       //returns true if a timer interrupt has already been set on capture/compare
+
+    void refresh(void);                                                       //update some registers to restart counters
+
+    uint32_t getTimerClkFreq(void);                                           //gets timer clock frequency in hertz
+
+    static void captureCompareCallback(SPL_TimerHandle_t *timer_handle);      //capture callback
+    static void updateCallback(SPL_TimerHandle_t *timer_handle);              //update callback
+
+    SPL_TimerHandle_t *getHandle();                                           //returns the handle address for SPL
+    int getChannel(uint32_t channel);
+    int getInterruptChannel(uint32_t channel);
+    int getLinkedChannel(uint32_t channel);
+
+#if defined(TIMER_CHCTL2_CH0NEN)
+    bool isLinkedChannel[TIMER_NUM_CHANNELS];
+#endif
 
   private:
-    uint32_t timerDevice;
-    bool isTimerActive;
-    timerPeriod_t timerPeriod;
-    timerCallback_t updateCallback;
-    timerCallback_t captureCallbacks[4] = {0};
-    captureMode _ChannelMode[4];
+    timerCallback_t timerCallbacks[1 + TIMER_NUM_CHANNELS];
+    captureMode _ChannelMode[TIMER_NUM_CHANNELS];
+    timerDevice_t _timerObj;
 };
 
-extern HardwareTimer *hardwaretimerObj[];
-extern timerhandle_t timerHandle;
+extern timerDevice_t *HWTimer_Handle[TIMER_NUM];
+
 extern timer_index_t get_timer_index(uint32_t htimer);
+
+#endif /* __cplusplus */
 
 #endif /* HARDWARETIMER_H */

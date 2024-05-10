@@ -30,16 +30,16 @@ OF SUCH DAMAGE.
 #ifndef UART_H
 #define UART_H
 
-/* Includes */
 #include "PinNames.h"
 #include "PeripheralNames.h"
+
+#include "gd32xxyy.h"
+#include "PeripheralPins.h"
+#include "pinmap.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "gd32xxyy.h"
-#include "PeripheralPins.h"
-#include "pinmap.h"
 
 #ifndef UART_IRQ_PRIORITY
 #define UART_IRQ_PRIORITY     1
@@ -89,6 +89,11 @@ extern "C" {
 #define USART_DMA_TRANSFER_ERROR  0x10U
 //#define USART_NOISE_ERROR     0x20U
 
+/* these are the same for all supported chip */
+#define USART_RX_MODE             ((uint32_t)USART_CTL0_REN)
+#define USART_TX_MODE             ((uint32_t)USART_CTL0_TEN)
+#define USART_RXTX_MODE           ((uint32_t)(USART_CTL0_REN | USART_CTL0_TEN))
+
 #define USART_TIMEOUT 1000
 
 /**
@@ -129,35 +134,45 @@ typedef enum {
 
 typedef struct serial_s serial_t;
 
-struct serial_s {
-  /* basic information */
-  UARTName uart;
-  uint8_t index;
-  PinName pin_tx;
-  PinName pin_rx;
-  /* config info */
+typedef struct {
   uint32_t baudrate;
   uint32_t databits;
   uint32_t stopbits;
   uint32_t parity;
-  /* operating params */
-  uint16_t rx_size;
+  uint32_t mode;
+  uint32_t hw_flow_control;
+  uint32_t oversample;
+} uart_params_t;
+
+typedef struct {
+  uint32_t instance;
+  uart_params_t params;
   uint8_t *tx_buffer_ptr;
+  uint16_t tx_size;
+  __IO uint16_t tx_count;
   uint8_t *rx_buffer_ptr;
-  /* for use in HardwareSerial */
+  uint16_t rx_size;
+  __IO uint16_t rx_count;
+  operation_state_enum global_state;
+  operation_state_enum rx_state;
+  __IO uint32_t error_code;
+} SPL_UartHandle_t;
+
+struct serial_s {
+  UARTName uart;
+  SPL_UartHandle_t handle;
+  int (*tx_callback)(serial_t *obj);
+  void (*rx_callback)(serial_t *obj);
+  PinName pin_tx;
+  PinName pin_rx;
+  uint8_t index;
+  uint8_t rvalue;
   uint8_t *rx_buff;
   uint8_t *tx_buff;
-  uint16_t tx_count;
-  uint16_t rx_count;
-  volatile uint16_t rx_tail;
-  volatile uint16_t tx_head;
+  uint16_t rx_tail;
+  uint16_t tx_head;
   volatile uint16_t rx_head;
   volatile uint16_t tx_tail;
-  uint32_t error_code;
-  operation_state_enum tx_state;
-  operation_state_enum rx_state;
-  void (*tx_callback)(serial_t *obj);
-  void (*rx_callback)(serial_t *obj);
 };
 
 typedef enum {
@@ -179,51 +194,52 @@ typedef enum {
   UART_NUM
 } uart_index_t;
 
-/* Initialize the serial peripheral. It sets the default parameters for serial peripheral, and configures its specifieds pins. */
-void serial_init(serial_t *obj, PinName pin_rx, PinName pin_tx);
-/* Enable serial peripheral after init or init + format. */
-void serial_enable(serial_t *obj);
-/* Release the serial peripheral, not currently invoked. It requires further resource management. */
+void serial_init(serial_t *obj, uint32_t bauderate, uint32_t databits, uint32_t parity, uint32_t stopbits);
 void serial_free(serial_t *obj);
-/* Configure the baud rate */
-void serial_baud(serial_t *obj, int baudrate);
-/* Configure the format. Set the number of bits, parity and the number of stop bits. */
-void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_bits);
-/* Get character. This is a blocking call, waiting for a character. */
-int serial_getc(serial_t *obj);
-/* Send a character. This is a blocking call, waiting for a peripheral to be available for writing. */
-void serial_putc(serial_t *obj, int c);
-/* Check if the serial peripheral is readable. */
-int serial_readable(serial_t *obj);
-/* Check if the serial peripheral is writable. */
-int serial_writable(serial_t *obj);
-/* Clear the serial peripheral. */
-void serial_clear(serial_t *obj);
-/* Attempts to determine if the serial peripheral is already in use for TX. */
-uint8_t serial_tx_active(serial_t *obj);
-/* Attempts to determine if the serial peripheral is already in use for RX. */
-uint8_t serial_rx_active(serial_t *obj);
-/* Attach UART transmit callback */
-void uart_attach_tx_callback(serial_t *obj, void(*callback)(serial_t *));
-/* Attach UART receive callback */
-void uart_attach_rx_callback(serial_t *obj, void(*callback)(serial_t *));
-/* Begin asynchronous TX transfer */
-int serial_transmit(serial_t *obj, const uint8_t *tx, size_t tx_length);
-/* Begin asynchronous RX transfer (enable interrupt for data collecting) */
-void serial_receive(serial_t *obj, const uint8_t *rx, size_t rx_length);
 
-/* non-blocking */
-//gd_status_enum serial_transmit_nb(serial_t *obj, const uint8_t *txData, size_t txSize);
-/* non-blocking */
-//gd_status_enum serial_receive_nb(serial_t *obj, uint8_t *rxData, size_t rxSize);
-/* tx transfer complete callback */
-//void uart_rx_transfercomplete(serial_t *obj);
-/* rx transfer complete callback */
-//void uart_tx_transfercomplete(serial_t *obj);
-/* error callback */
-//void uart_error_callback(struct serial_s *obj_s);
-/* IRQ Handler */
-//void UART_IRQHandler(struct serial_s *obj_s);
+size_t serial_write(serial_t *obj, uint8_t data, uint16_t size);
+int serial_getc(serial_t *obj, unsigned char *c);
+void uart_attach_tx_callback(serial_t *obj, int(*callback)(serial_t *));
+void uart_attach_rx_callback(serial_t *obj, void(*callback)(serial_t *));
+
+uint8_t serial_tx_active(serial_t *obj);
+uint8_t serial_rx_active(serial_t *obj);
+
+void serial_enable_tx(serial_t *obj);
+void serial_enable_rx(serial_t *obj);
+
+void serial_debug_init(void);
+size_t serial_debug_write(uint8_t *data, uint32_t size);
+
+/* TX transfer (blocking) */
+gd_status_enum serial_transmit(SPL_UartHandle_t *uart_handle, uint8_t *pData, uint16_t size, uint32_t timeout);
+/* RX transfer (blocking) */
+gd_status_enum serial_receive(SPL_UartHandle_t *uart_handle, uint8_t *pData, uint16_t size, uint32_t timeout);
+/* TX transfer (non-blocking) */
+gd_status_enum IT_serial_transmit(SPL_UartHandle_t *uart_handle, uint8_t *pData, uint16_t size);
+/* RX transfer (non-blocking) */
+gd_status_enum IT_serial_receive(SPL_UartHandle_t *uart_handle, uint8_t *pData, uint16_t size);
+
+
+/* extended and helper functions */
+gd_status_enum IT_transmit(SPL_UartHandle_t *uart_handle);
+gd_status_enum IT_receive(SPL_UartHandle_t *uart_handle);
+gd_status_enum serial_wait_flag_timeout(SPL_UartHandle_t *uart_handle,
+    uint32_t flag, FlagStatus status, uint32_t timeout);
+
+void UART_TX_TCCallback(SPL_UartHandle_t *uart_handle);
+void UART_ErrorCallback(SPL_UartHandle_t *uart_handle);
+
+void UART_RX_TCCallback(SPL_UartHandle_t *uart_handle);
+void UART_TX_TCCallback(SPL_UartHandle_t *uart_handle);
+
+void serial_rx_transfer_end(SPL_UartHandle_t *uart_handle);
+void IT_serial_transmit_end(SPL_UartHandle_t *uart_handle);
+
+void UART_IRQHandler(SPL_UartHandle_t *uart_handle);
+
+void serial_half_duplex_enable_tx(SPL_UartHandle_t *uart_handle);
+void serial_half_duplex_enable_rx(SPL_UartHandle_t *uart_handle);
 
 #ifdef __cplusplus
 }

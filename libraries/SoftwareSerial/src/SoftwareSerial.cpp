@@ -43,12 +43,6 @@
   #define TIMER_SERIAL TIMER6
   #elif defined(TIMER5)
   #define TIMER_SERIAL TIMER5
-  #elif defined(TIMER16)
-  #define TIMER_SERIAL TIMER16
-  #elif defined(TIMER15)
-  #define TIMER_SERIAL TIMER15
-  #elif defined(TIMER14)
-  #define TIMER_SERIAL TIMER14
   #elif defined(TIMER13)
   #define TIMER_SERIAL TIMER13
   #elif defined(TIMER12)
@@ -107,7 +101,7 @@ SoftwareSerial::SoftwareSerial(uint16_t receivePin, uint16_t transmitPin, bool i
 void SoftwareSerial::setSpeed(uint32_t speed)
 {
   if (speed != cur_speed) {
-    timer.stop();
+    timer.timerStop();
     if (speed != 0) {
       // Disable the timer
       uint32_t clock_rate, cmp_value;
@@ -123,10 +117,10 @@ void SoftwareSerial::setSpeed(uint32_t speed)
         }
       } while (cmp_value >= UINT16_MAX);
       timer.setPrescaler(pre);
-      timer.setReloadValue(cmp_value);
+      timer.setAutoReloadValue(cmp_value);
       timer.setCounter(0);
       timer.attachInterrupt(&handleInterrupt);
-      timer.start();
+      timer.timerStart();
       timer.refresh();
     } else {
       timer.detachInterrupt();

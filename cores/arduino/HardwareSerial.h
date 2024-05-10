@@ -21,12 +21,13 @@
   Modified 3 December 2013 by Matthijs Kooijman
 */
 
-#ifndef SerialUart_h
-#define SerialUart_h
+#ifndef HardwareSerial_h
+#define HardwareSerial_h
 
 #include <inttypes.h>
 
-#include "api/HardwareSerial.h"
+#include "Arduino.h"
+#include "api/Stream.h"
 #include "uart.h"
 
 
@@ -58,30 +59,35 @@ typedef uint16_t rx_buffer_index_t;
 typedef uint8_t rx_buffer_index_t;
 #endif
 
-typedef struct {
-  unsigned char buffer[SERIAL_RX_BUFFER_SIZE];
-  volatile int head;
-  volatile int tail;
-} ring_buffer_r;
+//typedef struct {
+//  unsigned char buffer[SERIAL_RX_BUFFER_SIZE];
+//  volatile int head;
+//  volatile int tail;
+//} ring_buffer_r;
 
-typedef struct {
-  unsigned char buffer[SERIAL_TX_BUFFER_SIZE];
-  volatile int head;
-  volatile int tail;
-} ring_buffer_t;
+//typedef struct {
+//  unsigned char buffer[SERIAL_TX_BUFFER_SIZE];
+//  volatile int head;
+//  volatile int tail;
+//} ring_buffer_t;
 
-//#define SERIAL_8N1  0x06
-//#define SERIAL_8N2  0x0E
-//#define SERIAL_7E1  0x24
-//#define SERIAL_8E1  0x26
-//#define SERIAL_7E2  0x2C
-//#define SERIAL_8E2  0x2E
-//#define SERIAL_7O1  0x34
-//#define SERIAL_8O1  0x36
-//#define SERIAL_7O2  0x3C
-//#define SERIAL_8O2  0x3E
+typedef enum {
+  UART_HALFDUPLEX_DISABLE,
+  UART_HALFDUPLEX_ENABLE
+} uart_halfduplex_flag;
 
-class SerialUart : public arduino::HardwareSerial
+#define SERIAL_8N1  0x06
+#define SERIAL_8N2  0x0E
+#define SERIAL_7E1  0x24
+#define SERIAL_8E1  0x26
+#define SERIAL_7E2  0x2C
+#define SERIAL_8E2  0x2E
+#define SERIAL_7O1  0x34
+#define SERIAL_8O1  0x36
+#define SERIAL_7O2  0x3C
+#define SERIAL_8O2  0x3E
+
+class HardwareSerial : public Stream
 {
   protected:
     // Has any byte been written to the UART since begin()
@@ -94,17 +100,22 @@ class SerialUart : public arduino::HardwareSerial
     serial_t _serial;
 
   public:
-    SerialUart(uint8_t rx, uint8_t tx, int uart_index);
+    HardwareSerial(uint32_t rx, uint32_t tx);
+    HardwareSerial(PinName rx, PinName tx);
+    HardwareSerial(UARTName periph, uart_halfduplex_flag hdFlag = UART_HALFDUPLEX_DISABLE);
+    HardwareSerial(uint32_t rxtx);
+    HardwareSerial(PinName rxtx);
     void begin(unsigned long baud)
     {
       begin(baud, SERIAL_8N1);
     }
-    void begin(unsigned long baud, uint16_t config);
+    void begin(unsigned long baud, uint8_t config);
     void end();
-    int available(void);
-    int peek(void);
-    int read(void);
-    void flush(void);
+    virtual int available(void);
+    virtual int peek(void);
+    virtual int read(void);
+    virtual void flush(void);
+    virtual size_t write(uint8_t);
     inline size_t write(unsigned long n)
     {
       return write((uint8_t)n);
@@ -121,74 +132,36 @@ class SerialUart : public arduino::HardwareSerial
     {
       return write((uint8_t)n);
     }
-    size_t write(uint8_t c);
     using Print::write; // pull in write(str) and write(buf, size) from Print
     operator bool()
     {
       return true;
     }
-
     int availableForWrite(void);
+    // enable halfduplex mode by setting rx pin to NC
+    // needs to be done before the call to begin()
+    void setHalfDuplex(void);
+    bool isHalfDuplex(void) const;
+    void enableHalfDuplexRx(void);
+    void setRx(uint32_t rx);
+    void setTx(uint32_t tx);
+    void setRx(PinName rx);
+    void setTx(PinName tx);
     // Interrupt handlers
     static void _rx_complete_irq(serial_t *obj);
-    static void _tx_complete_irq(serial_t *obj);
-
-    // helper func for linker
-    static int availableSerialN(unsigned n);
+    static int _tx_complete_irq(serial_t *obj);
 
   private:
+    bool _rx_enabled;
+    uint8_t _config;
+    unsigned long _baud;
+    void init(PinName rx, PinName tx);
 };
 
-/**
- * ‘Serial’ is for the CDC-ACM if enabled. Hardware serial peripherals begin at
- * ‘Serial1’.
- */
-#ifndef DEFAULT_HWSERIAL_INSTANCE 
-#define DEFAULT_HWSERIAL_INSTANCE 1
-#endif
+extern HardwareSerial Serial1;
+extern HardwareSerial Serial2;
+extern HardwareSerial Serial3;
+extern HardwareSerial Serial4;
+extern HardwareSerial Serial5;
 
-/* Macro-define Serial to actual serial instance. We don't yet have a selection mechanism, use the first one. */
-#if !defined(USBD_USE_CDC)
-#if !defined(Serial)
-#if DEFAULT_HWSERIAL_INSTANCE == 1
-#define Serial Serial1
-#define HAVE_HWSERIAL1
-#elif DEFAULT_HWSERIAL_INSTANCE == 2
-#define Serial Serial2
-#define HAVE_HWSERIAL2
-#elif DEFAULT_HWSERIAL_INSTANCE == 3
-#define Serial Serial3
-#define HAVE_HWSERIAL3
-#elif DEFAULT_HWSERIAL_INSTANCE == 4
-#define Serial Serial4
-#define HAVE_HWSERIAL4
-#elif DEFAULT_HWSERIAL_INSTANCE == 5
-#define Serial Serial5
-#define HAVE_HWSERIAL5
-#endif /* DEFAULT_HWSERIAL_INSTANCE */
-#endif /* Serial */
-#endif /* USBD_USE_CDC */
-
-#if defined(HAVE_HWSERIAL1)
-extern SerialUart Serial1;
-#endif
-
-#if defined(HAVE_HWSERIAL2)
-extern SerialUart Serial2;
-#endif
-
-#if defined(HAVE_HWSERIAL3)
-extern SerialUart Serial3;
-#endif
-
-#if defined(HAVE_HWSERIAL4)
-extern SerialUart Serial4;
-#endif
-
-#if defined(HAVE_HWSERIAL5)
-extern SerialUart Serial5;
-#endif
-
-extern void serialEventRun(void) __attribute__((weak));
-
-#endif
+#endif  /* HardwareSerial_h */

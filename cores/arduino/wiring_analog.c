@@ -30,6 +30,8 @@ uint32_t gpioOutputPinIsConfigured[GPIO_PORT_NUM] = { 0 };
 #define MAX_PWM_RESOLUTION  16
 #define MAX_ADC_RESOLUTION  12
 
+static uint32_t _writeFreq = PWM_FREQUENCY;
+
 static uint32_t analogRead_resolution = ADC_RESOLUTION;
 static uint32_t analogWrite_resolution = PWM_RESOLUTION;
 static uint32_t _ADCResolution = MAX_ADC_RESOLUTION;
@@ -39,7 +41,7 @@ static uint32_t analogOut_period_us = PWM_FREQUENCY;
 void analogReference(uint8_t mode)
 {
   // TODO: implement this
-  (void) mode;
+  (void)mode;
 }
 
 static inline uint32_t mapResolution(uint32_t value, uint32_t from, uint32_t to)
@@ -108,17 +110,7 @@ void analogWrite(pin_size_t pin, int value)
       }
       ulValue = mapResolution(value, analogWrite_resolution, internalAnalogOut_resolution);
       /* handle special cases: 100% off and 100% on */
-      if (ulValue == 0) {
-        stop_pwm(pin);
-        pinMode(pin, OUTPUT);
-        digitalWrite(pin, LOW);
-      } else if (ulValue == UINT16_MAX) {
-        stop_pwm(pin);
-        pinMode(pin, OUTPUT);
-        digitalWrite(pin, HIGH);
-      } else {
-        set_pwm_value_with_base_period(pin, analogOut_period_us, ulValue);
-      }
+      pwm_start(pn, _writeFreq, value, internalAnalogOut_resolution);
     } else {
       /* default to digital write */
       pinMode(pin, OUTPUT);

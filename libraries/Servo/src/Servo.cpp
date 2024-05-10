@@ -55,7 +55,7 @@ static void Servo_PeriodElapsedCallback()
   }
   timerChannel[timer_id]++;   // increment to the next channel
   if (timerChannel[timer_id] < ServoCount && timerChannel[timer_id] < SERVOS_PER_TIMER) {
-    TimerServo.setReloadValue(servos[timerChannel[timer_id]].ticks);
+    TimerServo.setAutoReloadValue(servos[timerChannel[timer_id]].ticks);
     CumulativeCountSinceRefresh += servos[timerChannel[timer_id]].ticks;
     if (servos[timerChannel[timer_id]].Pin.isActive == true) {
       digitalWrite(servos[timerChannel[timer_id]].Pin.nbr, HIGH);   // its an active channel so pulse it high
@@ -64,7 +64,7 @@ static void Servo_PeriodElapsedCallback()
     // finished all channels so wait for the refresh period to expire before starting over
     if (CumulativeCountSinceRefresh + 4 < REFRESH_INTERVAL) {
       // allow a few ticks to ensure the next OCR1A not missed
-      TimerServo.setReloadValue(REFRESH_INTERVAL - CumulativeCountSinceRefresh);
+      TimerServo.setAutoReloadValue(REFRESH_INTERVAL - CumulativeCountSinceRefresh);
     } else {
       // generate update to restart immediately from the beginning with the 1st servo
       TimerServo.refresh();
@@ -76,13 +76,14 @@ static void Servo_PeriodElapsedCallback()
 // Servo Timer init
 static void TimerServoInit()
 {
-  uint32_t freq = TimerServo.getTimerClkFreq();
+  uint32_t freq = TimerServo.getTimerClkFreq() / 1000000;
 
-  TimerServo.setPrescaler(freq / 1000000 - 1);
-  TimerServo.setReloadValue(REFRESH_INTERVAL);
+  TimerServo.setChannelMode(1, OC_TIMING, NC);
+  TimerServo.setPrescaler(freq);
+  TimerServo.setAutoReloadValue(REFRESH_INTERVAL);
   TimerServo.attachInterrupt(Servo_PeriodElapsedCallback);
   TimerServo.setPreloadARSEnable(false);
-  TimerServo.start();
+  TimerServo.timerStart();
 }
 
 // Check Timer active status
@@ -139,7 +140,7 @@ void Servo::detach()
   servos[this->servoIndex].Pin.isActive = false;
 
   if (isTimerActive() == false) {
-    TimerServo.stop();
+    TimerServo.timerStop();
   }
 }
 

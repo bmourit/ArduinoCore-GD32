@@ -26,7 +26,7 @@ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWIS
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 */
-
+#include "gd_debug.h"
 #include "uart.h"
 #include "Arduino.h"
 
@@ -50,7 +50,19 @@ extern "C" {
 #error "We don't understand this USART peripheral."
 #endif
 
-struct serial_s *obj_s_buf[UART_NUM] = { NULL };
+#if !defined(UART_DEBUG)
+#if defined(PIN_SERIAL_TX)
+#define UART_DEBUG          pinmap_peripheral(DIGITAL_TO_PINNAME(PIN_SERIAL_TX), PinMap_UART_TX)
+#define PINNAME_TX_DEBUG    DIGITAL_TO_PINNAME(PIN_SERIAL_TX)
+#else
+#define UART_DEBUG          NP
+#define PINNAME_TX_DEBUG    NC
+#endif
+#endif
+
+#if !defined(UART_DEBUG_BAUDRATE)
+#define UART_DEBUG_BAUDRATE 9600
+#endif
 
 static rcu_periph_enum usart_clk[UART_NUM] = {
   RCU_USART0,
@@ -71,57 +83,131 @@ static rcu_periph_enum usart_clk[UART_NUM] = {
 };
 
 static IRQn_Type usart_irq_n[UART_NUM] = {
-	USART0_IRQn,
-	USART1_IRQn,
+  USART0_IRQn,
+  USART1_IRQn,
 #ifdef USART2
-	USART2_IRQn,
+  USART2_IRQn,
 #endif
 #ifdef UART3
-	UART3_IRQn,
+  UART3_IRQn,
 #elif USART3
-	USART3_IRQn,
+  USART3_IRQn,
 #endif
 #ifdef UART4
-	UART4_IRQn
+  UART4_IRQn
 #elif USART4
-	USART4_IRQn
+  USART4_IRQn
 #endif
 };
 
-#define GET_SERIAL_S(obj) (obj_s_buf[(obj->index)])
+static SPL_UartHandle_t *uart_handlers[UART_NUM] = {NULL};
+
+static serial_t serial_debug = { .uart = NP, .index = UART_NUM };
+
+serial_t *get_serial_object(SPL_UartHandle_t *uart_handle)
+{
+	struct serial_s *obj_s;
+	serial_t *obj;
+
+	obj_s = (struct serial_s *)((char *)uart_handle - offsetof(struct serial_s, handle));
+	obj = (serial_t *)((char *)obj_s - offsetof(serial_t, uart));
+
+	return (obj);
+}
+
+static gd_status_enum usart_half_duplex_init(SPL_UartHandle_t *uart_handle)
+{
+	if (uart_handle == NULL) {
+		return GD_ERROR;
+	}
+
+	uart_handle->global_state = OP_STATE_BUSY;
+
+	usart_disable(uart_handle->instance);
+	usart_word_length_set(uart_handle->instance, uart_handle->params.databits);
+	usart_stop_bit_set(uart_handle->instance, uart_handle->params.stopbits);
+	usart_parity_config(uart_handle->instance, uart_handle->params.parity);
+
+	switch (uart_handle->params.mode) {
+		case USART_RXTX_MODE:
+	 		usart_receive_config(uart_handle->instance, USART_RECEIVE_ENABLE);
+	 		usart_transmit_config(uart_handle->instance, USART_TRANSMIT_ENABLE);
+	 		break;
+		case USART_RX_MODE:
+	 		usart_receive_config(uart_handle->instance, USART_RECEIVE_ENABLE);
+	 		break;
+		case USART_TX_MODE:
+	 		usart_transmit_config(uart_handle->instance, USART_TRANSMIT_ENABLE);
+	 		break;
+	 	default:
+	 		usart_receive_config(uart_handle->instance, USART_RECEIVE_DISABLE);
+	 		usart_transmit_config(uart_handle->instance, USART_RECEIVE_DISABLE);
+	}
+	usart_baudrate_set(uart_handle->instance, uart_handle->params.baudrate);
+
+	usart_lin_mode_disable(uart_handle->instance);
+	usart_synchronous_clock_disable(uart_handle->instance);
+	usart_smartcard_mode_disable(uart_handle->instance);
+	usart_irda_mode_disable(uart_handle->instance);
+	usart_halfduplex_enable(uart_handle->instance);
+
+	usart_enable(uart_handle->instance);
+
+	uart_handle->error_code = USART_NO_ERROR;
+	uart_handle->global_state = OP_STATE_READY;
+	uart_handle->rx_state = OP_STATE_READY;
+
+	return GD_OK;
+}
 
 /**
  * Initialize the USART peripheral.
  *
  * @param obj_s The serial object
  */
-static void usart_init(struct serial_s *obj_s)
+static gd_status_enum usart_init(SPL_UartHandle_t *uart_handle)
 {
-	if (obj_s->index >= UART_NUM) {
-		return;
+	if (uart_handle == NULL) {
+		return GD_ERROR;
 	}
 
-	/* USART configuration */
-	usart_deinit(obj_s->uart);
-	usart_word_length_set(obj_s->uart, obj_s->databits);
-	usart_baudrate_set(obj_s->uart, obj_s->baudrate);
-	usart_stop_bit_set(obj_s->uart, obj_s->stopbits);
-	usart_parity_config(obj_s->uart, obj_s->parity);
-	usart_receive_config(obj_s->uart, USART_RECEIVE_ENABLE);
-	usart_transmit_config(obj_s->uart, USART_TRANSMIT_ENABLE);
-}
+	uart_handle->global_state = OP_STATE_BUSY;
 
-/**
- * @brief     transmitter for half duplex mode. NOOP in regular mode
- * @param[in] obj : serial object pointer
- * @retval    none
- */
-void serial_enable(serial_t *obj)
-{
-	struct serial_s *p_obj = GET_SERIAL_S(obj);
-	usart_receive_config(p_obj->uart, USART_RECEIVE_ENABLE);
-  usart_transmit_config(p_obj->uart, USART_TRANSMIT_ENABLE);
-  usart_enable(p_obj->uart);
+	usart_disable(uart_handle->instance);
+	usart_word_length_set(uart_handle->instance, uart_handle->params.databits);
+	usart_stop_bit_set(uart_handle->instance, uart_handle->params.stopbits);
+	usart_parity_config(uart_handle->instance, uart_handle->params.parity);
+
+	switch (uart_handle->params.mode) {
+		case USART_RXTX_MODE:
+	 		usart_receive_config(uart_handle->instance, USART_RECEIVE_ENABLE);
+	 		usart_transmit_config(uart_handle->instance, USART_TRANSMIT_ENABLE);
+	 		break;
+		case USART_RX_MODE:
+	 		usart_receive_config(uart_handle->instance, USART_RECEIVE_ENABLE);
+	 		break;
+		case USART_TX_MODE:
+	 		usart_transmit_config(uart_handle->instance, USART_TRANSMIT_ENABLE);
+	 		break;
+	 	default:
+	 		usart_receive_config(uart_handle->instance, USART_RECEIVE_DISABLE);
+	 		usart_transmit_config(uart_handle->instance, USART_RECEIVE_DISABLE);
+	}
+	usart_baudrate_set(uart_handle->instance, uart_handle->params.baudrate);
+
+	usart_lin_mode_disable(uart_handle->instance);
+	usart_synchronous_clock_disable(uart_handle->instance);
+	usart_smartcard_mode_disable(uart_handle->instance);
+	usart_halfduplex_disable(uart_handle->instance);
+	usart_irda_mode_disable(uart_handle->instance);
+
+	usart_enable(uart_handle->instance);
+
+	uart_handle->error_code = USART_NO_ERROR;
+	uart_handle->global_state = OP_STATE_READY;
+	uart_handle->rx_state = OP_STATE_READY;
+
+	return GD_OK;
 }
 
 /**
@@ -132,17 +218,33 @@ void serial_enable(serial_t *obj)
  * @param tx  The TX pin name
  * @param rx  The RX pin name
  */
-void serial_init(serial_t *obj, PinName tx, PinName rx)
+void serial_init(serial_t *obj, uint32_t baudrate, uint32_t databits, uint32_t parity, uint32_t stopbits)
 {
-  //struct serial_s *p_obj = obj; //GET_SERIAL_S(obj);
   if (obj == NULL) {
     return;
   }
 
-	UARTName uart_tx = (UARTName)pinmap_peripheral(tx, PinMap_UART_TX);
-	UARTName uart_rx = (UARTName)pinmap_peripheral(rx, PinMap_UART_RX);
+	SPL_UartHandle_t *uart_handle = &(obj->handle);
+
+	UARTName uart_tx = (UARTName)pinmap_peripheral(obj->pin_tx, PinMap_UART_TX);
+	UARTName uart_rx = (UARTName)pinmap_peripheral(obj->pin_rx, PinMap_UART_RX);
+
+	if (uart_tx == NP) {
+		gd_debug("ERROR: [U(S)ART] TX pin has no peripheral!\n");
+		return;
+	}
+
+	if ((obj->pin_rx != NC) && (uart_rx == NP)) {
+		gd_debug("ERROR: [U(S)ART] RX pin has no peripheral!\n");
+		return;
+	}
 
 	obj->uart = (UARTName)pinmap_merge(uart_tx, uart_rx);
+
+  if (obj->uart == NP) {
+    gd_debug("ERROR: [U(S)ART] RX and TX pins and peripherals mismatch!\n");
+    return;
+  }
 
 	/* set uart index */
 	switch (obj->uart) {
@@ -178,222 +280,191 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
 	rcu_periph_clock_enable(usart_clk[obj->index]);
 
 	/* configure the pins */
-	pinmap_pinout(tx, PinMap_UART_TX);
-  pinmap_pinout(rx, PinMap_UART_RX);
+	pinmap_pinout(obj->pin_tx, PinMap_UART_TX);
+	if (uart_rx != NP) {
+  	pinmap_pinout(obj->pin_rx, PinMap_UART_RX);
+  }
 
-	obj->baudrate = 9600U;
-	obj->databits = USART_WL_8BIT;
-	obj->stopbits = USART_STB_1BIT;
-	obj->parity = USART_PM_NONE;
-	obj->pin_tx = tx;
-	obj->pin_rx = rx;
-	obj->tx_state = OP_STATE_BUSY;
-	obj->rx_state = OP_STATE_BUSY;
+  uart_handlers[obj->index] = uart_handle;
+  uart_handle->instance = (UARTName)(obj->uart);
+	uart_handle->params.baudrate = baudrate;
+	uart_handle->params.databits = databits;
+	uart_handle->params.stopbits = stopbits;
+	uart_handle->params.parity = parity;
+	uart_handle->params.mode = USART_RXTX_MODE;
+	uart_handle->params.hw_flow_control = 0x0U;
+	uart_handle->params.oversample = 0x0U;
 
-	obj_s_buf[obj->index] = obj;
-	struct serial_s *p_obj = GET_SERIAL_S(obj);
-	usart_init(p_obj);
-
-	p_obj->tx_state = OP_STATE_READY;
-	p_obj->rx_state = OP_STATE_READY;
+	if (uart_rx == NP) {
+		if (usart_half_duplex_init(uart_handle) != GD_OK) {
+			return;
+		}
+	} else if (usart_init(uart_handle) != GD_OK) {
+		return;
+	}
 }
 
-/**
- * Release the serial peripheral, not currently invoked. It requires further
- *  resource management.
- *
- * @param obj The serial object
- */
+static void serial_deinit(SPL_UartHandle_t *uart_handle)
+{
+	uart_handle->global_state = OP_STATE_BUSY;
+
+  usart_disable(uart_handle->instance);
+
+  uart_handle->error_code = USART_NO_ERROR;
+  uart_handle->global_state = OP_STATE_RESET;
+  uart_handle->rx_state = OP_STATE_RESET;
+}
+
+/*!
+ \brief  frees (deinitializes) the uart
+ \param  obj: pointer to serial_t structure
+ \retval none
+*/
 void serial_free(serial_t *obj)
 {
-	struct serial_s *p_obj = GET_SERIAL_S(obj);
+	uint32_t uartReg = 0U;
 
-  /* reset usart/uart and disable clock */
-	usart_deinit(p_obj->uart);
-	rcu_periph_clock_disable(usart_clk[p_obj->index]);
-
-  p_obj->tx_state = OP_STATE_BUSY;
-  usart_disable(p_obj->uart);
-
-  p_obj->error_code = USART_NO_ERROR;
-  p_obj->tx_state = OP_STATE_RESET;
-  p_obj->rx_state = OP_STATE_RESET;
-
-	/* reset the gpio state */
-#if defined(GD32F30x) || defined(GD32F10x)|| defined(GD32E50X)
-	pin_function(p_obj->pin_tx, PIN_PUPD_NONE);
-	pin_function(p_obj->pin_rx, PIN_PUPD_NONE);
-#else
-	pin_function(p_obj->pin_tx, PIN_MODE_INPUT);
-	pin_function(p_obj->pin_rx, PIN_MODE_INPUT);
+	switch (obj->index) {
+#if defined(USART0)
+	case UART0_INDEX:
+		uartReg = USART0;
+		break;
 #endif
-}
+#if defined(USART1)
+	case UART1_INDEX:
+		uartReg = USART1;
+		break;
+#endif
+#if defined(USART2)
+	case UART2_INDEX:
+		uartReg = USART2;
+		break;
+#endif
+#if defined(UART3)
+	case UART3_INDEX:
+		uartReg = UART3;
+		break;
+#endif
+#if defined(USART3)
+	case UART3_INDEX:
+		uartReg = USART3;
+		break;
+#endif
+#if defined(UART4)
+	case UART4_INDEX:
+		uartReg = UART4;
+		break;
+#endif
+#if defined(USART4)
+	case UART4_INDEX:
+		uartReg = USART4;
+		break;
+#endif
+	}
 
-/**
- * Configure the baud rate
- *
- * @param obj      The serial object
- * @param baudrate The baud rate to be configured
- */
-void serial_baud(serial_t *obj, int baudrate)
-{
-	uint16_t uen_flag = 0U;
-	struct serial_s *p_obj = GET_SERIAL_S(obj);
+	/* reset uart and disable clock */
+	if (uartReg != 0U) {
+		usart_deinit(uartReg);
+	}
 
-	/* store the uen flag */
-	uen_flag = USART_CTL0(p_obj->uart) & USART_CTL0_UEN;
+	rcu_periph_clock_disable(usart_clk[obj->index]);
+	serial_deinit(uart_handlers[obj->index]);
 
-	/* disable the uart first */
-	usart_disable(p_obj->uart);
-	usart_baudrate_set(p_obj->uart, baudrate);
-
-	p_obj->baudrate = baudrate;
-
-	/* restore the uen flag */
-	if (RESET != uen_flag) {
-		usart_enable(p_obj->uart);
+	/* free the uart debug for init */
+	if (serial_debug.index == obj->index) {
+		serial_debug.index = UART_NUM;
 	}
 }
 
-/**
- * Configure the format. Set the number of bits, parity and the number of stop bits
- *
- * @param obj       The serial object
- * @param data_bits The number of data bits
- * @param parity    The parity
- * @param stop_bits The number of stop bits
- */
-void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_bits)
+/*!
+  \brief  write the data on the uart
+  \param  obj : pointer to serial_t structure
+  \param  data : byte to write
+  \param  size : number of data to write
+  \retval returns the number of bytes written
+*/
+size_t serial_write(serial_t *obj, uint8_t data, uint16_t size)
 {
-	uint16_t uen_flag = 0U;
-	struct serial_s *p_obj = GET_SERIAL_S(obj);
-
-	/* store the uen flag */
-	uen_flag = USART_CTL0(p_obj->uart) & USART_CTL0_UEN;
-
-	/* disable the UART clock first */
-	usart_disable(p_obj->uart);
-
-	/* configurate the UART parity */
-	switch (parity) {
-		case ParityOdd:
-			p_obj->parity = USART_PM_ODD;
-			break;
-		case ParityEven:
-			p_obj->parity = USART_PM_EVEN;
-			break;
-		case ParityNone:
-		case ParityForced0:
-		case ParityForced1:
-		default:
-			p_obj->parity = USART_PM_NONE;
-			break;
-	}
-	usart_parity_config(p_obj->uart, p_obj->parity);
-
-	if (p_obj->parity == USART_PM_NONE) {
-		switch (data_bits) {
-			case 9:
-				p_obj->databits = USART_WL_9BIT;
-				break;
-			case 8:
-				p_obj->databits = USART_WL_8BIT;
-				break;
-			case 7:
-				return;
-		}
-		usart_word_length_set(p_obj->uart, p_obj->databits);
+	if (serial_transmit(uart_handlers[obj->index], &data, size, USART_TIMEOUT) == GD_OK) {
+		return size;
 	} else {
-		switch (data_bits) {
-			case 9:
-				return;
-			case 8: 
-				p_obj->databits = USART_WL_9BIT;
-				break;
-			case 7:
-				p_obj->databits = USART_WL_8BIT;
-				break;
+		return 0;
+	}
+}
+
+void serial_debug_init(void)
+{
+	if (UART_DEBUG != NP) {
+		serial_debug.pin_rx = pinmap_pin(UART_DEBUG, PinMap_UART_RX);
+#if defined(PINNAME_TX_DEBUG)
+		serial_debug.pin_tx = PINNAME_TX_DEBUG;
+#else
+		serial_debug.pin_tx = pinmap_pin(UART_DEBUG, PinMap_UART_TX);
+#endif
+		serial_init(&serial_debug, UART_DEBUG_BAUDRATE, USART_WL_8BIT, USART_PM_NONE, USART_STB_1BIT);
+	}
+}
+
+size_t serial_debug_write(uint8_t *data, uint32_t size)
+{
+	if (UART_DEBUG == NP) {
+		return 0;
+	}
+
+	IRQn_Type irq = 0;
+
+	if (serial_debug.index >= UART_NUM) {
+		for (serial_debug.index = 1; serial_debug.index < UART_NUM; serial_debug.index++) {
+			if (uart_handlers[serial_debug.index] != NULL) {
+				if (UART_DEBUG == uart_handlers[serial_debug.index]->instance) {
+					break;
+				}
+			}
 		}
-		usart_word_length_set(p_obj->uart, p_obj->databits);
+
+		if (serial_debug.index >= UART_NUM) {
+			serial_debug_init();
+			if (serial_debug.index >= UART_NUM) {
+				return 0;
+			}
+		} else {
+			serial_t *obj = get_serial_object(uart_handlers[serial_debug.index]);
+			if (obj) {
+				irq = usart_irq_n[obj->index];
+			}
+		}
 	}
+	NVIC_DisableIRQ(irq);
 
-	if (stop_bits == 2) {
-		p_obj->stopbits = USART_STB_2BIT;
-	} else {
-		p_obj->stopbits = USART_STB_1BIT;
+	while (serial_transmit(uart_handlers[serial_debug.index], data, size, USART_TIMEOUT) != GD_OK) {
+		for (int i = 0; i < USART_TIMEOUT; i++);
+		size = 0;
+		break;
 	}
-	usart_stop_bit_set(p_obj->uart, p_obj->stopbits);
+	NVIC_EnableIRQ(irq);
 
-	/* restore the uen flag */
-	if (RESET != uen_flag) {
-		usart_enable(p_obj->uart);
-	}
+	return size;
 }
 
-/**
- * @brief   Reads a rx byte from uart (blocking call)
- * @param   obj serial object pointer
- * @retval  returns the last character received
- */
-int serial_getc(serial_t *obj)
+/*!
+ \brief   reads a rx byte from uart
+ \param   obj: serial object pointer
+ \retval  returns the last character received
+*/
+int serial_getc(serial_t *obj, unsigned char *c)
 {
-  struct serial_s *p_obj = GET_SERIAL_S(obj);
+  if (obj == NULL) {
+  	return -1;
+  }
 
-	return (int)(usart_data_receive(p_obj->uart) & BITS(0, 7 + (p_obj->databits >> 12)));
-}
+  if (serial_rx_active(obj)) {
+  	return -1;
+  }
 
-/**
- * Send a character. This is a blocking call, waiting for a peripheral to be available
- *  for writing
- *
- * @param obj The serial object
- * @param c   The character to be sent
- */
-void serial_putc(serial_t *obj, int c)
-{
-	struct serial_s *p_obj = GET_SERIAL_S(obj);
+  *c = (unsigned char)(obj->rvalue);
+  IT_serial_receive(uart_handlers[obj->index], &(obj->rvalue), 1);
 
-	while (!serial_writable(obj));
-	usart_data_transmit(p_obj->uart, (int)((c) & BITS(0, 7 + (p_obj->databits >> 12))));
-}
-
-/**
- * Check if the serial peripheral is readable
- *
- * @param obj The serial object
- * @return Non-zero value if a character can be read, 0 if nothing to read
- */
-int serial_readable(serial_t *obj)
-{
-	struct serial_s *p_obj = GET_SERIAL_S(obj);
-
-	return (usart_flag_get(p_obj->uart, USART_FLAG_RBNE) != RESET) ? 1 : 0;
-}
-
-/**
- * Check if the serial peripheral is writable
- *
- * @param obj The serial object
- * @return Non-zero value if a character can be written, 0 otherwise.
- */
-int serial_writable(serial_t *obj)
-{
-	struct serial_s *p_obj = GET_SERIAL_S(obj);
-
-	return (usart_flag_get(p_obj->uart, USART_FLAG_TBE) != RESET) ? 1 : 0;
-}
-
-/**
- * Clear the serial peripheral
- *
- * @param obj The serial object
- */
-void serial_clear(serial_t *obj)
-{
-	struct serial_s *p_obj = GET_SERIAL_S(obj);
-
-	p_obj->tx_count = 0U;
-	p_obj->rx_count = 0U;
+	return 0;
 }
 
 /**
@@ -403,9 +474,7 @@ void serial_clear(serial_t *obj)
  */
 uint8_t serial_tx_active(serial_t *obj)
 {
-	struct serial_s *p_obj = GET_SERIAL_S(obj);
-
-	return ((p_obj->tx_state == OP_STATE_BUSY_TX) ? 1 : 0);
+	return ((uart_handlers[obj->index]->global_state == OP_STATE_BUSY_TX) ? 1 : 0);
 }
 
 /**
@@ -415,9 +484,7 @@ uint8_t serial_tx_active(serial_t *obj)
  */
 uint8_t serial_rx_active(serial_t *obj)
 {
-	struct serial_s *p_obj = GET_SERIAL_S(obj);
-
-	return ((p_obj->rx_state == OP_STATE_BUSY_RX) ? 1 : 0);
+	return ((uart_handlers[obj->index]->rx_state == OP_STATE_BUSY_RX) ? 1 : 0);
 }
 
 /**
@@ -426,16 +493,18 @@ uint8_t serial_rx_active(serial_t *obj)
  * @param obj The serial object
  * @param callback The transmit callback
  */
-void uart_attach_tx_callback(serial_t *obj, void(*callback)(serial_t *))
+void uart_attach_tx_callback(serial_t *obj, int(*callback)(serial_t *))
 {
 	if (obj == NULL) {
 		return;
 	}
-	struct serial_s *p_obj = GET_SERIAL_S(obj);
-	if (serial_tx_active(p_obj)) {
-		return;
-	}
-	p_obj->tx_callback = callback;
+
+	IRQn_Type irq = usart_irq_n[obj->index];
+	obj->tx_callback = callback;
+
+	NVIC_DisableIRQ(irq);
+	IT_serial_transmit(uart_handlers[obj->index], &obj->tx_buff[obj->tx_tail], 1);
+	nvic_irq_enable(irq, UART_IRQ_PRIORITY, UART_IRQ_SUBPRIORITY);
 }
 
 /**
@@ -449,55 +518,76 @@ void uart_attach_rx_callback(serial_t *obj, void(*callback)(serial_t *))
 	if (obj == NULL) {
 		return;
 	}
-	struct serial_s *p_obj = GET_SERIAL_S(obj);
 
 	/* Exit if a reception is already on-going */
-	if (serial_rx_active(p_obj)) {
+	if (serial_rx_active(obj)) {
 		return;
 	}
-	p_obj->rx_callback = callback;
+
+	IRQn_Type irq = usart_irq_n[obj->index];
+	obj->rx_callback = callback;
+
+	NVIC_DisableIRQ(irq);
+	IT_serial_receive(uart_handlers[obj->index], &(obj->rvalue), 1);
+	nvic_irq_enable(irq, UART_IRQ_PRIORITY, UART_IRQ_SUBPRIORITY);
+}
+
+void serial_enable_tx(serial_t *obj)
+{
+	if (obj != NULL && obj->pin_tx == NC) {
+		serial_half_duplex_enable_tx(uart_handlers[obj->index]);
+	}
+}
+
+void serial_enable_rx(serial_t *obj)
+{
+	if (obj != NULL && obj->pin_rx == NC) {
+		serial_half_duplex_enable_rx(uart_handlers[obj->index]);
+	}
 }
 
 /**
- * Handle the serial rx interrupt
- *
- * @param obj_s The serial object
- * @return Returns the status
+ *  Begin TX transfer (blocking) 
  */
-static gd_status_enum usart_rx_interrupt(struct serial_s *obj_s)
+gd_status_enum serial_transmit(SPL_UartHandle_t *uart_handle, uint8_t *pData, uint16_t size, uint32_t timeout)
 {
-	uint16_t *temp;
+	uint16_t *tmp;
+	if (uart_handle->global_state == OP_STATE_READY) {
+		if ((pData == NULL) || (size == 0U)) {
+			return GD_ERROR;
+		}
 
-	if (obj_s->rx_state == OP_STATE_BUSY_RX) {
-		if (obj_s->databits == USART_WL_9BIT) {
-			temp = (uint16_t *)obj_s->rx_buffer_ptr;
-			if (obj_s->parity == USART_PM_NONE) {
-				/* 9-bit data, none parity bit */
-				*temp = (uint16_t)(GD32_USART_RX_DATA(obj_s->uart) & (uint16_t)0x01FF);
-				obj_s->rx_buffer_ptr += 2U;
+		uart_handle->error_code = USART_NO_ERROR;
+		uart_handle->global_state = OP_STATE_BUSY_TX;
+		uart_handle->tx_size = size;
+		uart_handle->tx_count = size;
+
+		while (uart_handle->tx_count > 0U) {
+			uart_handle->tx_count--;
+			if (uart_handle->params.databits == USART_WL_9BIT) {
+				if (serial_wait_flag_timeout(uart_handle, USART_FLAG_TBE, RESET, timeout) != GD_OK) {
+					return GD_TIMEOUT;
+				}
+				tmp = (uint16_t *)pData;
+				USART_DATA(uart_handle->instance) = (*tmp & (uint16_t)0x01FF);
+				if (uart_handle->params.parity == USART_PM_NONE) {
+					pData += 2U;
+				} else {
+					pData += 1U;
+				}
 			} else {
-				/* 9-bit data, with parity bit */
-				*temp = (uint16_t)(GD32_USART_RX_DATA(obj_s->uart) & (uint16_t)0x00FF);
-				obj_s->rx_buffer_ptr += 1U;
-			}
-		} else {
-			if (obj_s->parity == USART_PM_NONE) {
-				/* 8-bit data, none parity bit */
-				*obj_s->rx_buffer_ptr++ = (uint8_t)(GD32_USART_RX_DATA(obj_s->uart) & (uint8_t)0x00FF);
-			} else {
-				/* 8-bit data, with parity bit */
-				*obj_s->rx_buffer_ptr++ = (uint8_t)(GD32_USART_RX_DATA(obj_s->uart) & (uint8_t)0x007F);
+				if (serial_wait_flag_timeout(uart_handle, USART_FLAG_TBE, RESET, timeout) != GD_OK) {
+					return GD_TIMEOUT;
+				}
+				USART_DATA(uart_handle->instance) = (*pData++ & (uint8_t)0xFF);
 			}
 		}
 
-		if (--obj_s->rx_count == 0U) {
-			usart_interrupt_disable(obj_s->uart, USART_INT_RBNE);
-			usart_interrupt_disable(obj_s->uart, USART_INT_PERR);
-			usart_interrupt_disable(obj_s->uart, USART_INT_ERR);
-
-			obj_s->rx_state = OP_STATE_READY;
-			obj_s->rx_callback(obj_s);
+		if (serial_wait_flag_timeout(uart_handle, USART_FLAG_TC, RESET, timeout) != GD_OK) {
+			return GD_TIMEOUT;
 		}
+		uart_handle->global_state = OP_STATE_READY;
+
 		return GD_OK;
 	} else {
 		return GD_BUSY;
@@ -505,230 +595,326 @@ static gd_status_enum usart_rx_interrupt(struct serial_s *obj_s)
 }
 
 /**
- * Handle the serial tx interrupt
- *
- * @param obj_s The serial object
- * @return Returns the status
+ *  Begin TX transfer (non-blocking) 
  */
-static gd_status_enum usart_tx_interrupt(struct serial_s *obj_s)
+gd_status_enum IT_serial_transmit(SPL_UartHandle_t *uart_handle, uint8_t *pData, uint16_t size)
 {
-	uint16_t *temp;
-
-	if (obj_s->tx_state == OP_STATE_BUSY_TX) {
-		if (obj_s->databits == USART_WL_9BIT) {
-			temp = (uint16_t *) obj_s->tx_buffer_ptr;
-			GD32_USART_TX_DATA(obj_s->uart) = (uint16_t)(*temp & (uint16_t)0x01FF);
-			if (obj_s->parity == USART_PM_NONE) {
-				obj_s->tx_buffer_ptr += 2U;
-			} else {
-				obj_s->tx_buffer_ptr += 1U;
-			}
-		} else {
-			GD32_USART_TX_DATA(obj_s->uart) = (uint8_t)(*obj_s->tx_buffer_ptr++ & (uint8_t)0x00FF);
+	if (uart_handle->global_state == OP_STATE_READY) {
+		if ((pData == NULL) || (size == 0U)) {
+			return GD_ERROR;
 		}
 
-		if (--obj_s->tx_count == 0U) {
-			/* disable USART_INT_TBE interrupt */
-			usart_interrupt_disable(obj_s->uart, USART_INT_TBE);
-			/* enable USART_INT_TC interrupt */
-			usart_interrupt_enable(obj_s->uart, USART_INT_TC);
-		}
+		uart_handle->tx_buffer_ptr = pData;
+		uart_handle->tx_size = size;
+		uart_handle->tx_count = size;
+		uart_handle->error_code = USART_NO_ERROR;
+		uart_handle->global_state = OP_STATE_BUSY_TX;
+
+		usart_interrupt_enable(uart_handle->instance, USART_INT_TBE);
+
 		return GD_OK;
 	} else {
 		return GD_BUSY;
 	}
-}
-
-/**
- * Handle the serial tx complete interrupt
- *
- * @param obj_s The serial object
- */
-static void usart_tx_complete_interrupt(struct serial_s *obj_s)
-{
-	usart_interrupt_disable(obj_s->uart, USART_INT_TC);
-
-	obj_s->tx_state = OP_STATE_READY;
-	obj_s->tx_callback(obj_s);
-}
-
-/**
- * Preprocess the USART tx interrupt
- *
- * @param obj_s The serial object
- * @param pData Pointer to tx buffer
- * @param Size  Size of tx buffer
- * @return Returns the status
- */
-static gd_status_enum usart_tx_interrupt_preprocess(struct serial_s *obj_s, uint8_t *pData, uint16_t Size)
-{
-    if (obj_s->tx_state == OP_STATE_READY) {
-        if ((pData == NULL) || (Size == 0U)) {
-            return GD_ERROR;
-        }
-
-        obj_s->tx_buffer_ptr = pData;
-        obj_s->tx_count = Size;
-        obj_s->tx_state = OP_STATE_BUSY_TX;
-
-        usart_interrupt_enable(obj_s->uart, USART_INT_TBE);
-        return GD_OK;
-    } else {
-        return GD_BUSY;
-    }
-}
-
-/**
- * Preprocess the USART rx interrupt
- *
- * @param obj_s The serial object
- * @param pData Pointer to rx buffer
- * @param Size  Size of rx buffer
- * @return Returns the status
- */
-static gd_status_enum usart_rx_interrupt_preprocess(struct serial_s *obj_s, uint8_t *pData,
-                                                    uint16_t Size)
-{
-    if (obj_s->rx_state == OP_STATE_READY) {
-        if ((pData == NULL) || (Size == 0U)) {
-            return GD_ERROR;
-        }
-
-        obj_s->rx_buffer_ptr = pData;
-        obj_s->rx_size = Size;
-        obj_s->rx_count = Size;
-        obj_s->rx_state = OP_STATE_BUSY_RX;
-
-        usart_interrupt_enable(obj_s->uart, USART_INT_PERR);
-        usart_interrupt_enable(obj_s->uart, USART_INT_ERR);
-        usart_interrupt_enable(obj_s->uart, USART_INT_RBNE);
-        return GD_OK;
-    } else {
-        return GD_BUSY;
-    }
-}
-
-/**
- * Begin asynchronous TX transfer
- * @param obj       The serial object
- * @param tx        The transmit buffer
- * @param tx_length The number of bytes to transmit
- * @return Returns number of data transfered, otherwise returns 0
- */
-int serial_transmit(serial_t *obj, const uint8_t *tx, size_t tx_length)
-{
-  struct serial_s *p_obj = GET_SERIAL_S(obj);
-  IRQn_Type irq = usart_irq_n[p_obj->index];
-
-  if (tx_length == 0) {
-      return 0;
-  }
-
-  if (serial_tx_active(obj)) {
-      /* some transmit is in progress */
-      return 0;
-  }
-
-  obj->tx_buffer_ptr = (uint8_t *)tx;
-  obj->tx_count = tx_length;
-
-  /* enable interrupt */
-  /* clear pending IRQ */
-  NVIC_ClearPendingIRQ(irq);
-  /* disable the IRQ first */
-  nvic_irq_disable(irq);
-  /* enable IRQ */
-  nvic_irq_enable(irq, 1, 0);
-
-  if (usart_tx_interrupt_preprocess(p_obj, (uint8_t *)tx, tx_length) != GD_OK) {
-      return 0;
-  }
-
-  return tx_length;
 }
 
 /**
  *  Begin RX transfer (blocking) 
  */
-void serial_receive(serial_t *obj, const uint8_t *rx, size_t rx_length)
+gd_status_enum serial_receive(SPL_UartHandle_t *uart_handle, uint8_t *pData, uint16_t size, uint32_t timeout)
 {
-  struct serial_s *p_obj = GET_SERIAL_S(obj);
-  IRQn_Type irq = usart_irq_n[p_obj->index];
+	uint16_t *tmp;
 
-  if (rx_length == 0) {
-      return;
-  }
+	if (uart_handle->rx_state == OP_STATE_READY) {
+		if ((pData == NULL) || (size == 0U)) {
+			return GD_ERROR;
+		}
 
-  if (serial_rx_active(obj)) {
-		/* some reception is in progress */
-		return;
-  }
+		uart_handle->error_code = USART_NO_ERROR;
+		uart_handle->rx_state = OP_STATE_BUSY_RX;
+		uart_handle->rx_size = size;
+		uart_handle->rx_count = size;
 
-	obj->rx_buffer_ptr = (uint8_t *)rx;
-	obj->rx_count = rx_length;
+		while (uart_handle->rx_count > 0U) {
+			uart_handle->rx_count--;
+			if (uart_handle->params.databits == USART_WL_9BIT) {
+				if (serial_wait_flag_timeout(uart_handle, USART_FLAG_RBNE, RESET, timeout) != GD_OK) {
+					return GD_TIMEOUT;
+				}
+				tmp = (uint16_t *)pData;
+				if (uart_handle->params.parity == USART_PM_NONE) {
+					*tmp = (uint16_t)(GET_BITS(USART_DATA(uart_handle->instance), 0U, 8U));
+					pData += 2U;
+				} else {
+					*tmp = (uint16_t)(GET_BITS(USART_DATA(uart_handle->instance), 0U, 7U));
+					pData += 1U;
+				}
+			} else {
+				if (serial_wait_flag_timeout(uart_handle, USART_FLAG_RBNE, RESET, timeout) != GD_OK) {
+					return GD_TIMEOUT;
+				}
+				if (uart_handle->params.parity == USART_PM_NONE) {
+					*pData++ = (uint8_t)(GET_BITS(USART_DATA(uart_handle->instance), 0U, 7U));
+				} else {
+					*pData++ = (uint8_t)(GET_BITS(USART_DATA(uart_handle->instance), 0U, 6U));
+				}
+			}
+		}
+		uart_handle->rx_state = OP_STATE_READY;
 
-	/* enable interrupt */
-	/* clear pending irq */
-	NVIC_ClearPendingIRQ(irq);
-	/* disable the irq first */
-	nvic_irq_disable(irq);
-	/* enable irq */
-	nvic_irq_enable(irq, 0, 0);
+		return GD_OK;
+	} else {
+		return GD_BUSY;
+	}
+}
 
-	usart_rx_interrupt_preprocess(p_obj, (uint8_t *)rx, rx_length);
+/**
+ *  Begin RX transfer (non-blocking) 
+ */
+gd_status_enum IT_serial_receive(SPL_UartHandle_t *uart_handle, uint8_t *pData, uint16_t size)
+{
+	if (uart_handle->rx_state == OP_STATE_READY) {
+		if ((pData == NULL) || (size == 0U)) {
+			return GD_ERROR;
+		}
+
+		uart_handle->rx_buffer_ptr = pData;
+		uart_handle->rx_size = size;
+		uart_handle->rx_count = size;
+		uart_handle->error_code = USART_NO_ERROR;
+		uart_handle->rx_state = OP_STATE_BUSY_RX;
+
+		usart_interrupt_enable(uart_handle->instance, USART_INT_PERR);
+		usart_interrupt_enable(uart_handle->instance, USART_INT_ERR);
+		usart_interrupt_enable(uart_handle->instance, USART_INT_RBNE);
+
+		return GD_OK;
+	} else {
+		return GD_BUSY;
+	}
+}
+
+gd_status_enum IT_transmit(SPL_UartHandle_t *uart_handle)
+{
+	uint16_t *tmp;
+
+	if (uart_handle->global_state == OP_STATE_BUSY_TX) {
+		if (uart_handle->params.databits == USART_WL_9BIT) {
+			tmp = (uint16_t *)uart_handle->tx_buffer_ptr;
+			usart_data_transmit(uart_handle->instance, (uint16_t)*tmp);
+			if (uart_handle->params.parity == USART_PM_NONE) {
+				uart_handle->tx_buffer_ptr += 2U;
+			} else {
+				uart_handle->tx_buffer_ptr += 1U;
+			}
+		} else {
+			USART_DATA(uart_handle->instance) = (uint8_t)(*uart_handle->tx_buffer_ptr++ & (uint8_t)0xFF);
+		}
+
+		if (--uart_handle->tx_count == 0U) {
+			usart_interrupt_disable(uart_handle->instance, USART_INT_TBE);
+			usart_interrupt_disable(uart_handle->instance, USART_INT_TC);			
+		}
+		return GD_OK;
+	} else {
+		return GD_BUSY;
+	}
+}
+
+gd_status_enum IT_receive(SPL_UartHandle_t *uart_handle)
+{
+	uint16_t *tmp;
+	if (uart_handle->rx_state == OP_STATE_BUSY_RX) {
+		if (uart_handle->params.databits == USART_WL_9BIT) {
+			tmp = (uint16_t *)uart_handle->rx_buffer_ptr;
+			if (uart_handle->params.parity == USART_PM_NONE) {
+				*tmp = usart_data_receive(uart_handle->instance);
+				uart_handle->rx_buffer_ptr += 2U;
+			} else {
+				*tmp = (uint16_t)(GET_BITS(USART_DATA(uart_handle->instance), 0U, 7U));
+				uart_handle->rx_buffer_ptr += 1U;
+			}
+		} else {
+			if (uart_handle->params.parity == USART_PM_NONE) {
+				*uart_handle->rx_buffer_ptr++ = (uint8_t)(GET_BITS(USART_DATA(uart_handle->instance), 0U, 7U));
+			} else {
+				*uart_handle->rx_buffer_ptr++ = (uint8_t)(GET_BITS(USART_DATA(uart_handle->instance), 0U, 6U));
+			}
+		}
+
+		if (--uart_handle->rx_count == 0U) {
+			usart_interrupt_disable(uart_handle->instance, USART_INT_RBNE);
+			usart_interrupt_disable(uart_handle->instance, USART_INT_PERR);
+			usart_interrupt_disable(uart_handle->instance, USART_INT_ERR);
+
+			uart_handle->rx_state = OP_STATE_READY;
+
+			UART_RX_TCCallback(uart_handle);
+			return GD_OK;
+		}
+		return GD_OK;
+	} else {
+		return GD_BUSY;
+	}
+}
+
+/**
+ *  Wait for flag or timeout
+ */
+gd_status_enum serial_wait_flag_timeout(SPL_UartHandle_t *uart_handle, uint32_t flag, FlagStatus status, uint32_t timeout)
+{
+	while ((usart_flag_get(uart_handle->instance, flag) ? SET : RESET) == status) {
+		for (int i = 0; i < timeout; i++);
+		usart_interrupt_disable(uart_handle->instance, USART_INT_RBNE);
+		usart_interrupt_disable(uart_handle->instance, USART_INT_PERR);
+		usart_interrupt_disable(uart_handle->instance, USART_INT_TBE);
+		usart_interrupt_disable(uart_handle->instance, USART_INT_ERR);
+
+		uart_handle->global_state = OP_STATE_READY;
+		uart_handle->rx_state = OP_STATE_READY;
+
+		return GD_TIMEOUT;
+	}
+	return GD_OK;
+}
+
+void UART_ErrorCallback(SPL_UartHandle_t *uart_handle)
+{
+	if (usart_flag_get(uart_handle->instance, USART_FLAG_PERR) != RESET) {
+		usart_flag_clear(uart_handle->instance, USART_FLAG_PERR);
+	} else if (usart_flag_get(uart_handle->instance, USART_FLAG_FERR) != RESET) {
+		usart_flag_clear(uart_handle->instance, USART_FLAG_FERR);
+	} else if (usart_flag_get(uart_handle->instance, USART_FLAG_NERR) != RESET) {
+		usart_flag_clear(uart_handle->instance, USART_FLAG_NERR);
+	} else if (usart_flag_get(uart_handle->instance, USART_FLAG_ORERR) != RESET) {
+		usart_flag_clear(uart_handle->instance, USART_FLAG_ORERR);
+	}
+	serial_t *obj = get_serial_object(uart_handle);
+	if (obj && !serial_rx_active(obj)) {
+		IT_serial_receive(uart_handle, &(obj->rvalue), 1);
+	}
+}
+
+void UART_RX_TCCallback(SPL_UartHandle_t *uart_handle)
+{
+	serial_t *obj = get_serial_object(uart_handle);
+	if (obj) {
+		obj->rx_callback(obj);
+	}
+}
+
+void UART_TX_TCCallback(SPL_UartHandle_t *uart_handle)
+{
+	serial_t *obj = get_serial_object(uart_handle);
+
+	if (obj && obj->tx_callback(obj) != -1) {
+		if (IT_serial_transmit(uart_handle, &obj->tx_buff[obj->tx_tail], 1) != GD_OK) {
+			return;
+		}
+	}
+}
+
+void serial_rx_transfer_end(SPL_UartHandle_t *uart_handle)
+{
+	usart_interrupt_disable(uart_handle->instance, USART_INT_RBNE);
+	usart_interrupt_disable(uart_handle->instance, USART_INT_PERR);
+	usart_interrupt_disable(uart_handle->instance, USART_INT_ERR);
+
+	uart_handle->rx_state = OP_STATE_READY;
+}
+
+void IT_serial_transmit_end(SPL_UartHandle_t *uart_handle)
+{
+	usart_interrupt_disable(uart_handle->instance, USART_INT_TC);
+	uart_handle->global_state = OP_STATE_READY;
+
+	UART_TX_TCCallback(uart_handle);
 }
 
 /**
  * This function is the uart/usart interrupt handler
  * @param obj_s The serial obj
  */
-static void UART_IRQHandler(struct serial_s *obj_s)
+void UART_IRQHandler(SPL_UartHandle_t *uart_handle)
 {
-  uint32_t err_flags = 0U;
+  uint32_t stat_flags = GD32_USART_STAT(uart_handle->instance);
+  uint32_t ctl0_bits = USART_CTL0(uart_handle->instance);
+  uint32_t ctl2_bits = USART_CTL2(uart_handle->instance);
+  uint32_t error_flags = 0U;
+  uint32_t dma_request = 0U;
 
   /* no error occurs */
-  err_flags = (GD32_USART_STAT(obj_s->uart) & (uint32_t)(USART_FLAG_PERR | USART_FLAG_FERR |
-                                               USART_FLAG_ORERR | USART_FLAG_NERR));
-  if (err_flags == RESET) {
-    /* check whether USART is in receiver mode or not */
-    if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_RBNE) != RESET) {
-      usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_RBNE);
-      usart_rx_interrupt(obj_s);
+  error_flags = (stat_flags & (uint32_t)(USART_FLAG_PERR | USART_FLAG_FERR | USART_FLAG_NERR | USART_FLAG_ORERR));
+  if (error_flags == RESET) {
+    /* check whether USART is in receiver mode */
+    if (((stat_flags & USART_FLAG_RBNE) != RESET) && ((ctl0_bits & USART_INT_RBNE) != RESET)) {
+    	IT_receive(uart_handle);
       return;
     }
   }
-  if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_TBE) != RESET) {
-    usart_tx_interrupt(obj_s);
-    return;
-  }
-  if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_TC) != RESET) {
-    usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_TC);
-    usart_tx_complete_interrupt(obj_s);
-    return;
-  }
-  if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_ERR_ORERR) != RESET) {
-    /* clear ORERR error flag by reading USART DATA register */
-    GD32_USART_RX_DATA(obj_s->uart);
-    usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_ERR_ORERR);
-  }
-  if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_ERR_NERR) != RESET) {
-    /* clear NERR error flag by reading USART DATA register */
-    GD32_USART_RX_DATA(obj_s->uart);
-    usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_ERR_NERR);
-  }
-  if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_ERR_FERR) != RESET) {
-    /* clear FERR error flag by reading USART DATA register */
-    GD32_USART_RX_DATA(obj_s->uart);
-    /* also clear it by clearing the interrupt */
-    usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_ERR_FERR);
+
+  if ((error_flags != RESET) && (((ctl2_bits & USART_INT_ERR) != RESET) || ((ctl0_bits & (USART_INT_RBNE | USART_INT_PERR)) != RESET))) {
+  	if (((stat_flags & USART_FLAG_PERR) != RESET) && ((ctl0_bits & USART_INT_PERR) != RESET)) {
+  		uart_handle->error_code |= USART_PARITY_ERROR;
+  	}
+
+  	if (((stat_flags & USART_FLAG_NERR) != RESET) && ((ctl2_bits & USART_INT_ERR) != RESET)) {
+  		uart_handle->error_code |= USART_NOISE_ERROR;
+  	}
+
+  	if (((stat_flags & USART_FLAG_FERR) != RESET) && ((ctl2_bits & USART_INT_ERR) != RESET)) {
+  		uart_handle->error_code |= USART_FRAME_ERROR;
+  	}
+
+  	if (((stat_flags & USART_FLAG_ORERR) != RESET) && ((ctl2_bits & USART_INT_ERR) != RESET)) {
+  		uart_handle->error_code |= USART_OVERRUN_ERROR;
+  	}
+
+  	if (uart_handle->error_code != USART_NO_ERROR) {
+  		if (((stat_flags & USART_FLAG_RBNE) != RESET) && ((ctl0_bits & USART_INT_RBNE) != RESET)) {
+  			IT_receive(uart_handle);
+  		}
+  		dma_request = (((USART_CTL2(uart_handle->instance)) & (USART_CTL2_DENR)) != 0U);
+  		if (((uart_handle->error_code & USART_OVERRUN_ERROR) != RESET) || dma_request) {
+  			serial_rx_transfer_end(uart_handle);
+  			if (((USART_CTL2(uart_handle->instance)) & (USART_CTL2_DENR)) != 0U) {
+  				usart_dma_receive_config(uart_handle->instance, USART_RECEIVE_DMA_DISABLE);
+  				UART_ErrorCallback(uart_handle);
+  			} else {
+  				UART_ErrorCallback(uart_handle);
+  			}
+  		} else {
+  			UART_ErrorCallback(uart_handle);
+  		}
+  	}
+  	return;
   }
 
-  if (usart_interrupt_flag_get(obj_s->uart, USART_INT_FLAG_PERR) != RESET) {
-    /* clear PERR error flag by reading USART DATA register */
-    GD32_USART_RX_DATA(obj_s->uart);
-    /* also clear it by clearing the interrupt */
-    usart_interrupt_flag_clear(obj_s->uart, USART_INT_FLAG_PERR);
+  if (((stat_flags & USART_FLAG_TBE) != RESET) && ((ctl0_bits & USART_INT_TBE) != RESET)) {
+  	IT_transmit(uart_handle);
+  	return;
   }
+
+  if (((stat_flags & USART_FLAG_TC) != RESET) && ((ctl0_bits & USART_INT_TC) != RESET)) {
+  	IT_serial_transmit_end(uart_handle);
+  	return;
+  }
+}
+
+void serial_half_duplex_enable_tx(SPL_UartHandle_t *uart_handle)
+{
+	uart_handle->global_state = OP_STATE_BUSY;
+	usart_receive_config(uart_handle->instance, USART_RECEIVE_DISABLE);
+	usart_transmit_config(uart_handle->instance, USART_TRANSMIT_ENABLE);
+	uart_handle->global_state = OP_STATE_READY;
+}
+
+void serial_half_duplex_enable_rx(SPL_UartHandle_t *uart_handle)
+{
+	uart_handle->global_state = OP_STATE_BUSY;
+	usart_transmit_config(uart_handle->instance, USART_TRANSMIT_DISABLE);
+	usart_receive_config(uart_handle->instance, USART_RECEIVE_ENABLE);
+	uart_handle->global_state = OP_STATE_READY;
 }
 
 /**
@@ -739,7 +925,7 @@ void USART0_IRQHandler(void)
 {
 	/* clear pending IRQ */
 	NVIC_ClearPendingIRQ(usart_irq_n[UART0_INDEX]);
-	UART_IRQHandler(obj_s_buf[UART0_INDEX]);
+	UART_IRQHandler(uart_handlers[UART0_INDEX]);
 }
 #endif
 
@@ -751,7 +937,7 @@ void USART1_IRQHandler(void)
 {
 	/* clear pending IRQ */
 	NVIC_ClearPendingIRQ(usart_irq_n[UART1_INDEX]);
-  UART_IRQHandler(obj_s_buf[UART1_INDEX]);
+  UART_IRQHandler(uart_handlers[UART1_INDEX]);
 }
 #endif
 
@@ -763,7 +949,7 @@ void USART2_IRQHandler(void)
 {
 	/* clear pending IRQ */
 	NVIC_ClearPendingIRQ(usart_irq_n[UART2_INDEX]);
-	UART_IRQHandler(obj_s_buf[UART2_INDEX]);
+	UART_IRQHandler(uart_handlers[UART2_INDEX]);
 }
 #endif
 
@@ -775,7 +961,7 @@ void UART3_IRQHandler(void)
 {
 	/* clear pending IRQ */
 	NVIC_ClearPendingIRQ(usart_irq_n[UART3_INDEX]);
-	UART_IRQHandler(obj_s_buf[UART3_INDEX]);
+	UART_IRQHandler(uart_handlers[UART3_INDEX]);
 }
 #endif
 
@@ -787,31 +973,31 @@ void USART3_IRQHandler(void)
 {
 	/* clear pending IRQ */
 	NVIC_ClearPendingIRQ(usart_irq_n[UART3_INDEX]);
-	UART_IRQHandler(obj_s_buf[UART3_INDEX]);
+	UART_IRQHandler(uart_handlers[UART3_INDEX]);
 }
 #endif
 
 /**
- * UART4 RQ handler
+ * UART4 IRQ handler
  */
 #if defined(UART4)
 void UART4_IRQHandler(void)
 {
 	/* clear pending IRQ */
 	NVIC_ClearPendingIRQ(usart_irq_n[UART4_INDEX]);
-	UART_IRQHandler(obj_s_buf[UART4_INDEX]);
+	UART_IRQHandler(uart_handlers[UART4_INDEX]);
 }
 #endif
 
 /**
- * USART4 RQ handler
+ * USART4 IRQ handler
  */
 #if defined(USART4)
 void USART4_IRQHandler(void)
 {
 	/* clear pending IRQ */
 	NVIC_ClearPendingIRQ(usart_irq_n[UART4_INDEX]);
-	UART_IRQHandler(obj_s_buf[UART4_INDEX]);
+	UART_IRQHandler(uart_handlers[UART4_INDEX]);
 }
 #endif
 

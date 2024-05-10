@@ -58,11 +58,12 @@ int main(void)
   // be used.
   USBCore().connect();
 #endif
+
   setup();
 
   for (;;) {
     loop();
-    if (arduino::serialEventRun) arduino::serialEventRun();
+    serialEventRun();
   }
 
   return 0;

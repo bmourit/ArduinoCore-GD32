@@ -32,10 +32,10 @@ OF SUCH DAMAGE.
 #define __ANALOG_H
 
 #include "gd32xxyy.h"
-
 #include "PinNames.h"
 #include "PeripheralPins.h"
-#include "api/ArduinoAPI.h"
+#include "HardwareTimer.h"
+#include "timer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,17 +45,19 @@ typedef struct {
   uint8_t isactive;
 } analog_t;
 
+/* adc */
 uint8_t get_adc_channel(PinName pn);
 uint8_t get_adc_index(uint32_t instance);
-uint8_t get_dac_index(uint32_t instance);
-void adc_clock_enable(uint32_t instance);
-
-void set_dac_value(PinName pn, uint16_t value, uint8_t needs_init);
-void dac_stop(PinName pn);
-void set_pwm_value(pin_size_t pin, uint32_t value);
-void set_pwm_value_with_base_period(pin_size_t pin, uint32_t base_period_us, uint32_t value);
-void stop_pwm(pin_size_t pin);
 uint16_t get_adc_value(PinName pn);
+void adc_clock_enable(uint32_t instance);
+/* dac */
+void set_dac_value(PinName pn, uint16_t value, uint8_t needs_init);
+uint8_t get_dac_index(uint32_t instance);
+void dac_stop(PinName pn);
+/* pwm */
+void pwm_start(PinName pin, uint32_t PWM_freq, uint32_t value, enum captureCompareFormat resolution);
+void pwm_stop(PinName pin);
+uint32_t get_pwm_channel(PinName pin);
 
 #ifdef __cplusplus
 }

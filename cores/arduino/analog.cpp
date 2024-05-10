@@ -29,7 +29,6 @@ OF SUCH DAMAGE.
 */
 
 #include "analog.h"
-#include "HardwarePWM.h"
 #include "gd_debug.h"
 
 #ifdef __cplusplus
@@ -169,29 +168,69 @@ void dac_stop(PinName pn)
   dac_deinit();
 }
 
-/* pwm set value */
-void set_pwm_value(pin_size_t ulPin, uint32_t value)
+uint32_t get_pwm_channel(PinName pin)
 {
-  uint16_t ulvalue = 1000 * value / 65535;
-  HardwarePWM pwm(ulPin);
-  pwm.setPeriodCycle(1000, ulvalue, FORMAT_US);
-  pwm.start();
+  uint32_t function = pinmap_function(pin, PinMap_PWM);
+  uint32_t channel = -1;
+
+  switch (GD_PIN_CHANNEL_GET(function)) {
+    case 0:
+      channel = TIMER_CH_0;
+      break;
+    case 1:
+      channel = TIMER_CH_1;
+      break;
+    case 2:
+      channel = TIMER_CH_2;
+      break;
+    case 3:
+      channel = TIMER_CH_3;
+      break;
+    default:
+      channel = -1;
+      break;
+  }
+  return channel;
 }
 
-/* pwm set value and period */
-void set_pwm_value_with_base_period(pin_size_t ulPin, uint32_t base_period_us, uint32_t ulValue)
+/* pwm start */
+void pwm_start(PinName pin, uint32_t PWM_freq, uint32_t value, enum captureCompareFormat resolution)
 {
-  uint16_t value = base_period_us * ulValue / 65535;
-  HardwarePWM pwm(ulPin);
-  pwm.setPeriodCycle(base_period_us, value, FORMAT_US);
-  pwm.start();
+  uint32_t instance = (uint32_t)pinmap_peripheral(pin, PinMap_PWM);
+  HardwareTimer *HWT;
+  captureMode previous;
+  uint32_t index = get_timer_index(instance);
+  if (HWTimer_Handle[index] == NULL) {
+    HWTimer_Handle[index]->_timer_instance = new HardwareTimer((uint32_t)pinmap_peripheral(pin, PinMap_PWM));
+  }
+  HWT = (HardwareTimer *)(HWTimer_Handle[index]->_timer_instance);
+  uint32_t channel = GD_PIN_CHANNEL_GET(pinmap_function(pin, PinMap_PWM));
+
+  previous = HWT->getChannelMode((uint32_t)channel);
+  if (previous != OC_PWM0) {
+    HWT->setChannelMode((uint32_t)channel, OC_PWM0, pin);
+  }
+  HWT->setAutoReloadValue(PWM_freq, FORMAT_HZ);
+  HWT->setCaptureCompare((uint32_t)channel, value, resolution);
+  if (previous != OC_PWM0) {
+    HWT->timerStart();
+  }
 }
 
 /* pwm stop */
-void stop_pwm(pin_size_t ulPin)
+void pwm_stop(PinName pin)
 {
-  HardwarePWM pwm(ulPin);
-  pwm.stop();
+  uint32_t instance = (uint32_t)pinmap_peripheral(pin, PinMap_PWM);
+  HardwareTimer *HWT;
+  uint32_t index = get_timer_index(instance);
+  if (HWTimer_Handle[index] == NULL) {
+    HWTimer_Handle[index]->_timer_instance = new HardwareTimer((uint32_t)pinmap_peripheral(pin, PinMap_PWM));
+  }
+  HWT = (HardwareTimer *)(HWTimer_Handle[index]->_timer_instance);
+  if (HWT != NULL) {
+    delete (HWT);
+    HWT = NULL;
+  }
 }
 
 /* get adc value */

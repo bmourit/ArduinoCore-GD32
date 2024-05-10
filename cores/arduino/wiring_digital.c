@@ -35,7 +35,7 @@ void pinMode(pin_size_t pin, PinMode ulMode)
       if (pin_in_pinmap(p, PinMap_DAC)) {
         dac_stop(p);
       } else if (pin_in_pinmap(p, PinMap_PWM)) {
-        stop_pwm(p);
+        pwm_stop(p);
       }
       RESET_PIN_CONFIG(p, gpioOutputPinIsConfigured);
     }

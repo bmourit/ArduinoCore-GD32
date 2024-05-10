@@ -45,7 +45,8 @@ using namespace arduino;
 #define digitalPinToInterrupt(pin)  (pin)
 
 #ifdef __cplusplus
-#include "HardwarePWM.h"
+#include "HardwareTimer.h"
+#include "WSerial.h"
 
 extern "C" {
 #endif /* __cplusplus */
@@ -73,5 +74,6 @@ void loop();
 #include "CDCACM.h"
 #endif
 
-#endif
+#endif	/* __cplusplus */
+
 #endif

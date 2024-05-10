@@ -29,7 +29,6 @@ OF SUCH DAMAGE.
 #define _TIMER_H_
 
 #include "gd32xxyy.h"
-//#include "PinNames.h"
 #include "PeripheralPins.h"
 
 #ifdef __cplusplus
@@ -168,13 +167,44 @@ typedef enum {
 	UNKNOWN_TIMER = 0xFFFF
 } timer_index_t;
 
-typedef void(*callBack_t)(uint32_t instance, uint8_t channel);
+enum captureCompareFormat {
+	CC_FORMAT_1B = 1,
+	CC_FORMAT_2B,
+	CC_FORMAT_3B,
+	CC_FORMAT_4B,
+	CC_FORMAT_5B,
+	CC_FORMAT_6B,
+	CC_FORMAT_7B,
+	CC_FORMAT_8B,
+	CC_FORMAT_9B,
+	CC_FORMAT_10B,
+	CC_FORMAT_11B,
+	CC_FORMAT_12B,
+	CC_FORMAT_13B,
+	CC_FORMAT_14B,
+	CC_FORMAT_15B,
+	CC_FORMAT_16B,
+	CC_FORMAT_TICK = 0x80,
+	CC_FORMAT_US,
+	CC_FORMAT_HZ,
+	CC_FORMAT_PERCENT
+};
 
 enum captureMode {
-	RISING_EDGE,
-	FALLING_EDGE,
-	BOTH_EDGE,
-	DISABLED
+	TIMER_DISABLED,
+	IC_RISING_EDGE,
+	IC_FALLING_EDGE,
+	IC_BOTH_EDGE,
+	IC_MEASUREMENT,
+	OC_TIMING,
+	OC_ACTIVE,
+	OC_INACTIVE,
+	OC_TOGGLE,
+	OC_LOW,
+	OC_HIGH,
+	OC_PWM0,
+	OC_PWM1,
+	TIMER_UNUSED = 0xffff
 };
 
 enum timeFormat {
@@ -185,82 +215,47 @@ enum timeFormat {
 	FORMAT_HZ
 };
 
-typedef struct {
-	uint32_t timer;
-	uint8_t channel;
-} pwmDevice_t;
+typedef enum {
+	CHAN0_ACTIVE = 0x1U,
+	CHAN1_ACTIVE = 0x2U,
+	CHAN2_ACTIVE = 0x4U,
+	CHAN3_ACTIVE = 0x8U,
+	CHAN_ALL_CLEARED = 0x00U
+} timer_active_channel_t;
 
 typedef struct {
-	uint32_t period;
-	uint32_t cycle;
-	enum timeFormat format;
-} pwmPeriodCycle_t;
+	uint32_t timer_instance;
+	uint32_t Channel;
+	bool isTimerActive;
+	timer_parameter_struct init_params;
+} SPL_TimerHandle_t;
 
 typedef struct {
-	uint32_t time;
-	enum timeFormat format;
-} timerPeriod_t;
+	void *_timer_instance;
+	SPL_TimerHandle_t handle;
+	uint32_t timerPreemptPriority;
+	uint32_t timerSubPriority;
+} timerDevice_t;
 
-typedef struct timerhandle {
-	void (*init)(uint32_t instance, timerPeriod_t *timerPeriod);
-	void (*start)(uint32_t instance);
-	void (*stop)(uint32_t instance);
-	void (*setPeriodTime)(uint32_t instance, timerPeriod_t *timerPeriod);
-	void (*refresh)(uint32_t instance);
-	void (*enableUpdateIT)(uint32_t instance);
-	void (*enableCaptureIT)(uint32_t instance, uint8_t channel);
-	void (*disableUpdateIT)(uint32_t instance);
-	void (*disableCaptureIT)(uint32_t instance, uint8_t channel);
-	void (*interruptHandle)(uint32_t instance);
-	void (*setIntPriority)(uint32_t instance, uint32_t prempt, uint32_t subPrio);
-	callBack_t captureInterruptHandle[4];
-} timerhandle_t;
+timerDevice_t *get_timer_object(SPL_TimerHandle_t *timerHandle);	// get the timer object (timerDevice_t) belonging to the timer
 
-typedef struct pwmhandle {
-	void (*init)(pwmDevice_t *pwmDevice);
-	void (*start)(pwmDevice_t *pwmDevice);
-	void (*stop)(pwmDevice_t *pwmDevice);
-	void (*setPeriodCycle)(pwmDevice_t *pwmDevice, pwmPeriodCycle_t *pwmPeriodCycle);
-	void (*writeCycleValue)(pwmDevice_t *pwmDevice, pwmPeriodCycle_t *pwmPeriodCycle);
-	void (*enablePWMIT)(pwmDevice_t *pwmDevice);
-	void (*disablePWMIT)(pwmDevice_t *pwmDevice);
-	void (*interruptHandle)(uint32_t instance, uint8_t channel);
-} pwmhandle_t;
+void Timer_clock_enable(SPL_TimerHandle_t *timerHandle);				// enable timer clock
+void Timer_clock_disable(SPL_TimerHandle_t *timerHandle);			// disable timer clock
 
-pwmDevice_t getTimerDeviceFromPinname(PinName instance);	// get timer device from pinname
-uint32_t getPWMIndex(pwmDevice_t instance);					// get pwm index
-uint32_t getTimerIndex(uint32_t instance);					// get timer index
-void timer_clock_enable(uint32_t instance);					// enable timer clock
-void timer_clock_disable(uint32_t instance);					// disable timer clock
+void Timer_init(SPL_TimerHandle_t *timerHandle);						// initialize timer
 
-void Timer_init(uint32_t instance, timerPeriod_t *timerPeriod);				// initialize timer
-void Timer_start(uint32_t instance);													// start timer
-void Timer_stop(uint32_t instance);														// stop timer
-void Timer_setPeriodTime(uint32_t instance, timerPeriod_t *timerPeriod);	// set timer period
+void Timer_enableUpdateIT(uint32_t instance);								// enable timer update interrupt
+void Timer_disableUpdateIT(uint32_t instance);								// disable timer update interrupt
+void Timer_enableCaptureIT(uint32_t instance, uint32_t interrupt);	// enable timer channel capture interrupt
+void Timer_disableCaptureIT(uint32_t instance, uint32_t interrupt);	// disable timer channel capture interrupt
 
-void Timer_refresh(uint32_t instance);										// update some registers to restart counters
-void Timer_enableUpdateIT(uint32_t instance);							// enable timer update interrupt
-void Timer_disableUpdateIT(uint32_t instance);							// disable timer update interrupt
-void Timer_updateHandle(uint32_t instance);								// timer update interrupt handler
-void Timer_enableCaptureIT(uint32_t instance, uint8_t channel);	// enable timer channel capture interrupt
-void Timer_disableCaptureIT(uint32_t instance, uint8_t channel);	// disable timer channel capture interrupt
-void Timer_captureHandle(uint32_t timer, uint8_t channel);			// timer capture interrupt handler
-void Timer_setIntPriority(uint32_t instance, uint32_t prempt, uint32_t subPrio);
+uint32_t  getTimerClkFrequency(uint32_t instance);		// get timer clock frequency
+IRQn_Type getTimerUpIrq(uint32_t timer);					// get timer update IRQn
+IRQn_Type getTimerCCIrq(uint32_t timer);					// get timer capture/compare IRQn
 
-void PWM_init(pwmDevice_t *pwmDevice);		// initialize pwm
-void PWM_start(pwmDevice_t *pwmDevice);	// start pwm output
-void PWM_stop(pwmDevice_t *pwmDevice);		// stop pwm output
-
-void PWM_setPeriodCycle(pwmDevice_t *pwmDevice, pwmPeriodCycle_t *pwmPeriodCycle);	// set pwm period and cycle
-void PWM_writeCyclevalue(pwmDevice_t *pwmDevice, pwmPeriodCycle_t *pwmPeriodCycle);	// set pwm cycle
-
-void PWM_enablePWMIT(pwmDevice_t *pwmDevice);				// enable pwm interrupt
-void PWM_disablePWMIT(pwmDevice_t *pwmDevice);				// disable pwm interrupt
-void PWM_irqHandle(uint32_t instance, uint8_t channel);	// pwm capture/compare interrupt handler
-
-uint32_t  getTimerClkFrequency(uint32_t instance);	// get timer clock frequency
-IRQn_Type getTimerUpIrq(uint32_t tim);					// get timer update IRQn
-IRQn_Type getTimerCCIrq(uint32_t tim);					// get timer capture/compare IRQn
+void timerInterruptHandler(SPL_TimerHandle_t *timer_handle);
+void timer_captureHandle(SPL_TimerHandle_t *timer_handle);
+void timer_updateHandle(SPL_TimerHandle_t *timer_handle);
 
 #ifdef __cplusplus
 }
