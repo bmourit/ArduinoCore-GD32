@@ -44,6 +44,12 @@ extern "C" {
 #define SPI_MODE2 2
 #define SPI_MODE3 3
 
+typedef enum {
+  SPI_OK,
+  SPI_TIMEOUT,
+  SPI_ERROR
+} spi_status_t;
+
 /* SPI default speed */
 #define SPI_SPEED_DEFAULT     4000000
 
@@ -56,8 +62,21 @@ extern "C" {
 #define SPI_CLOCK_DIV128  ((uint32_t)128)
 #define SPI_CLOCK_DIV256  ((uint32_t)256)
 
+typedef struct SPL_SPIHandle_s {
+  uint32_t instance;
+  spi_parameter_struct params;
+  uint8_t *tx_buffer_ptr;
+  uint16_t tx_size;
+  __IO uint16_t tx_count;
+  uint8_t *rx_buffer_ptr;
+  uint16_t rx_size;
+  __IO uint16_t rx_count
+  void (*tx_callback)(struct SPL_SPIHandle_s *spi_handler);
+  void (*rx_callback)(struct SPL_SPIHandle_s *spi_handler);
+} SPL_SPIHandle_t;
+
 struct spi_s {
-  spi_parameter_struct spi_struct;
+  SPL_SPIHandle_t handle;
   SPIName spi;
   PinName pin_miso;
   PinName pin_mosi;
@@ -68,10 +87,12 @@ struct spi_s {
 typedef struct spi_s spi_t;
 
 void spi_begin(spi_t *obj, uint32_t speed, uint8_t mode, uint8_t endian);
-uint32_t spi_master_write(spi_t *obj, uint8_t value);
-void spi_master_block_write(spi_t *obj, uint8_t *tx_buffer, uint8_t *rx_buffer, uint16_t len);
-uint32_t dev_spi_clock_source_frequency_get(spi_t *obj);
 void spi_free(spi_t *obj);
+
+spi_status_t spi_send(spi_t *obj, uint16_t *data, uint16_t length);
+spi_status_t spi_transfer(spi_t *obj, uint16_t *tx_buffer, uint16_t *rx_buffer, uint16_t length, bool skipRX);
+
+uint32_t spi_getClkFreq(spi_t *obj);
 
 #ifdef __cplusplus
 }

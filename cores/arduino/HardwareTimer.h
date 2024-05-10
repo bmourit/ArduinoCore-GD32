@@ -43,9 +43,9 @@ OF SUCH DAMAGE.
 
 #ifdef __cplusplus
 
-#include <functional>
-//typedef void(*timerCallback_t)(void);
-using timerCallback_t = std::function<void(void)>;
+//#include <functional>
+typedef void(*timerCallback_t)(void);
+//using timerCallback_t = std::function<void(void)>;
 
 class HardwareTimer
 {

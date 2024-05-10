@@ -40,26 +40,22 @@ timerDevice_t *HWTimer_Handle[TIMER_NUM] = {NULL};
   \param[in]  instance: TIMERx(x=0..13)
   \retval     none
 */
-HardwareTimer::HardwareTimer(uint32_t instance) :
-    _timerObj{
-        ._timer_instance = (void *)this,
-        .handle = {
-            .timer_instance = instance,
-            .Channel = CHAN_ALL_CLEARED,
-            .isTimerActive = false,
-        },
-        .timerPreemptPriority = TIMER_IRQ_PRIORITY,
-        .timerSubPriority = TIMER_IRQ_SUBPRIORITY,
-        .handle.init_params = {
-            .prescaler = 0,
-            .period = PERIOD_MAX,
-            .counterdirection = TIMER_COUNTER_UP,
-            .clockdivision = TIMER_CKDIV_DIV1,
-            .alignedmode = TIMER_COUNTER_EDGE,
-            .repetitioncounter = 0,
-        }
-    }
+HardwareTimer::HardwareTimer(uint32_t instance)
 {
+  _timerObj._timer_instance = (void *)this;
+  _timerObj.handle.timer_instance = instance;
+  _timerObj.handle.Channel = CHAN_ALL_CLEARED;
+  _timerObj.handle.isTimerActive = false;
+
+  _timerObj.timerPreemptPriority = TIMER_IRQ_PRIORITY;
+  _timerObj.timerSubPriority = TIMER_IRQ_SUBPRIORITY;
+  _timerObj.handle.init_params.prescaler = 0;
+  _timerObj.handle.init_params.period = PERIOD_MAX;
+  _timerObj.handle.init_params.counterdirection = TIMER_COUNTER_UP;
+  _timerObj.handle.init_params.clockdivision = TIMER_CKDIV_DIV1;
+  _timerObj.handle.init_params.alignedmode = TIMER_COUNTER_EDGE;
+  _timerObj.handle.init_params.repetitioncounter = 0;
+    
     uint32_t index = get_timer_index(instance);
     if (index == UNKNOWN_TIMER) {
         Error_Handler();
@@ -1228,13 +1224,6 @@ extern "C"
       timerInterruptHandler(&HWTimer_Handle[TIMER12_INDEX]->handle);
     }
 #endif
-  }
-
-  void TIMER7_UP_IRQHandler(void)
-  {
-    if (HWTimer_Handle[TIMER7_INDEX]) {
-      timerInterruptHandler(&HWTimer_Handle[TIMER7_INDEX]->handle);
-    }
   }
 
   void TIMER7_Channel_IRQHandler(void)

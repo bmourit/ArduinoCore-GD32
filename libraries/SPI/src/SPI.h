@@ -39,57 +39,99 @@ extern "C" {
  */
 #define SPI_HAS_TRANSACTION 1
 
+enum SPITransferMode {
+  SPI_CONTINUE, /* Transfer not finished: CS pin kept active */
+  SPI_LAST      /* Transfer ended: CS pin released */
+};
+
 class SPISettings
 {
   public:
-    SPISettings(uint32_t speedMax, BitOrder bitOrder, uint8_t dataMode)
+    SPISettings(uint32_t speedMax, BitOrder bitOrder, uint8_t dataMode, bool noRX = 0)
     {
-      this->speed = speedMax;
-      this->bitorder = bitOrder;
-      this->datamode = dataMode;
+      speed = speedMax;
+      bitorder = bitOrder;
+      datamode = dataMode;
     }
+
     /* Set speed to default, SPI mode set to MODE 0 and Bit order set to MSB first. */
     SPISettings()
     {
-      this->speed = SPI_SPEED_DEFAULT;
-      this->bitorder = MSBFIRST;
-      this->datamode = SPI_MODE0;
+      speed = SPI_SPEED_DEFAULT;
+      bitorder = MSBFIRST;
+      datamode = SPI_MODE0;
     }
 
   private:
     uint32_t speed;
     uint8_t datamode;
     BitOrder bitorder;
+    int spimode
 
     friend class SPIClass;
+    bool _noRX
 };
 
-const SPISettings DEFAULT_SPI_SETTINGS = SPISettings();
+//const SPISettings DEFAULT_SPI_SETTINGS = SPISettings();
 
 class SPIClass
 {
   public:
     SPIClass();
-    SPIClass(PinName mosi, PinName miso, PinName sclk, PinName ssel);
-    SPIClass(PinName mosi, PinName miso, PinName sclk);
+    SPIClass(uint8_t mosi, uint8_t miso, uint8_t sclk, uint8_t ssel = (uint8_t)NC);
+
+    void setMISO(uint32_t miso)
+    {
+      _spi.pin_miso = DIGITAL_TO_PINNAME(miso);
+    };
+    void setMOSI(uint32_t mosi)
+    {
+      _spi.pim_mosi = DIGITAL_TO_PINNAME(mosi);
+    };
+    void setSCLK(uint32_t sclk)
+    {
+      _spi.pin_sclk = DIGITAL_TO_PINNAME(sclk);
+    };
+    void setSSEL(uint32_t ssel)
+    {
+      _spi.pin_ssel = DIGITAL_TO_PINNAME(ssel);
+    };
+
+    void setMISO(PinName miso)
+    {
+      _spi.pin_miso = (miso);
+    };
+    void setMOSI(PinName mosi)
+    {
+      _spi.pin_mosi = (mosi);
+    };
+    void setSCLK(PinName sclk)
+    {
+      _spi.pin_sclk = (sclk);
+    };
+    void setSSEL(PinName ssel)
+    {
+      _spi.pin_ssel = (ssel);
+    };
 
     void begin();
     void end();
+
     void beginTransaction(SPISettings settings);
     void endTransaction(void);
-    uint8_t transfer(uint8_t val8);
-    uint16_t transfer16(uint16_t val16);
-    void transfer(void *buf, size_t count);
-    void transfer(void *bufout, void *bufin, size_t count);
+
+    byte transfer(uint8_t data, SPITransferMode mode = SPI_LAST);
+    uint16_t transfer16(uint16_t data, SPITransferMode mode = SPI_LAST);
+    void transfer(void *buf, size_t count, SPITransferMode mode = SPI_LAST);
+    void transfer(void *bufout, void *bufin, size_t count, SPITransferMode mode = SPI_LAST);
+
     void setBitOrder(BitOrder order);
     void setDataMode(uint8_t mode);
     void setClockDivider(uint32_t divider);
 
   private:
-    void config(SPISettings settings);
-
-    SPISettings spiSettings;
-    bool initialized;
+    SPISettings spiSettings[4];
+    int16_t _initialized;
     spi_t _spi;
 };
 
