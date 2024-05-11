@@ -134,35 +134,47 @@ void SystemInit(void)
   }
   RCU_MODIFY(0x50);
 
-  RCU_CFG0 &= ~RCU_CFG0_SCS;
+  /* reset SCS, SCSS, AHBPSC, APBPSC, APB1PSC, APB2PSC, ADCPSC, and CKOUT0SEL */
+  RCU_CFG0 &= 0xf8ff0000U;//~RCU_CFG0_SCS;
 
 #if (defined(GD32F30X_HD) || defined(GD32F30X_XD))
   /* reset HXTALEN, CKMEN and PLLEN bits */
   RCU_CTL &= ~(RCU_CTL_PLLEN | RCU_CTL_CKMEN | RCU_CTL_HXTALEN);
-  /* disable all interrupts */
-  RCU_INT = 0x009f0000U;
 #elif defined(GD32F30X_CL)
   /* Reset HXTALEN, CKMEN, PLLEN, PLL1EN and PLL2EN bits */
   RCU_CTL &= ~(RCU_CTL_PLLEN | RCU_CTL_PLL1EN | RCU_CTL_PLL2EN | RCU_CTL_CKMEN | RCU_CTL_HXTALEN);
-  /* disable all interrupts */
-  RCU_INT = 0x00ff0000U;
 #endif
 
   /* reset HXTALBPS bit */
   RCU_CTL &= ~(RCU_CTL_HXTALBPS);
 
-  /* Reset CFG0 and CFG1 registers */
-  RCU_CFG0 = 0x00000000U;
-  RCU_CFG1 = 0x00000000U;
+  /* reset PLLSEL, PREDV0, PLLMF, USBDPSC, PLLMF_4, PLLMF_5, USBDPSC_2 */
+  RCU_CFG0 &= ~(RCU_CFG0_PLLSEL | RCU_CFG0_PREDV0 | RCU_CFG0_PLLMF | RCU_CFG0_USBDPSC | RCU_CFG0_PLLMF_4 | RCU_CFG0_PLLMF_5 | RCU_CFG0_USBDPSC_2);
 
-  /* configure the system clock source, PLL Multiplier, AHB/APBx prescalers and Flash settings */
-  system_clock_config();
+#if defined(GD32F30X_CL)
+  /* reset PLL1En and PLL2EN */
+  RCU_CTL &= ~(RCU_CTL_PLL1EN | RCO_CTL_PLL2EN)
+  /* disable all interrupts */
+  RCU_INT = 0x00ff0000U;
+  RCU_CFG1 = 0x00000000U;
+#elif (defined(GD32F30X_HD) || defined(GD32F30X_XD))
+  /* disable all interrupts */
+  RCU_INT = 0x009f0000U;
+  RCU_CFG1 &= ~(RCU_CFG1_ADCPSC_3 | RCU_CFG1_PLLPRESEL)
+#endif
+
+  /* Reset CFG0 and CFG1 registers */
+  //RCU_CFG0 = 0x00000000U;
+
   //SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET;
 #ifdef VECT_TAB_SRAM
   nvic_vector_table_set(NVIC_VECTTAB_RAM, VECT_TAB_OFFSET);
 #else
   nvic_vector_table_set(NVIC_VECTTAB_FLASH, VECT_TAB_OFFSET);
 #endif
+
+  /* configure the system clock source, PLL Multiplier, AHB/APBx prescalers and Flash settings */
+  //system_clock_config();
 }
 
 /*!
@@ -937,21 +949,21 @@ void SystemCoreClockUpdate(void)
   tmp_val = GET_BITS(RCU_CFG0, 2, 3);
 
   switch (tmp_val) {
-  case SEL_IRC8M:     /* IRC8M is selected as CK_SYS */
-    SystemCoreClock = IRC8M_VALUE;
-    break;
-  case SEL_HXTAL:     /* HXTAL is selected as CK_SYS */
-    SystemCoreClock = HXTAL_VALUE;
-    break;
-  case SEL_PLL:       /* PLL is selected as CK_SYS */
-    /* PLL clock source selection, HXTAL, IRC48M or IRC8M / 2 */
-    pllsel = (RCU_CFG0 & RCU_CFG0_PLLSEL);
+    case SEL_IRC8M:     /* IRC8M is selected as CK_SYS */
+      SystemCoreClock = IRC8M_VALUE;
+      break;
+    case SEL_HXTAL:     /* HXTAL is selected as CK_SYS */
+      SystemCoreClock = HXTAL_VALUE;
+      break;
+    case SEL_PLL:       /* PLL is selected as CK_SYS */
+      /* PLL clock source selection, HXTAL, IRC48M or IRC8M / 2 */
+      pllsel = (RCU_CFG0 & RCU_CFG0_PLLSEL);
 
-    if (RCU_PLLSRC_HXTAL_IRC48M == pllsel) {
+    if (pllsel == RCU_PLLSRC_HXTAL_IRC48M) {
       /* PLL clock source is HXTAL or IRC48M */
       pllpresel = (RCU_CFG1 & RCU_CFG1_PLLPRESEL);
-      
-      if (RCU_PLLPRESRC_HXTAL == pllpresel) {
+
+      if (pllpresel == RCU_PLLPRESRC_HXTAL) {
         /* PLL clock source is HXTAL */
         ck_src = HXTAL_VALUE;
       } else {

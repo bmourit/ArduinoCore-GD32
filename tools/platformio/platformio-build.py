@@ -140,8 +140,9 @@ machine_flags = [
     "-masm-syntax-unified",
 ]
 
-# Some GD32F303RET6 chips shipped without FPU support. There is no easy way to check this
-# TODO: Do a check somehow?
+# Some GD32F303RET6 chips shipped without an FPU and appear to have no easy way to check
+# TODO: Do a check somehow? For now, if you use this chip and are certain it has an FPU,
+# you may uncomment the following line of code (Note: BOOT WILL FAIL if no FPU exists)
 #if any(mcu in board_config.get("build.cpu") for cpu in ("cortex-m4", "cortex-m7")):
 #    machine_flags.extend(["-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"])
 if board_config.get("build.cpu") == "cortex-m7":
