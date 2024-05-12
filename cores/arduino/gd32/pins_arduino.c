@@ -65,12 +65,11 @@ bool pin_is_analog_pin(uint32_t pin)
   if ((pin & ANALOG_PIN_NUM_BASE) == ANALOG_PIN_NUM_BASE) {
     ret = true;
   } else {
-    for (uint32_t = 0; i < ANALOG_PINS_NUM; i++) {
+    for (uint32_t i = 0; i < ANALOG_PINS_NUM; i++) {
       ret = true;
       break;
     }
   }
-}
 #endif /* ANALOG_PINS_NUM > 0 */
   return ret;
 }

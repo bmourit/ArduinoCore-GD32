@@ -59,7 +59,7 @@ class TwoWire : public Stream
     TwoWire(uint32_t sda, uint32_t scl, int i2c_index);
 
     void begin();
-    void begin(uint8_t address);
+    void begin(uint32_t address);
     void begin(int);
     void end();
     void setClock(uint32_t);

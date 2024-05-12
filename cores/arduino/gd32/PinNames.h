@@ -204,15 +204,10 @@ typedef enum {
   PORTI_14 = (PORTI << 4) + 0x0E,
   PORTI_15 = (PORTI << 4) + 0x0F,
 #endif
-  //INT_ADC_BASE = PIN_NAME_INT_ANALOG_BASE,
   /* ADC internal channels */
   ADC_PINS_BASE = PINNAME_ANALOG_INT,
-#if defined(ADC_CHANNEL_TEMPSENSOR) || defined(ADC_CHANNEL_TEMPSENSOR_ADC0)
   ADC_TEMP,
-#endif
-#if defined(ADC_CHANNEL_VREFINT)
   ADC_VREF,
-#endif
 /* pin names specific to the variant */
 #if __has_include("PinNamesVar.h")
 #include "PinNamesVar.h"

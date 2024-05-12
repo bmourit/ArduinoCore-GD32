@@ -244,7 +244,7 @@ uint16_t get_adc_value(PinName pn)
 
   if (pn & ADC_PINS_BASE) {
     adc_periph = ADC0;
-    switch(pn) {
+    switch (pn) {
     case ADC_TEMP:
       channel = ADC_CHANNEL_16;
       break;
@@ -304,10 +304,12 @@ uint16_t get_adc_value(PinName pn)
   }
 #if defined(GD32F30x) || defined(GD32E50X)
   adc_regular_channel_config(adc_periph, 0U, channel, sampling_time);
-  if (pn == ADC_TEMP || pn == ADC_VREF) {
-    adc_tempsensor_vrefint_enable();
-    delay(1U);
+
+  if ((pn == ADC_TEMP) | (pn == ADC_VREF)) {
+      adc_tempsensor_vrefint_enable();
+      delay(1U);
   }
+
   adc_software_trigger_enable(adc_periph, ADC_REGULAR_CHANNEL);
   while (!adc_flag_get(adc_periph, ADC_FLAG_EOC));
   adc_flag_clear(adc_periph, ADC_FLAG_EOC);

@@ -44,3 +44,5 @@ enum {
   D180, D181, D182, D183, D184, D185, D186, D187, D188, D189,
   D190, D191, DMAX
 };
+
+#endif  /* _ARDUINO_DIGITAL_PINS_H_ */
