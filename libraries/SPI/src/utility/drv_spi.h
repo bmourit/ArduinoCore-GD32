@@ -70,7 +70,7 @@ typedef struct SPL_SPIHandle_s {
   __IO uint16_t tx_count;
   uint8_t *rx_buffer_ptr;
   uint16_t rx_size;
-  __IO uint16_t rx_count
+  __IO uint16_t rx_count;
   void (*tx_callback)(struct SPL_SPIHandle_s *spi_handler);
   void (*rx_callback)(struct SPL_SPIHandle_s *spi_handler);
 } SPL_SPIHandle_t;
@@ -93,6 +93,7 @@ spi_status_t spi_send(spi_t *obj, uint16_t *data, uint16_t length);
 spi_status_t spi_transfer(spi_t *obj, uint16_t *tx_buffer, uint16_t *rx_buffer, uint16_t length, bool skipRX);
 
 uint32_t spi_getClkFreq(spi_t *obj);
+void spi_set_config(SPL_SPIHandle_t *spi_handle);
 
 #ifdef __cplusplus
 }

@@ -36,6 +36,11 @@ extern "C" {
 
 #define ALTMASK 0x700
 
+/* analog internal */
+#define PINNAME_ANALOG_INT  0x1000
+
+#define PINNAME_MASK        0xff
+
 typedef enum {
 #if defined GPIOA
   PORTA_0  = (PORTA << 4) + 0x00,
@@ -201,9 +206,13 @@ typedef enum {
 #endif
   //INT_ADC_BASE = PIN_NAME_INT_ANALOG_BASE,
   /* ADC internal channels */
-  ADC_PINS_BASE = 0x100,
+  ADC_PINS_BASE = PINNAME_ANALOG_INT,
+#if defined(ADC_CHANNEL_TEMPSENSOR) || defined(ADC_CHANNEL_TEMPSENSOR_ADC0)
   ADC_TEMP,
+#endif
+#if defined(ADC_CHANNEL_VREFINT)
   ADC_VREF,
+#endif
 /* pin names specific to the variant */
 #if __has_include("PinNamesVar.h")
 #include "PinNamesVar.h"

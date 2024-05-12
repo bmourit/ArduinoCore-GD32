@@ -50,6 +50,9 @@ OF SUCH DAMAGE.
 extern "C" {
 #endif
 
+/* weaked */
+void SystemClock_Config(void);
+
 void _Error_Handler(const char *, int);
 
 #define Error_Handler() _Error_Handler(__FILE__, __LINE__)

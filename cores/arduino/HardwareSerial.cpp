@@ -70,35 +70,6 @@ void serialEvent5() __attribute__((weak));
 
 #define SERIAL_UART_DATA_MASK   0x07
 
-/*void serialEventRun(void)
-{
-#if defined(HAVE_HWSERIAL1)
-  if (serialEvent1 && Serial1_available()) {
-    serialEvent1();
-  }
-#endif
-#if defined(HAVE_HWSERIAL2)
-  if (serialEvent2 && Serial2_available()) {
-    serialEvent2();
-  }
-#endif
-#if defined(HAVE_HWSERIAL3)
-  if (serialEvent3 && Serial3_available()) {
-    serialEvent3();
-  }
-#endif
-#if defined(HAVE_HWSERIAL4)
-  if (serialEvent4 && Serial4_available()) {
-    serialEvent4();
-  }
-#endif
-#if defined(HAVE_HWSERIAL5)
-  if(serialEvent5 && Serial5_available()) {
-    serialEvent5();
-  }
-#endif
-}*/
-
 HardwareSerial::HardwareSerial(uint32_t rx, uint32_t tx)
 {
   init(DIGITAL_TO_PINNAME(rx), DIGITAL_TO_PINNAME(tx));

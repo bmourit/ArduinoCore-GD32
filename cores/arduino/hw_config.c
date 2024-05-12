@@ -37,6 +37,7 @@
   */
 
 #include "hw_config.h"
+#include "systick.h"
 
 #ifdef __cplusplus
 extern "C" {

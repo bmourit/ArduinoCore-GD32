@@ -4,7 +4,7 @@
 /*
  * Core and peripherals registers definitions
 */
-#include "interrupt.h"
+#include "api/Interrupts.h"
 #include "analog.h"
 #include "backup_domain.h"
 #include "systick.h"

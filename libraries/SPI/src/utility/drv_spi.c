@@ -41,7 +41,7 @@ extern "C" {
  * Configures the pins used by SPI, sets a default format and frequency, and enables the peripheral
  * @param[out] spi_handle  The SPI handle to initialize
  */
-static void spi_set_config(SPL_SPIHandle_t *spi_handle)
+void spi_set_config(SPL_SPIHandle_t *spi_handle)
 {
   if (spi_handle == NULL) {
     return;

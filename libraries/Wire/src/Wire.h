@@ -56,20 +56,20 @@ class TwoWire : public Stream
     void (*user_onReceive)(int);
 
   public:
-    TwoWire(uint8_t sda, uint8_t scl, int i2c_index);
+    TwoWire(uint32_t sda, uint32_t scl, int i2c_index);
 
     void begin();
     void begin(uint8_t address);
     void begin(int);
     void end();
     void setClock(uint32_t);
-    void beginTransmission(uint8_t);
+    void beginTransmission(uint32_t);
     void beginTransmission(int);
     uint8_t endTransmission(void);
     uint8_t endTransmission(uint8_t);
-    uint8_t requestFrom(uint8_t, uint8_t);
-    uint8_t requestFrom(uint8_t, uint8_t, uint8_t);
-    uint8_t requestFrom(uint8_t, uint8_t, uint32_t, uint8_t, uint8_t);
+    uint8_t requestFrom(uint32_t, uint8_t);
+    uint8_t requestFrom(uint32_t, uint8_t, uint8_t);
+    uint8_t requestFrom(uint32_t, uint8_t, uint32_t, uint8_t, uint8_t);
     uint8_t requestFrom(int, int);
     uint8_t requestFrom(int, int, int);
     virtual size_t write(uint8_t);

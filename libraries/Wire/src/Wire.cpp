@@ -31,7 +31,7 @@ extern "C" {
 TwoWire Wire(SDA, SCL, 0);
 #endif
 
-TwoWire::TwoWire(uint8_t sda, uint8_t scl, int i2c_index)
+TwoWire::TwoWire(uint32_t sda, uint32_t scl, int i2c_index)
 {
   user_onRequest = NULL;
   transmitting = 0;
@@ -69,7 +69,7 @@ void TwoWire::begin()
   \param[out] none
   \retval     none
 */
-void TwoWire::begin(uint8_t address)
+void TwoWire::begin(uint32_t address)
 {
   ownAddress = address << 1;
 
@@ -81,7 +81,7 @@ void TwoWire::begin(uint8_t address)
 
 void TwoWire::begin(int address)
 {
-  begin((uint8_t)address);
+  begin((uint32_t)address);
 }
 
 void TwoWire::end(void)
@@ -94,7 +94,7 @@ void TwoWire::end(void)
   i2c_deinit(_i2c.i2c);
 }
 
-uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint32_t iaddress, uint8_t isize, uint8_t sendStop)
+uint8_t TwoWire::requestFrom(uint32_t address, uint8_t quantity, uint32_t iaddress, uint8_t isize, uint8_t sendStop)
 {
   if (isize > 0) {
     // send internal address; this mode allows sending a repeated start to access
@@ -130,12 +130,12 @@ uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint32_t iaddres
   return quantity;
 }
 
-uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop)
+uint8_t TwoWire::requestFrom(uint32_t address, uint8_t quantity, uint8_t sendStop)
 {
   return requestFrom((uint8_t)address, (uint8_t)quantity, (uint32_t)0, (uint8_t)0, (uint8_t)sendStop);
 }
 
-uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity)
+uint8_t TwoWire::requestFrom(uint32_t address, uint8_t quantity)
 {
   return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)true);
 }
@@ -147,7 +147,7 @@ uint8_t TwoWire::requestFrom(int address, int quantity)
 
 uint8_t TwoWire::requestFrom(int address, int quantity, int sendStop)
 {
-  return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)sendStop);
+  return requestFrom((uint32_t)address, (uint8_t)quantity, (uint8_t)sendStop);
 }
 
 /*!
@@ -156,7 +156,7 @@ uint8_t TwoWire::requestFrom(int address, int quantity, int sendStop)
   \param[out] none
   \retval     none
 */
-void TwoWire::beginTransmission(uint8_t address)
+void TwoWire::beginTransmission(uint32_t address)
 {
   // indicate that we are transmitting
   transmitting = 1;
@@ -169,7 +169,7 @@ void TwoWire::beginTransmission(uint8_t address)
 
 void TwoWire::beginTransmission(int address)
 {
-  beginTransmission((uint8_t)address);
+  beginTransmission((uint32_t)address);
 }
 
 uint8_t TwoWire::endTransmission(uint8_t sendStop)

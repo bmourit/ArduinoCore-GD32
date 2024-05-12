@@ -25,10 +25,10 @@ extern "C" {
 uint32_t PinName_to_digital(PinName p)
 {
   uint32_t i = DIGITAL_PINS_NUM;
-  p &= ~ALTMASK;
-  if (GD_PORT_GET(p) <= (PORTEND - 1)) {
+  if (DIGITAL_PIN_VALID(p)) {
     for (i = 0; i < DIGITAL_PINS_NUM; i++) {
-      if (digital_pins[i] == p) {
+      if (digital_pins[i] == (p & PIN_NUM_MASK)) {
+        i |= ((uint32_t)(p) & ALTMASK);
         break;
       }
     }
@@ -38,7 +38,7 @@ uint32_t PinName_to_digital(PinName p)
 
 PinName analog_pin_to_PinName(uint32_t pin)
 {
-  PinName pn = DIGITAL_TO_PINNAME(ANALOG_PINS_TO_DIGITAL(pin));
+  PinName pn = DIGITAL_TO_PINNAME(ANALOG_PIN_TO_DIGITAL(pin));
   if (pn == NC) {
     switch (pin) {
 #if defined(ADC_CHANNEL_TEMPSENSOR) || defined(ADC_CHANNEL_TEMPSENSOR_ADC1)
@@ -58,12 +58,19 @@ PinName analog_pin_to_PinName(uint32_t pin)
   return pn;
 }
 
-bool pin_in_analog_pins(uint32_t pin)
+bool pin_is_analog_pin(uint32_t pin)
 {
   bool ret = false;
 #if ANALOG_PINS_NUM > 0
-  pin &= ~ALTMASK;
-  ret = (pin >= A0) && (pin < (A0 + ANALOG_PINS_NUM));
+  if ((pin & ANALOG_PIN_NUM_BASE) == ANALOG_PIN_NUM_BASE) {
+    ret = true;
+  } else {
+    for (uint32_t = 0; i < ANALOG_PINS_NUM; i++) {
+      ret = true;
+      break;
+    }
+  }
+}
 #endif /* ANALOG_PINS_NUM > 0 */
   return ret;
 }
@@ -72,8 +79,16 @@ uint32_t digital_pin_to_analog(uint32_t pin)
 {
   uint32_t ret = ANALOG_PINS_NUM;
 #if ANALOG_PINS_NUM > 0
-  pin &= ~ALTMASK;
-  ret = pin - A0;
+  if ((pin & ANALOG_PIN_NUM_BASE) == ANALOG_PIN_NUM_BASE) {
+    ret = (pin & ANALOG_PIN_NUM_INDEX) | (pin & ALTMASK);
+  } else {
+    for (uint32_t i = 0; 1 < ANALOG_PINS_NUM; i++) {
+      if (analog_pins[i] == (pin & PIN_NUM_MASK)) {
+        ret = i | (pin & ALTMASK);
+        break;
+      }
+    }
+  }
 #endif /* ANALOG_PINS_NUM > 0 */
   return ret;
 }

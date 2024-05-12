@@ -160,7 +160,7 @@ void SystemInit(void)
 #elif (defined(GD32F30X_HD) || defined(GD32F30X_XD))
   /* disable all interrupts */
   RCU_INT = 0x009f0000U;
-  RCU_CFG1 &= ~(RCU_CFG1_ADCPSC_3 | RCU_CFG1_PLLPRESEL)
+  RCU_CFG1 &= ~(RCU_CFG1_ADCPSC_3 | RCU_CFG1_PLLPRESEL);
 #endif
 
   /* Reset CFG0 and CFG1 registers */

@@ -178,8 +178,8 @@ extern "C" {
 #define DEFAULT_HWSERIAL_INSTANCE    1
 
 // Default pin used for 'Serial1' instance
-#define SERIAL0_TX      PA9
-#define SERIAL0_RX      PA10
+#define PIN_SERIAL_RX      PA9
+#define PIN_SERIAL_TX      PA10
 
 #ifdef __cplusplus
 } // extern "C"
