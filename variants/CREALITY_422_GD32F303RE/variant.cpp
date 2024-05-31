@@ -17,6 +17,7 @@
 */
 
 #include "pins_arduino.h"
+#include "safe_clocks.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -98,66 +99,60 @@ const uint32_t analog_pins[] = {
 
 WEAK void SystemClock_Config(void)
 {
-  uint32_t timeout = 0U;
-  uint32_t stab_flag = 0U;
+  SC_oscillator_params_t osc_params = {};
+  SC_clock_params_t clock_params = {};
+  SC_peripheral_params_t pclk_params = {};
 
-  /* enable HXTAL */
-  RCU_CTL |= RCU_CTL_HXTALEN;
+  uint32_t reg = RCU_APB1EN;
+  reg &= ~RCU_APB1EN_PMUEN;
+  reg |= RCU_APB1EN_PMUEN;
+  RCU_APB1EN = reg;
 
-  /* wait until HXTAL is stable or the startup time is longer than HXTAL_STARTUP_TIMEOUT */
-  do {
-    timeout++;
-    stab_flag = (RCU_CTL & RCU_CTL_HXTALSTB);
-  } while ((0U == stab_flag) && (HXTAL_STARTUP_TIMEOUT != timeout));
+  reg = PMU_CTL;
+  reg &= ~PMU_CTL_LDOVS;
+  reg |= (3 << 14);
+  PMU_CTL = reg;
 
-  /* if fail */
-  if (0U == (RCU_CTL & RCU_CTL_HXTALSTB)) {
-    while (1) {
-    }
+  osc_params.osc = RCU_OSC_HXTAL;
+  osc_params.HXTAL_state = RCU_HXTAL_ON;
+  osc_params.HXTAL_prediv = RCU_HXTAL_PREDIV2;
+  osc_params.IRC8M_state = RCU_IRC8M_ON;
+  osc_params.pll_params.pll_status = RCU_PLL_ON;
+  osc_params.pll_params.pll_source_clock = RCU_PLLSRC_HXTAL_IRC48M;
+  osc_params.pll_params.pll_multiplier = RCU_PLL_MUL30;
+  if (SC_Osc_Params(&osc_params) != SC_OK) {
+    Error_Handler();
   }
 
-  RCU_APB1EN |= RCU_APB1EN_PMUEN;
-  PMU_CTL |= PMU_CTL_LDOVS;
-
-  /* HXTAL is stable */
-  /* AHB = SYSCLK */
-  RCU_CFG0 |= RCU_AHB_CKSYS_DIV1;
-  /* APB2 = AHB/1 */
-  RCU_CFG0 |= RCU_APB2_CKAHB_DIV1;
-  /* APB1 = AHB/2 */
-  RCU_CFG0 |= RCU_APB1_CKAHB_DIV2;
-
-  /* select HXTAL / 2 as clock source */
-  RCU_CFG0 &= ~(RCU_CFG0_PLLSEL | RCU_CFG0_PREDV0);
-  RCU_CFG0 |= (RCU_PLLSRC_HXTAL_IRC48M | RCU_CFG0_PREDV0);
-
-  /* CK_PLL = (CK_HXTAL / 2) * 30 = 120 MHz */
-  RCU_CFG0 &= ~(RCU_CFG0_PLLMF | RCU_CFG0_PLLMF_4 | RCU_CFG0_PLLMF_5);
-  RCU_CFG0 |= RCU_PLL_MUL30;
-
-  /* enable PLL */
-  RCU_CTL |= RCU_CTL_PLLEN;
-
-  /* wait until PLL is stable */
-  while (0U == (RCU_CTL & RCU_CTL_PLLSTB)) {
+  clock_params.clock = RCU_CLK_AHB | RCU_CLK_SYS | RCU_CLK_APB1 | RCU_CLK_APB2;
+  clock_params.system_source = RCU_CKSYSSRC_PLL;
+  clock_params.ahbclk_div = RCU_AHB_CKSYS_DIV1;
+  clock_params.apb1clk_div = RCU_APB1_CKAHB_DIV2;
+  clock_params.apb2clk_div = RCU_APB2_CKAHB_DIV1;
+  if (SC_Clock_Params(&clock_params, WS_WSCNT_2) != SC_OK) {
+    Error_Handler();
   }
 
   /* enable the high-drive to extend the clock frequency to 120 MHz */
-  PMU_CTL |= PMU_CTL_HDEN;
-  while (0U == (PMU_CS & PMU_CS_HDRF)) {
+  reg = PMU_CTL;
+  reg &= ~PMU_CTL_HDEN;
+  reg |= PMU_CTL_HDEN;
+  PMU_CTL = reg;
+  while (((PMU_CS & PMU_CS_HDRF) >> 16) != 1U) {
   }
 
   /* select the high-drive mode */
-  PMU_CTL |= PMU_CTL_HDS;
-  while (0U == (PMU_CS & PMU_CS_HDSRF)) {
+  reg = PMU_CTL;
+  reg &= ~PMU_CTL_HDS;
+  reg |= PMU_CTL_HDS;
+  PMU_CTL = reg;
+  while (((PMU_CS & PMU_CS_HDSRF) >> 17) != 1U) {
   }
 
-  /* select PLL as system clock */
-  RCU_CFG0 &= ~RCU_CFG0_SCS;
-  RCU_CFG0 |= RCU_CKSYSSRC_PLL;
-
-  /* wait until PLL is selected as system clock */
-  while (0U == (RCU_CFG0 & RCU_SCSS_PLL)) {
+  pclk_params.pclock = RCU_PERIPHCLK_ADC;
+  pclk_params.adc_clk = RCU_CKADC_CKAPB2_DIV8;
+  if (SC_Periph_Params(&pclk_params) != SC_OK) {
+    Error_Handler();
   }
 }
 

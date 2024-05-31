@@ -19,16 +19,17 @@
 */
 #include "FWatchdogTimer.h"
 
-#if defined(GD32F30x)
-#include "gd32f30x_fwdgt.h"
-#include "gd32f30x_rcu.h"
-#elif defined(GD32F10x)
-#include "gd32f10x_fwdgt.h"
-#include "gd32f10x_rcu.h"
-#endif
+//#if defined(GD32F30x)
+//#include "gd32f30x_fwdgt.h"
+//#include "gd32f30x_rcu.h"
+//#elif defined(GD32F10x)
+//#include "gd32f10x_fwdgt.h"
+//#include "gd32f10x_rcu.h"
+//#endif
+#include "gd32xxyy.h"
 
 // Initialize static variable
-bool FWatchdogTimerClass::_enabled = false;
+bool FWatchdogTimerClass::_FWDGT_enabled = false;
 
 /**
   * @brief  Enable FWDGT, must be called once
@@ -45,10 +46,11 @@ void FWatchdogTimerClass::begin(uint32_t timeout)
 
   // Enable the IRC40K peripheral clock FWDGT
   rcu_osci_on(RCU_IRC40K);
-  rcu_osci_stab_wait(RCU_IRC40K);
+  while (rcu_osci_stab_wait(RCU_IRC40K) != SUCCESS) {
+  }
   // Enable the FWDGT by writing 0xCCCC in the FWDGT_CTL register
   fwdgt_enable();
-  _enabled = true;
+  _FWDGT_enabled = true;
 
   set(timeout);
 }
@@ -61,6 +63,7 @@ void FWatchdogTimerClass::begin(uint32_t timeout)
   */
 void FWatchdogTimerClass::set(uint32_t timeout)
 {
+  ErrStatus status = ERROR;
   if ((isEnabled()) && (!IS_FWDGT_TIMEOUT(timeout))) {
     return;
   }
@@ -71,7 +74,7 @@ void FWatchdogTimerClass::set(uint32_t timeout)
   uint16_t reload = 0;
 
   // Convert timeout to seconds
-  float t_sec = (float)timeout / 1000000 * IRC40K_VAL;
+  float t_sec = (float)timeout / 1000000 * IRC40K_VALUE;
 
   do {
     div = 4 << prescaler;
@@ -85,22 +88,20 @@ void FWatchdogTimerClass::set(uint32_t timeout)
   reload = (uint16_t)(t_sec / div) - 1;
 
   // Enable register access by writing 0x5555 in the FWDGT_CTL register
-  // Write the FWDGT prescaler by programming IWDG_PR from 0 to 6
+  // Write the FWDGT prescaler by programming FWDGT_PSC with prescaler value
   // FWDGT_PSC_DIV4 (0) is lowest divider
-  // This is all handled in the below function
-  fwdgt_prescaler_value_config((uint16_t)prescaler);
-  // Write the reload register (FWDGT_RLD)
-  fwdgt_reload_value_config(reload);
-
-  // Wait for the registers to be updated (FWDGT_STAT = 0x00000000)
-  while ((fwdgt_flag_get(FWDGT_FLAG_PUD) | fwdgt_flag_get(FWDGT_FLAG_RUD)) != 0) {
+  // Then write the reload register (FWDGT_RLD)
+  // This is all handled in the below function, which also handles timeouts;
+  status = fwdgt_config(reload, prescaler);
+  if (status != SUCCESS) {
+    return;
   }
   // Refresh the counter value with FWDGT_KEY_RELOAD (FWDGT_CTL = 0xAAAA)
   fwdgt_counter_reload();
 }
 
 /**
-  * @brief  Get the current timeout and window values
+  * @brief  Get the current timeout value
   * @param  timeout: pointer to the get the value in microseconds
   * @retval None
   */
@@ -108,13 +109,13 @@ void FWatchdogTimerClass::get(uint32_t *timeout)
 {
   if (timeout != NULL) {
     uint32_t prescaler = 0;
-    uint32_t reload = 0;
-    float base = (1000000.0 / IRC40K_VAL);
+    uint16_t reload = 0;
+    float base = (1000000.0 / IRC40K_VALUE);
 
-    while (fwdgt_flag_get(FWDGT_FLAG_RUD));
+    while (fwdgt_flag_get(FWDGT_FLAG_RUD) == SET);
     reload = (FWDGT_RLD & FWDGT_RLD_RLD);
 
-    while (fwdgt_flag_get(FWDGT_FLAG_PUD));
+    while (fwdgt_flag_get(FWDGT_FLAG_PUD) == SET);
     prescaler = (FWDGT_PSC & FWDGT_PSC_PSC);
 
     // Timeout given in microseconds
@@ -142,7 +143,7 @@ bool FWatchdogTimerClass::isReset(bool clear)
 {
   bool status = false;
 
-  if (rcu_flag_get(RCU_FLAG_FWDGTRST) != 0) {
+  if (rcu_flag_get(RCU_FLAG_FWDGTRST) == SET) {
     status = true;
   }
 
@@ -163,4 +164,4 @@ void FWatchdogTimerClass::clearReset(void)
 }
 
 // Preinstantiate Object
-FWatchdogTimerClass FWatchdogTimer = FWatchdogTimerClass();
+FWatchdogTimerClass FWatchdog = FWatchdogTimerClass();

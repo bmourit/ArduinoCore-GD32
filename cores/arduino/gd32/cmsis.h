@@ -1,11 +1,11 @@
-/* mbed Microcontroller Library - CMSIS
+/* ARM CMSIS
  * Copyright (C) 2009-2011 ARM Limited. All rights reserved.
  *
- * A generic CMSIS include header, pulling in GD32F303VG specifics
+ * A generic CMSIS include header, pulling in GD32 specifics
  */
 
-#ifndef MBED_CMSIS_H
-#define MBED_CMSIS_H
+#ifndef CMSIS_H
+#define CMSIS_H
 
 #include <gd32xxyy.h>
 #include "cmsis_nvic.h"

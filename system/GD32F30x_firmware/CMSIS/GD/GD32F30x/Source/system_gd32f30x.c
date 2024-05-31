@@ -21,7 +21,7 @@
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-   ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+   ARE DISCLAIMED.w IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -34,14 +34,18 @@
 
 #include "gd32f30x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* system frequency define */
 #define __IRC8M         (IRC8M_VALUE)            /* internal 8 MHz RC oscillator frequency */
 #define __HXTAL         (HXTAL_VALUE)            /* high speed crystal oscillator frequency */
 #define __SYS_OSC_CLK   (__IRC8M)                /* main oscillator frequency */
 
-
-//#define VECT_TAB_OFFSET  0x00000000U  /*!< Vector Table base offset field.
-                                  //This value must be a multiple of 0x200. */
+#ifndef VECT_TAB_OFFSET
+#define VECT_TAB_OFFSET  0x00000000U  /* Vector Table base offset field must be a multiple of 0x200 */
+#endif
 
 /* select a system clock by uncommenting the following line */
 /* use IRC8M */
@@ -57,6 +61,8 @@
 //#define __SYSTEM_CLOCK_72M_PLL_HXTAL    (uint32_t)(72000000)
 //#define __SYSTEM_CLOCK_108M_PLL_HXTAL   (uint32_t)(108000000)
 #define __SYSTEM_CLOCK_120M_PLL_HXTAL     (uint32_t)(120000000)
+//#define __SYSTEM_CLOCK_120M_PLL_HXTAL     (uint32_t)(16000000)
+
 
 #define RCU_MODIFY(__delay)   do {                                \
                                 volatile uint32_t i;              \
@@ -128,16 +134,23 @@ void SystemInit(void)
   SCB->CPACR |= ((3UL << 10 * 2) | (3UL << 11 * 2));
 #endif
   /* reset the RCU clock configuration to the default reset state */
-  /* Set IRC8MEN bit */
+  /* Set IRC8MEN bit and wait for stablity bit */
   RCU_CTL |= RCU_CTL_IRC8MEN;
-  while (0U == (RCU_CTL & RCU_CTL_IRC8MSTB)) {
-  }
-  RCU_MODIFY(0x50);
+  //while (0U == (RCU_CTL & RCU_CTL_IRC8MSTB)) {
+  //}
+  //RCU_MODIFY(0x50);
 
-  /* reset SCS, SCSS, AHBPSC, APBPSC, APB1PSC, APB2PSC, ADCPSC, and CKOUT0SEL */
-  RCU_CFG0 &= 0xf8ff0000U;//~RCU_CFG0_SCS;
+  /* reset SCS, SCSS, AHBPSC, APBPSC, APB1PSC, APB2PSC, ADCPSC, ADCPSC_2, and CKOUT0SEL */
+  RCU_CFG0 &= 0xE8FF0000U;
 
-#if (defined(GD32F30X_HD) || defined(GD32F30X_XD))
+  /* reset ADCPSC_3 and PLLPRESEL */
+#if defined(GD32F30X_HD) || defined(GD32F30X_XD)
+  RCU_CFG1 &= ~(RCU_CFG1_ADCPSC_3 | RCU_CFG1_PLLPRESEL);
+#elif defined(GD32F30X_CL)
+  RCU_CFG1 = 0x00000000U;
+#endif
+
+#if defined(GD32F30X_HD) || defined(GD32F30X_XD)
   /* reset HXTALEN, CKMEN and PLLEN bits */
   RCU_CTL &= ~(RCU_CTL_PLLEN | RCU_CTL_CKMEN | RCU_CTL_HXTALEN);
 #elif defined(GD32F30X_CL)
@@ -152,25 +165,23 @@ void SystemInit(void)
   RCU_CFG0 &= ~(RCU_CFG0_PLLSEL | RCU_CFG0_PREDV0 | RCU_CFG0_PLLMF | RCU_CFG0_USBDPSC | RCU_CFG0_PLLMF_4 | RCU_CFG0_PLLMF_5 | RCU_CFG0_USBDPSC_2);
 
 #if defined(GD32F30X_CL)
-  /* reset PLL1En and PLL2EN */
+  /* reset PLL1EN and PLL2EN */
   RCU_CTL &= ~(RCU_CTL_PLL1EN | RCO_CTL_PLL2EN)
   /* disable all interrupts */
   RCU_INT = 0x00ff0000U;
-  RCU_CFG1 = 0x00000000U;
-#elif (defined(GD32F30X_HD) || defined(GD32F30X_XD))
+#elif defined(GD32F30X_HD) || defined(GD32F30X_XD)
   /* disable all interrupts */
   RCU_INT = 0x009f0000U;
-  RCU_CFG1 &= ~(RCU_CFG1_ADCPSC_3 | RCU_CFG1_PLLPRESEL);
 #endif
 
   /* Reset CFG0 and CFG1 registers */
   //RCU_CFG0 = 0x00000000U;
 
-  //SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET;
+ //SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET;
 #ifdef VECT_TAB_SRAM
-  nvic_vector_table_set(NVIC_VECTTAB_RAM, VECT_TAB_OFFSET);
+  SCB->VTOR = SRAM_BASE | VECT_TAB_OFFSET;
 #else
-  nvic_vector_table_set(NVIC_VECTTAB_FLASH, VECT_TAB_OFFSET);
+  SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET;
 #endif
 
   /* configure the system clock source, PLL Multiplier, AHB/APBx prescalers and Flash settings */
@@ -959,79 +970,83 @@ void SystemCoreClockUpdate(void)
       /* PLL clock source selection, HXTAL, IRC48M or IRC8M / 2 */
       pllsel = (RCU_CFG0 & RCU_CFG0_PLLSEL);
 
-    if (pllsel == RCU_PLLSRC_HXTAL_IRC48M) {
-      /* PLL clock source is HXTAL or IRC48M */
-      pllpresel = (RCU_CFG1 & RCU_CFG1_PLLPRESEL);
+      if (pllsel == RCU_PLLSRC_HXTAL_IRC48M) {
+        /* PLL clock source is HXTAL or IRC48M */
+        pllpresel = (RCU_CFG1 & RCU_CFG1_PLLPRESEL);
 
-      if (pllpresel == RCU_PLLPRESRC_HXTAL) {
-        /* PLL clock source is HXTAL */
-        ck_src = HXTAL_VALUE;
-      } else {
-        /* PLL clock source is IRC48 */
-        ck_src = IRC48M_VALUE;
-      }
+        if (pllpresel == RCU_PLLPRESRC_HXTAL) {
+          /* PLL clock source is HXTAL */
+          ck_src = HXTAL_VALUE;
+        } else {
+          /* PLL clock source is IRC48 */
+          ck_src = IRC48M_VALUE;
+        }
 
 #if (defined(GD32F30X_HD) || defined(GD32F30X_XD))
-      predv0sel = (RCU_CFG0 & RCU_CFG0_PREDV0);
-      /* PREDV0 input source clock divided by 2 */
-      if (predv0sel == RCU_CFG0_PREDV0) {
-        ck_src /= 2U;
-      }
-#elif defined(GD32F30X_CL)
-      predv0sel = (RCU_CFG1 & RCU_CFG1_PREDV0SEL);
-      /* source clock use PLL1 */
-      if (predv0sel == RCU_PREDV0SRC_CKPLL1) {
-        predv1 = ((RCU_CFG1 & RCU_CFG1_PREDV1) >> 4) + 1U;
-        pll1mf = ((RCU_CFG1 & RCU_CFG1_PLL1MF) >> 8) + 2U;
-        if (pll1mf == 17U) {
-          pll1mf = 20U;
+        predv0sel = (RCU_CFG0 & RCU_CFG0_PREDV0);
+        /* PREDV0 input source clock divided by 2 */
+        if (predv0sel == RCU_CFG0_PREDV0) {
+          ck_src /= 2U;
         }
-        ck_src = (ck_src / predv1) * pll1mf;
-      }
-      predv0 = (RCU_CFG1 & RCU_CFG1_PREDV0) + 1U;
-      ck_src /= predv0;
+#elif defined(GD32F30X_CL)
+        predv0sel = (RCU_CFG1 & RCU_CFG1_PREDV0SEL);
+        /* source clock use PLL1 */
+        if (predv0sel == RCU_PREDV0SRC_CKPLL1) {
+          predv1 = ((RCU_CFG1 & RCU_CFG1_PREDV1) >> 4) + 1U;
+          pll1mf = ((RCU_CFG1 & RCU_CFG1_PLL1MF) >> 8) + 2U;
+          if (pll1mf == 17U) {
+            pll1mf = 20U;
+          }
+          ck_src = (ck_src / predv1) * pll1mf;
+        }
+        predv0 = (RCU_CFG1 & RCU_CFG1_PREDV0) + 1U;
+        ck_src /= predv0;
 #endif /* GD32F30X_HD and GD32F30X_XD */
-    } else {
-      /* PLL clock source is IRC8M / 2 */
-      ck_src = IRC8M_VALUE / 2U;
-    }
+      } else {
+        /* PLL clock source is IRC8M / 2 */
+        ck_src = IRC8M_VALUE / 2U;
+      }
 
-    /* PLL multiplication factor */
-    pllmf = GET_BITS(RCU_CFG0, 18, 21);
+      /* PLL multiplication factor */
+      pllmf = GET_BITS(RCU_CFG0, 18, 21);
 
-    if ((RCU_CFG0 & RCU_CFG0_PLLMF_4)) {
-      pllmf |= 0x10U;
-    }
+      if ((RCU_CFG0 & RCU_CFG0_PLLMF_4)) {
+        pllmf |= 0x10U;
+      }
 
-    if ((RCU_CFG0 & RCU_CFG0_PLLMF_5)) {
-      pllmf |= 0x20U;
-    }
+      if ((RCU_CFG0 & RCU_CFG0_PLLMF_5)) {
+        pllmf |= 0x20U;
+      }
 
-    if (pllmf >= 15U) {
-      pllmf += 1U;
-    } else {
-      pllmf += 2U;
-    }
+      if (pllmf >= 15U) {
+        pllmf += 1U;
+      } else {
+        pllmf += 2U;
+      }
 
-    if (pllmf > 61U) {
-      pllmf = 63U;
-    }
+      if (pllmf > 61U) {
+        pllmf = 63U;
+      }
 
-    SystemCoreClock = ck_src * pllmf;
+      SystemCoreClock = ck_src * pllmf;
 
-  #ifdef GD32F30X_CL
-    if (pllmf == 15U) {
-      SystemCoreClock = (ck_src * 6U) + (ck_src / 2U);
-    }
+    #ifdef GD32F30X_CL
+      if (pllmf == 15U) {
+        SystemCoreClock = (ck_src * 6U) + (ck_src / 2U);
+      }
   #endif /* GD32F30X_CL */
-    break;
-  /* IRC8M is selected as CK_SYS */
-  default:
-    SystemCoreClock = IRC8M_VALUE;
-    break;
+      break;
+    /* IRC8M is selected as CK_SYS */
+    default:
+      SystemCoreClock = IRC8M_VALUE;
+      break;
   }
 
   /* calculate AHB clock frequency */
   tmp_val = AHBPrescaler[((RCU_CFG0 & RCU_CFG0_AHBPSC) >> 4U)];
   SystemCoreClock >>= tmp_val;
 }
+
+#ifdef __cplusplus
+}
+#endif

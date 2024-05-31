@@ -132,8 +132,6 @@ typedef enum {
   ParityForced0 = 4
 } SerialParity;
 
-typedef struct serial_s serial_t;
-
 typedef struct {
   uint32_t baudrate;
   uint32_t databits;
@@ -157,6 +155,8 @@ typedef struct {
   operation_state_enum rx_state;
   __IO uint32_t error_code;
 } SPL_UartHandle_t;
+
+typedef struct serial_s serial_t;
 
 struct serial_s {
   UARTName uart;

@@ -1,4 +1,4 @@
-#ifdef GD32F30x
+#if defined(GD32F30x)
 #include "gd32f30x_adc.c"
 #include "gd32f30x_bkp.c"
 #include "gd32f30x_can.c"
@@ -43,7 +43,7 @@
 #include "gd32f3x0_timer.c"
 #include "gd32f3x0_tsi.c"
 #include "gd32f3x0_usart.c"
-#ifdef GD32F350
+#if defined(GD32F350)
 #include "gd32f3x0_cec.c"
 #include "gd32f3x0_cmp.c"
 #include "gd32f3x0_dac.c"
@@ -71,7 +71,7 @@
 #include "gd32f1x0_wwdgt.c"
 #include "gd32f1x0_misc.c"
 #include "gd32f1x0_tsi.c"
-#ifdef GD32F170_190
+#if defined(GD32F170_190)
 #include "gd32f1x0_slcd.c"
 #include "gd32f1x0_opa.c"
 #include "gd32f1x0_ivref.c"
@@ -121,8 +121,8 @@
 #include "gd32e23x_timer.c"
 #include "gd32e23x_usart.c"
 #include "gd32e23x_wwdgt.c"
-#elif defined(GD32EPRT) || defined(GD32E50X)
-#ifndef GD32EPRT
+#elif defined(GD32E50X)
+#if !defined(GD32EPRT)
 /* SPL files common to GD32E50X */
 #include "gd32e50x_adc.c"
 #include "gd32e50x_bkp.c"
@@ -149,7 +149,7 @@
 #include "gd32e50x_wwdgt.c"
 #include "gd32e50x_sqpi.c"
 
-#if defined (GD32E50X_CL) || defined (GD32E508)
+#if defined(GD32E50X_CL) || defined(GD32E508)
 #include "gd32e50x_enet.c"
 #include "gd32e50x_tmu.c"
 #include "gd32e50x_cmp.c"
@@ -181,7 +181,6 @@
 #include "gd32e50x_usart.c"
 #include "gd32e50x_wwdgt.c"
 #include "gd32e50x_sqpi.c"
-
 #endif /* GD32EPRT */
 #else
 #error "Unknown chip series!"

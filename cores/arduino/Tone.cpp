@@ -1,6 +1,7 @@
 
 #include "Arduino.h"
 #include "HardwareTimer.h"
+#include "gpio_extra.h"
 
 #define MAX_FREQ  65535
 
@@ -21,15 +22,13 @@ static void tonePeriodElapsedCallback()
   uint32_t pin =  gpio_pin[GD_PIN_GET(TimerTone_pinInfo.pin)];
 
   if (port != NP) {
-    if (TimerTone_pinInfo.count == -1) {
-      gpio_bit_write(port, pin, (bit_status)(1 - (int)gpio_input_bit_get(port, pin)));
-    } else if (TimerTone_pinInfo.count != 0) {
+    if (TimerTone_pinInfo.count != 0) {
       if (TimerTone_pinInfo.count > 0) {
         TimerTone_pinInfo.count--;
       }
-      gpio_bit_write(port, pin, (bit_status)(1 - (int)gpio_input_bit_get(port, pin)));
+      gpio_digital_toggle(port, pin);
     } else {
-      gpio_bit_write(port, pin, (bit_status)0);
+      gpio_digital_write(port, pin, 0);
     }
   }
 }
@@ -40,7 +39,7 @@ static void timerTonePinDeinit()
     TimerTone->timerStop();
   }
   if (TimerTone_pinInfo.pin != NC) {
-    pin_function(TimerTone_pinInfo.pin, GD_PIN_DATA(PIN_MODE_INPUT, PIN_PUPD_NONE, 0));
+    pin_function(TimerTone_pinInfo.pin, GD_PIN_DATA(GD_MODE_INPUT, PIN_PUPD_NONE, 0));
     TimerTone_pinInfo.pin = NC;
   }
 }
@@ -64,7 +63,7 @@ static void timerTonePinInit(PinName p, uint32_t frequency, uint32_t duration)
         TimerTone_pinInfo.count = -1;
       }
 
-      pin_function(TimerTone_pinInfo.pin, GD_PIN_DATA(PIN_MODE_OUT_PP, PIN_PUPD_NONE, 0));
+      pin_function(TimerTone_pinInfo.pin, GD_PIN_DATA(GD_MODE_OUT_PP, PIN_PUPD_NONE, 0));
 
       TimerTone->setChannelMode(1, OC_TIMING, NC);
       TimerTone->setAutoReloadValue(timFreq, FORMAT_HZ);

@@ -33,16 +33,15 @@ OF SUCH DAMAGE.
 #include "PinNames.h"
 #include "PeripheralPins.h"
 #include "PeripheralNames.h"
-#include "gd_debug.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define SPI_MODE0 0
-#define SPI_MODE1 1
-#define SPI_MODE2 2
-#define SPI_MODE3 3
+#define SPI_MODE0   0U
+#define SPI_MODE1   1U
+#define SPI_MODE2   2U
+#define SPI_MODE3   3U
 
 typedef enum {
   SPI_OK,
@@ -89,8 +88,8 @@ typedef struct spi_s spi_t;
 void spi_begin(spi_t *obj, uint32_t speed, uint8_t mode, uint8_t endian);
 void spi_free(spi_t *obj);
 
-spi_status_t spi_send(spi_t *obj, uint16_t *data, uint16_t length);
-spi_status_t spi_transfer(spi_t *obj, uint16_t *tx_buffer, uint16_t *rx_buffer, uint16_t length, bool skipRX);
+spi_status_t spi_send(spi_t *obj, uint8_t *data, uint16_t length);
+spi_status_t spi_transfer(spi_t *obj, uint8_t *tx_buffer, uint8_t *rx_buffer, uint16_t length, bool skipRX);
 
 uint32_t spi_getClkFreq(spi_t *obj);
 void spi_set_config(SPL_SPIHandle_t *spi_handle);

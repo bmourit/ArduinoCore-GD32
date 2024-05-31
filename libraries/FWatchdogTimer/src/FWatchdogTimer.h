@@ -22,17 +22,15 @@
 
 #include "Arduino.h"
 
-#define IRC40K_VAL  40000U
 // Minimal timeout in microseconds
-#define FWDGT_TIMEOUT_MIN    ((4 * 1000000) / IRC40K_VAL)
+#define FWDGT_TIMEOUT_MIN    ((4 * 1000000) / IRC40K_VALUE)
 // Maximal timeout in microseconds
-#define FWDGT_TIMEOUT_MAX    (((256 * 1000000) / IRC40K_VAL) * FWDGT_RLD_RLD)
+#define FWDGT_TIMEOUT_MAX    (((256 * 1000000) / IRC40K_VALUE) * FWDGT_RLD_RLD)
 
-#define IS_FWDGT_TIMEOUT(X) (((X) >= FWDGT_TIMEOUT_MIN) &&\
-                             ((X) <= FWDGT_TIMEOUT_MAX))
+#define IS_FWDGT_TIMEOUT(X) (((X) >= FWDGT_TIMEOUT_MIN) && ((X) <= FWDGT_TIMEOUT_MAX))
 
-class FWatchdogTimerClass {
-
+class FWatchdogTimerClass
+{
   public:
     void begin(uint32_t timeout);
     void set(uint32_t timeout);
@@ -40,15 +38,15 @@ class FWatchdogTimerClass {
     void reload(void);
     bool isEnabled(void)
     {
-      return _enabled;
+      return _FWDGT_enabled;
     };
     bool isReset(bool clear = false);
     void clearReset(void);
 
   private:
-    static bool _enabled;
+    static bool _FWDGT_enabled;
 };
 
-extern FWatchdogTimerClass FWatchdogTimer;
+extern FWatchdogTimerClass FWatchdog;
 
 #endif /* __FWATCHDOGTIMER_H__ */

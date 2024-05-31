@@ -2,18 +2,18 @@
 ENTRY(Reset_Handler)
 
 _estack = 0x20000000 + LD_MAX_DATA_SIZE;
-_Min_Heap_Size = 0x400;      /* required amount of heap  */
-_Min_Stack_Size = 0x400;     /* required amount of stack */
+_Min_Heap_Size = 0x800;      /* required amount of heap  */
+_Min_Stack_Size = 0x800;     /* required amount of stack */
 
 /* memory map */
 MEMORY
 {
-  RAM (xrw) : ORIGIN = 0x20000000, LENGTH = LD_MAX_DATA_SIZE
+  RAM (rwx) : ORIGIN = 0x20000000, LENGTH = LD_MAX_DATA_SIZE
   FLASH (rx) : ORIGIN = 0x08000000 + LD_FLASH_OFFSET, LENGTH = 512K - LD_FLASH_OFFSET
 }
 
 SECTIONS
-{  
+{
   /* ISR vectors */
   /* The startup code into "FLASH" Rom type memory */
   .vectors :
@@ -41,7 +41,7 @@ SECTIONS
   } >FLASH
 
   /* Constant data into "FLASH" Rom type memory */
-  .rodata (READONLY) :
+  .rodata :
   {
     . = ALIGN(4);
     *(.rodata)      /* .rodata sections (constants, strings, etc.) */
@@ -49,9 +49,8 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  .ARM.extab (READONLY) :
-  {
-    . = ALIGN(4); 
+  .ARM.extab : {
+    . = ALIGN(4);
     *(.ARM.extab* .gnu.linkonce.armextab.*)
     . = ALIGN(4);
   } >FLASH
@@ -63,7 +62,7 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  .preinit_array (READONLY) :
+  .preinit_array :
   {
     . = ALIGN(4);
     PROVIDE_HIDDEN (__preinit_array_start = .);
@@ -72,7 +71,7 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  .init_array (READONLY) :
+  .init_array :
   {
     . = ALIGN(4);
     PROVIDE_HIDDEN (__init_array_start = .);
@@ -82,7 +81,7 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  .fini_array (READONLY) :
+  .fini_array :
   {
     . = ALIGN(4);
     PROVIDE_HIDDEN (__fini_array_start = .);
@@ -122,19 +121,24 @@ SECTIONS
     __bss_end__ = _ebss;
   } >RAM
 
-  /* user_heap_stack section, used to check that there is enough "RAM" Ram  type memory left */
+  /* user_heap_stack section, used to check that there is enough "RAM" Ram type memory left */
   .user_heap_stack :
   {
     . = ALIGN(8);
-    PROVIDE ( end = _ebss );
-    PROVIDE ( _end = _ebss );
+    PROVIDE ( end = . );
+    PROVIDE ( _end = . );
     . = . + _Min_Heap_Size;
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
   } >RAM
 
-  .ARM.attributes 0 : { *(.ARM.attributes) }
+  /* Remove information from the compiler libraries */
+  /DISCARD/ :
+  {
+    libc.a ( * )
+    libm.a ( * )
+    libgcc.a ( * )
+  }
 
+  .ARM.attributes 0 : { *(.ARM.attributes) }
 }
-  /* input sections */
-  GROUP(libgcc.a libc.a libm.a libnosys.a)

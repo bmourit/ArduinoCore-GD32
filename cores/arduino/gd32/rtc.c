@@ -25,18 +25,18 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
+#include "safe_clocks.h"
 #include "rtc.h"
 #include <time.h>
 
-/*
-  In the definitions for GD32F30X_{H,X}D, this is 'Alarm', but for the
-  CL variant, it’s 'ALARM'. The core uses the upper case version. I
-  have no good solution other than getting the official firmware
-  library changed. -bjc (2021-Aug-20)
-*/
-#if defined(GD32F30X_CL) || defined(GD32F30X_HD) || defined (GD32F30X_XD) || defined(GD32E50X)
-#define RTC_ALARM_IRQn RTC_Alarm_IRQn
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+static clock_source_t _clk_src = SOURCE_LXTAL;
+static uint8_t _HXTAL_divider = 0;
+
+static void rtc_clock_init(clock_source_t clock_source);
 
 /* 
   If this macro is defined, then on a microcontroller restart, the old contents of the backup domain will be reset.
@@ -89,30 +89,54 @@ uint32_t rtc_counter_get()
 
 static void rtc_clock_init(clock_source_t clock_source)
 {
-  if (clock_source != SOURCE_LXTAL) {
-    clock_source = SOURCE_LXTAL;
-  }
+  uint32_t reg = 0U;
+  SC_peripheral_params_t periph_params;
+
   if (clock_source == SOURCE_LXTAL) {
     clockEnable(SOURCE_LXTAL);
-    /* select RCU_LXTAL as RTC clock source */
-    rcu_rtc_clock_config(RCU_RTCSRC_LXTAL);
-    /* enable RTC Clock */
-    rcu_periph_clock_enable(RCU_RTC);
-    /* wait for RTC registers synchronization */
-    rtc_register_sync_wait();
-#if defined(GD32F30x) || defined(GD32E50X)
-    /* wait until last write operation on RTC registers has finished */
-    rtc_lwoff_wait();
-#endif
-    /* set RTC prescaler: set RTC period to 1s */
-    rtc_prescaler_set(32767);
-#if defined(GD32F30x) || defined(GD32E50X)
-    /* wait until last write operation on RTC registers has finished */
-    rtc_lwoff_wait();
-#endif
+
+    periph_params.pclock = RCU_PERIPHCLK_RTC;
+    periph_params.rtc_clk = RCU_RTCSRC_LXTAL;
+    if (SC_Periph_Params(&periph_params) != SC_OK) {
+      Error_Handler();
+    }
+    _clk_src = SOURCE_LXTAL;
+  } else if (clock_source == SOURCE_HXTAL) {
+    clockEnable(SOURCE_HXTAL);
+
+    /**
+     * HXTAL divider for RTC must be large enough to
+     * ensure the RTC is supplied a clock <= 1 MHz
+     */
+    periph_params.pclock = RCU_PERIPHCLK_RTC;
+    periph_params.rtc_clk = RCU_RTCSRC_HXTAL_DIV_128;
+    _HXTAL_divider = 128;
+
+    if ((HXTAL_VALUE / _HXTAL_divider) > HXTAL_RTC_CLOCK_MAX) {
+      Error_Handler();
+    }
+
+    if (SC_Periph_Params(&periph_params) != SC_OK) {
+      Error_Handler();
+    }
+    _clk_src = SOURCE_HXTAL;
+
+  } else if (clock_source == SOURCE_IRC40K) {
+    clockEnable(SOURCE_IRC40K);
+    periph_params.pclock = RCU_PERIPHCLK_RTC;
+    periph_params.rtc_clk = RCU_RTCSRC_IRC40K;
+    if (SC_Periph_Params(&periph_params) != SC_OK) {
+      Error_Handler();
+    }
+    _clk_src = SOURCE_IRC40K;
   } else {
     Error_Handler();
   }
+  /* enable the RTC clock */
+  reg = RCU_BDCTL;
+  reg &= ~RCU_BDCTL_RTCEN;
+  reg |= RCU_BDCTL_RTCEN;
+  RCU_BDCTL = reg;
 }
 
 /*!
@@ -121,23 +145,41 @@ static void rtc_clock_init(clock_source_t clock_source)
   \param[out] none
   \retval     none
 */
-void rtc_Init(void)
+void rtc_Init(clock_source_t clock_source)
 {
-#if defined(GD32E23x)
-  /* no prio group */
-  nvic_irq_enable(RTC_IRQn, 2);
-#else
-  nvic_priority_group_set(NVIC_PRIGROUP_PRE2_SUB2);
-  nvic_irq_enable(RTC_IRQn, 2, 0);
-#endif 
-#if defined(GD32F30x) || defined(GD32E50X)
-  nvic_irq_enable(RTC_ALARM_IRQn, 2, 0);
-#endif
-  backup_domain_enable();
 #if defined(KILL_RTC_BACKUP_DOMAIN_ON_RESTART)
   backup_domain_kill();
 #endif
-  rtc_clock_init(SOURCE_LXTAL);
+
+  rtc_clock_init(clock_source);
+
+  /* wait for RTC reg synch */
+  rtc_register_sync_wait();
+
+  /* clear flags */
+  rtc_flag_clear(RTC_FLAG_OVERFLOW);
+  rtc_flag_clear(RTC_FLAG_ALARM);
+  rtc_flag_clear(RTC_FLAG_SECOND);
+
+#if defined(GD32F30x) || defined(GD32E50X)
+  /* wait until last write op is finished */
+  rtc_lwoff_wait();
+#endif
+
+#if defined(GD32E23x)
+  /* no prio group */
+  nvic_irq_enable(RTC_IRQn, 2);
+#elif defined(GD32F30x) || defined(GD32E50X)
+  uint32_t prio_group = NVIC_GetPriorityGrouping();
+  NVIC_SetPriority(RTC_Alarm_IRQn, NVIC_EncodePriority(prio_group, RTC_IRQ_PRIORITY, RTC_IRQ_SUBPRIORITY));
+  NVIC_EnableIRQ(RTC_Alarm_IRQn);
+#else
+  uint32_t prio_group = NVIC_GetPriorityGrouping();
+  NVIC_SetPriority(RTC_IRQn, NVIC_EncodePriority(prio_group, RTC_IRQ_PRIORITY, RTC_IRQ_SUBPRIORITY));
+  NVIC_EnableIRQ(RTC_IRQn);
+#endif
+
+  backup_domain_enable();
 }
 
 /*!
@@ -442,3 +484,7 @@ uint32_t mkTimtoStamp(UTCTimeStruct *utcTime)
                        utcTime->seconds);
   return timestamp;
 }
+
+#ifdef __cplusplus
+}
+#endif

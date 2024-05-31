@@ -29,10 +29,8 @@ OF SUCH DAMAGE.
 
 #include "gd_debug.h"
 #include "utility/drv_spi.h"
+#include "gd32f30x_remap.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define SPI_PINS_FREE_MODE   0x00000001
 
@@ -53,15 +51,15 @@ void spi_set_config(SPL_SPIHandle_t *spi_handle)
 }
 
 /**
- * @brief   get the clock frequency of SPI instance
- * @param   obj : pointer to spi structure
+ * @brief   get the clock frequency of the SPI instance
+ * @param   spi_instance : the spi instance name
  * @retval  returns the clock freq of the SPI instance else SystemCoreClock
  */
 uint32_t spi_getClkFreqInstance(SPIName spi_instance)
 {
   uint32_t spi_freq = SystemCoreClock;
 
-  if (spi_instance != NP) {
+  if (spi_instance != (SPIName)NP) {
     switch (spi_instance) {
       case SPI_0:
         /* clock source is APB2 */
@@ -99,6 +97,7 @@ uint32_t spi_getClkFreq(spi_t *obj)
 
   if (obj != NULL) {
     spi_instance = pinmap_peripheral(obj->pin_sclk, PinMap_SPI_SCLK);
+
     if (spi_instance != NP) {
       spi_freq = spi_getClkFreqInstance(spi_instance);
     }
@@ -122,6 +121,7 @@ void spi_begin(spi_t *obj, uint32_t speed, uint8_t mode, uint8_t endian)
 
   SPL_SPIHandle_t *handle = &(obj->handle);
   uint32_t spi_freq = 0;
+  uint32_t pull = 0;
 
   /* Determine the SPI to use */
   SPIName spi_mosi = (SPIName)pinmap_peripheral(obj->pin_mosi, PinMap_SPI_MOSI);
@@ -138,6 +138,7 @@ void spi_begin(spi_t *obj, uint32_t speed, uint8_t mode, uint8_t endian)
   /* return SPIName according to PinName */
   SPIName spi_data = (SPIName)pinmap_merge(spi_mosi, spi_miso);
   SPIName spi_cntl = (SPIName)pinmap_merge(spi_sclk, spi_ssel);
+
   obj->spi = (SPIName)pinmap_merge(spi_data, spi_cntl);
 
   if (spi_data == NP || spi_cntl == NP || obj->spi == NP) {
@@ -203,11 +204,21 @@ void spi_begin(spi_t *obj, uint32_t speed, uint8_t mode, uint8_t endian)
   pinmap_pinout(obj->pin_sclk, PinMap_SPI_SCLK);
 
   /* PULLUP or PULLDOWN SCLK pin according to polarity */
-  if (handle->params.clock_polarity_phase == SPI_CK_PL_LOW_PH_1EDGE || SPI_CK_PL_LOW_PH_2EDGE) {
-    gpio_bit_reset(gpio_port[GD_PORT_GET(obj->pin_sclk)], gpio_pin[GD_PIN_GET(obj->pin_sclk)]);
-  } else {
-    gpio_bit_set(gpio_port[GD_PORT_GET(obj->pin_sclk)], gpio_pin[GD_PIN_GET(obj->pin_sclk)]);
+  switch (handle->params.clock_polarity_phase) {
+    case SPI_CK_PL_LOW_PH_1EDGE:
+    case SPI_CK_PL_LOW_PH_2EDGE:
+      pull = GPIO_PULLDOWN;
+      break;
+    case SPI_CK_PL_HIGH_PH_1EDGE:
+    case SPI_CK_PL_HIGH_PH_2EDGE:
+      pull = GPIO_PULLUP;
+      break;
+    default:
+      pull = GPIO_NOPULL;
+      break;
   }
+  f3_pin_pull_config(gpio_port[GD_PORT_GET(obj->pin_sclk)], gpio_pin[GD_PIN_GET(obj->pin_sclk)], pull);
+  pinmap_pinout(obj->pin_ssel, PinMap_SPI_SSEL);
 
   /* enable SPI clock */
   if (handle->instance == SPI0) {
@@ -275,7 +286,7 @@ void spi_free(spi_t *obj)
   * @param  data : data to be sent
   * @retval returns the spi status
   */
-spi_status_t spi_send(spi_t *obj, uint16_t *data, uint16_t length)
+spi_status_t spi_send(spi_t *obj, uint8_t *data, uint16_t length)
 {
   return spi_transfer(obj, data, data, length, 1);
 }
@@ -290,7 +301,7 @@ spi_status_t spi_send(spi_t *obj, uint16_t *data, uint16_t length)
   * #param  skipRX : skip recieve
   * @retval returns the spi status
   */
-spi_status_t spi_transfer(spi_t *obj, uint16_t *tx_buffer, uint16_t *rx_buffer, uint16_t length, bool skipRX)
+spi_status_t spi_transfer(spi_t *obj, uint8_t *tx_buffer, uint8_t *rx_buffer, uint16_t length, bool skipRX)
 {
   int count = 0;
   spi_status_t spi_status = SPI_OK;
@@ -306,7 +317,7 @@ spi_status_t spi_transfer(spi_t *obj, uint16_t *tx_buffer, uint16_t *rx_buffer, 
     if (count >= 1000) {
       return SPI_TIMEOUT;
     }
-    spi_i2s_data_transmit(spiObj, *tx_buffer++);
+    spi_i2s_data_transmit(spiObj, (uint16_t)*tx_buffer++);
 
     count = 0;
     if (!skipRX) {

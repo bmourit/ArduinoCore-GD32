@@ -35,11 +35,11 @@
 #ifndef SYSTEM_GD32F30X_H
 #define SYSTEM_GD32F30X_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stdint.h>
 
 /* system clock frequency (core clock) */
 extern uint32_t SystemCoreClock;

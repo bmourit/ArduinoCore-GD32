@@ -52,8 +52,14 @@ void hw_config_init(void)
 {
   /* Configure the system clock */
   SystemClock_Config();
-  /* do this after clock config */
-  systick_config();
+  /**
+   * start the time keeping tick counter
+   * since this is based on the value of
+   * SystemCoreClock, we need to start
+   * this after the clocks are properly
+   * set, or risk timing maddness!
+   */
+  systick_init(0x00U);
 }
 
 #ifdef __cplusplus

@@ -33,12 +33,21 @@ OF SUCH DAMAGE.
 #include "backup_domain.h"
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
+#endif
+
+#define HXTAL_RTC_CLOCK_MAX   1000000U
+
+#ifndef RTC_IRQ_PRIORITY
+#define RTC_IRQ_PRIORITY      2
+#endif
+#ifndef RTC_IRQ_SUBPRIORITY
+#define RTC_IRQ_SUBPRIORITY   0
 #endif
 
 #define IsLeapYear(yr) (!((yr) % 400) || (((yr) % 100) && !((yr) % 4)))
 #define YearLength(yr)  ((uint16_t)(IsLeapYear(yr) ? 366 : 365))
+
 #define SECONDS_PER_MINUTE    60UL
 #define SECONDS_PER_HOUR      3600UL
 #define SECONDS_PER_DAY       86400UL
@@ -64,7 +73,7 @@ typedef enum {
   INT_OVERFLOW_MODE
 } INT_MODE;
 
-void rtc_Init(void);                                            //rtc init
+void rtc_Init(clock_source_t clock_source);                                            //rtc init
 void rtc_setUTCTime(UTCTimeStruct *utcTime);                    //rtc set UTC time
 void rtc_setSecTime(uint32_t secTime);                          //rtc set second time
 uint32_t rtc_getSecTime(void);                                  //rtc get second time

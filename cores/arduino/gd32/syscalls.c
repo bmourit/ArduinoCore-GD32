@@ -14,6 +14,10 @@
 #include <errno.h>
 #include <unistd.h>
 
+#ifdef __cplusplus
+extern "C"
+#endif
+
 #undef errno
 extern int errno;
 
@@ -86,7 +90,7 @@ __attribute__((weak))int _write(UNUSED(int file), UNUSED(char *ptr), UNUSED(int 
 
 __attribute__((weak)) void _exit(UNUSED(int status))
 {
-  for (; ;) ;
+  for (;;);
 }
 
 __attribute__((weak))int _kill(UNUSED(int pid), UNUSED(int sig))
@@ -99,3 +103,7 @@ __attribute__((weak))int _getpid(void)
 {
   return 1;
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -28,8 +28,14 @@ OF SUCH DAMAGE.
   Based on mbed-os/targets/TARGET_GigaDevice/TARGET_GD32F30X/analogout_api.c
 */
 
+#include "Arduino.h"
 #include "analog.h"
+#include "gd32xxyy.h"
+#include "PinNames.h"
+#include "PeripheralPins.h"
+#include "HardwareTimer.h"
 #include "gd_debug.h"
+#include "gd32f30x_remap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -234,15 +240,15 @@ void pwm_stop(PinName pin)
 }
 
 /* get adc value */
-uint16_t get_adc_value(PinName pn)
+uint16_t get_adc_value(PinName pn, uint32_t resolution)
 {
   uint16_t value;
   uint32_t adc_periph = NP;
   uint8_t index = 0;
   uint32_t sampling_time = ADC_SAMPLETIME;
-  uint8_t channel = 0;
+  uint32_t channel = 0;
 
-  if (pn & ADC_PINS_BASE) {
+  if ((pn & ADC_PINS_BASE) && (pn < ADC_START_ANALOG)) {
     adc_periph = ADC0;
     switch (pn) {
     case ADC_TEMP:
@@ -264,22 +270,50 @@ uint16_t get_adc_value(PinName pn)
     return 0;
   }
 
+  uint32_t res = 0;
+  switch (resolution) {
+#ifdef ADC_RESOLUTION_6B
+    case 6:
+      res = ADC_RESOLUTION_6B;
+      break;
+#endif
+    case 8:
+      res = ADC_RESOLUTION_8B;
+      break;
+    case 10:
+      res = ADC_RESOLUTION_10B;
+      break;
+    case 12:
+      res = ADC_RESOLUTION_12B;
+      break;
+    default:
+      res = ADC_RESOLUTION_10B;
+      break;
+  }
+
+  /**
+   * configure clocks before starting them
+   * to prevent startup errors
+   */
+  rcu_adc_clock_config(ADC_PRESCALE_DIV);
+  adc_clock_enable((ADCName)adc_periph);
+
   index = get_adc_index(adc_periph);
-  if (!ADC_[index].isactive) {
+  if (!(ADC_[index].isactive & ADC_PINS_BASE)) {
     pinmap_pinout(pn, PinMap_ADC);
-    adc_clock_enable(adc_periph);
 
 #if defined(GD32F30x)|| defined(GD32E50X)
-    rcu_adc_clock_config(ADC_PRESCALE_DIV);
+    //rcu_adc_clock_config(ADC_PRESCALE_DIV);
     adc_mode_config(ADC_MODE_FREE);
-    adc_resolution_config(adc_periph, ADC_RESOLUTION_12B);
+    adc_resolution_config(adc_periph, res);
     adc_data_alignment_config(adc_periph, ADC_DATAALIGN_RIGHT);
     adc_channel_length_config(adc_periph, ADC_REGULAR_CHANNEL, 1U);
+    adc_regular_channel_config(adc_periph, 0U, channel, sampling_time);
 #elif defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32E23x)
-    rcu_adc_clock_config(ADC_PRESCALE_DIV);
+    //rcu_adc_clock_config(ADC_PRESCALE_DIV);
     adc_special_function_config(ADC_CONTINUOUS_MODE, ENABLE);
 #if defined(GD32F3x0) || defined(GD32F170_190) || defined(GD32E23x)
-    adc_resolution_config(ADC_RESOLUTION_12B);
+    adc_resolution_config(res);
 #endif
     adc_data_alignment_config(ADC_DATAALIGN_RIGHT);
     adc_channel_length_config(ADC_REGULAR_CHANNEL, 1U);
@@ -303,8 +337,6 @@ uint16_t get_adc_value(PinName pn)
     ADC_[index].isactive = true;
   }
 #if defined(GD32F30x) || defined(GD32E50X)
-  adc_regular_channel_config(adc_periph, 0U, channel, sampling_time);
-
   if ((pn == ADC_TEMP) | (pn == ADC_VREF)) {
       adc_tempsensor_vrefint_enable();
       delay(1U);
@@ -390,123 +422,112 @@ uint8_t get_dac_index(uint32_t instance)
 }
 
 /* get adc channel */
-uint8_t get_adc_channel(PinName pinname)
+uint32_t get_adc_channel(PinName pinname)
 {
   uint32_t function = pinmap_function(pinname, PinMap_ADC);
-  uint32_t channel = GD_PIN_CHANNEL_GET(function);
-  uint32_t gd_channel = 0;
-  switch (channel) {
+  uint32_t channel = 0xFF;
+  switch (GD_PIN_CHANNEL_GET(function)) {
   #ifdef ADC_CHANNEL_0
     case 0:
-      gd_channel = ADC_CHANNEL_0;
+      channel = ADC_CHANNEL_0;
       break;
   #endif
   #ifdef ADC_CHANNEL_1
     case 1:
-      gd_channel = ADC_CHANNEL_1;
+      channel = ADC_CHANNEL_1;
       break;
   #endif
   #ifdef ADC_CHANNEL_2
     case 2:
-      gd_channel = ADC_CHANNEL_2;
+      channel = ADC_CHANNEL_2;
       break;
   #endif
   #ifdef ADC_CHANNEL_3
     case 3:
-      gd_channel = ADC_CHANNEL_3;
+      channel = ADC_CHANNEL_3;
       break;
   #endif
   #ifdef ADC_CHANNEL_4
     case 4:
-      gd_channel = ADC_CHANNEL_4;
+      channel = ADC_CHANNEL_4;
       break;
   #endif
   #ifdef ADC_CHANNEL_5
     case 5:
-      gd_channel = ADC_CHANNEL_5;
+      channel = ADC_CHANNEL_5;
       break;
   #endif
   #ifdef ADC_CHANNEL_6
     case 6:
-      gd_channel = ADC_CHANNEL_6;
+      channel = ADC_CHANNEL_6;
       break;
   #endif
   #ifdef ADC_CHANNEL_7
     case 7:
-      gd_channel = ADC_CHANNEL_7;
+      channel = ADC_CHANNEL_7;
       break;
   #endif
   #ifdef ADC_CHANNEL_8
     case 8:
-      gd_channel = ADC_CHANNEL_8;
+      channel = ADC_CHANNEL_8;
       break;
   #endif
   #ifdef ADC_CHANNEL_9
     case 9:
-      gd_channel = ADC_CHANNEL_9;
+      channel = ADC_CHANNEL_9;
       break;
   #endif
   #ifdef ADC_CHANNEL_10
     case 10:
-      gd_channel = ADC_CHANNEL_10;
+      channel = ADC_CHANNEL_10;
       break;
   #endif
   #ifdef ADC_CHANNEL_11
     case 11:
-      gd_channel = ADC_CHANNEL_11;
+      channel = ADC_CHANNEL_11;
       break;
   #endif
   #ifdef ADC_CHANNEL_12
     case 12:
-      gd_channel = ADC_CHANNEL_12;
+      channel = ADC_CHANNEL_12;
       break;
   #endif
   #ifdef ADC_CHANNEL_13
     case 13:
-      gd_channel = ADC_CHANNEL_13;
+      channel = ADC_CHANNEL_13;
       break;
   #endif
   #ifdef ADC_CHANNEL_14
     case 14:
-      gd_channel = ADC_CHANNEL_14;
+      channel = ADC_CHANNEL_14;
       break;
   #endif
   #ifdef ADC_CHANNEL_15
     case 15:
-      gd_channel = ADC_CHANNEL_15;
-      break;
-  #endif
-  #ifdef ADC_CHANNEL_16
-    case 16:
-      gd_channel = ADC_CHANNEL_16;
-      break;
-  #endif
-  #ifdef ADC_CHANNEL_17
-    case 17:
-      gd_channel = ADC_CHANNEL_17;
+      channel = ADC_CHANNEL_15;
       break;
   #endif
   default:
-    gd_channel = 0xFF;
+    channel = 0xFF;
     break;
   }
-  return gd_channel;
+  return channel;
 }
 
 /* adc clock enable */
-void adc_clock_enable(uint32_t instance)
+void adc_clock_enable(ADCName instance)
 {
   rcu_periph_enum temp;
   switch (instance) {
 #if defined(GD32F30x) || defined(GD32F10x) || defined(GD32E50X) //todo: other series
-  case ADC0:
+  case ADC_0:
     temp = RCU_ADC0;
     break;
-  case ADC1:
+  case ADC_1:
     temp = RCU_ADC1;
     break;
 #if defined(GD32F30X_HD) || defined(GD32F30X_XD) || defined(GD32F10X_HD)
-  case ADC2:
+  case ADC_2:
     temp = RCU_ADC2;
     break;
 #endif

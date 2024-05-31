@@ -35,6 +35,10 @@ OF SUCH DAMAGE.
 #include <gd32f30x_rcu.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined(GD32F1x0) || defined(GD32F3x0) || defined(GD32E50X) || defined(GD32EPRT)
 #define TIMER5_IRQ_Name TIMER5_DAC_IRQn
 #else
@@ -484,7 +488,7 @@ uint32_t getTimerClkFrequency(uint32_t instance)
   uint32_t clk_src = 0;
 
   if (instance != -1) {
-    switch ((uint32_t)instance) {
+    switch (instance) {
 #if defined(TIMER0)
       case (uint32_t)TIMER0:
 #endif
@@ -557,16 +561,16 @@ uint32_t getTimerClkFrequency(uint32_t instance)
 
 /*!
   \brief      get timer update IRQn
-  \param[in]  tim: TIMERx(x=0..13)
+  \param[in]  timer: TIMERx(x=0..13)
   \param[out] none
   \retval     timer update IRQn
 */
-IRQn_Type getTimerUpIrq(uint32_t tim)
+IRQn_Type getTimerUpIrq(uint32_t timer)
 {
   IRQn_Type IRQn = NonMaskableInt_IRQn;
 
-  if (tim != (uint32_t)NC) {
-    switch ((uint32_t)tim) {
+  if (timer != (uint32_t)NC) {
+    switch (timer) {
 #if defined(TIMER0)
       case (uint32_t)TIMER0:
         //differing update interrupt for Timer0 on some devices
@@ -651,16 +655,16 @@ IRQn_Type getTimerUpIrq(uint32_t tim)
 
 /*!
   \brief      get timer capture/compare IRQn
-  \param[in]  tim: TIMERx(x=0..13)
+  \param[in]  timer: TIMERx(x=0..13)
   \param[out] none
   \retval     timer capture/compare IRQn
 */
-IRQn_Type getTimerCCIrq(uint32_t tim)
+IRQn_Type getTimerCCIrq(uint32_t timer)
 {
   IRQn_Type IRQn = NonMaskableInt_IRQn;
 
-  if (tim != (uint32_t)NC) {
-    switch ((uint32_t)tim) {
+  if (timer != (uint32_t)NC) {
+    switch (timer) {
 #if defined(TIMER0)
       case (uint32_t)TIMER0:
         IRQn = TIMER0_Channel_IRQn;
@@ -804,3 +808,7 @@ __attribute__((weak)) void timer_captureHandle(SPL_TimerHandle_t *timer_handle)
 {
 
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -3,7 +3,7 @@
 
 /*
  * Core and peripherals registers definitions
-*/
+ */
 #include "api/Interrupts.h"
 #include "analog.h"
 #include "backup_domain.h"

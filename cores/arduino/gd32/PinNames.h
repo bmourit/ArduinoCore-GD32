@@ -208,6 +208,7 @@ typedef enum {
   ADC_PINS_BASE = PINNAME_ANALOG_INT,
   ADC_TEMP,
   ADC_VREF,
+  ADC_START_ANALOG,
 /* pin names specific to the variant */
 #if __has_include("PinNamesVar.h")
 #include "PinNamesVar.h"
@@ -218,7 +219,7 @@ typedef enum {
 /* pin mode */
 #define PIN_MODE_SHIFT        0
 #define PIN_MODE_MASK         0x7
-#define PIN_MODE_BITS         (PIN_FMODE_MASK << PIN_FMODE_SHIFT)
+#define PIN_MODE_BITS         (PIN_MODE_MASK << PIN_MODE_SHIFT)
 
 /* pin output mode */
 #define PIN_OUTPUT_OD_SHIFT   3
@@ -261,7 +262,7 @@ typedef enum {
 #define GD_PORT_GET(X)  (((uint32_t)(X) >> 4) & 0xF)
 #define GD_PIN_GET(X)   (((uint32_t)(X) & 0xF))
 
-/* get mode, speed, remap, output, pull state, af function, channel, and channel-ON of GPIO pin */
+/* get mode, speed, remap, output, pull state, af function, channel, and channel-ON of GPIO pin function */
 #define GD_PIN_MODE_GET(X)        (((X) >> PIN_MODE_SHIFT) & PIN_MODE_MASK)
 #define GD_PIN_OUTPUT_OD_GET(X)   (((X) >> PIN_OUTPUT_OD_SHIFT) & PIN_OUTPUT_OD_MASK)
 #define GD_PIN_PULL_UD_GET(X)     (((X) >> PIN_PULL_UD_SHIFT) & PIN_PULL_UD_MASK)
@@ -275,6 +276,7 @@ typedef enum {
 #define GD_PIN_DATA(MODE_OD, PUPD, AFN)   ((int)(MODE_OD) | \
                                           ((PUPD & PIN_PULL_UD_MASK) << PIN_PULL_UD_SHIFT) | \
                                           ((AFN & PIN_AF_MASK) << PIN_AF_SHIFT))
+
 #define GD_PIN_DATA_EXT(MODE_OD, PUPD, AFN, CHAN, CHON) \
                                           ((int)(MODE_OD) | ((PUPD & PIN_PULL_UD_MASK) << PIN_PULL_UD_SHIFT) | \
                                           ((AFN & PIN_AF_MASK) << PIN_AF_SHIFT) | \
@@ -290,24 +292,18 @@ typedef enum {
 } PinModeExtension;
 
 /* GPIO pull-up/pull-down/none */
-enum {
-  PIN_PUPD_NONE = 0,
-  PIN_PUPD_PULLUP = 1,
-  PIN_PUPD_PULLDOWN = 2,
-};
+#define PIN_PUPD_NONE       0
+#define PIN_PUPD_PULLUP     1
+#define PIN_PUPD_PULLDOWN   2
 
 /* GPIO output push-pull/open drain */
-enum {
-  PIN_OTYPE_PP = 0,
-  PIN_OTYPE_OD = 1,
-};
+#define PIN_OTYPE_PP    0
+#define PIN_OTYPE_OD    1
 
 /* GPIO output speed type */
-enum {
-  PIN_SPEED_2MHZ = 0,
-  PIN_SPEED_10MHZ = 1,
-  PIN_SPEED_50MHZ = 3,
-};
+#define PIN_SPEED_2MHZ  0
+#define PIN_SPEED_10MHZ 1
+#define PIN_SPEED_50MHZ 3
 
 typedef enum {
   GD_PIN_INPUT = 0,
@@ -322,12 +318,15 @@ typedef enum {
  * are encoded the same way. This cleans up a lot of code.
  * Decoding happens later in a different function
  */
-#define PIN_MODE_INPUT          (GD_PIN_INPUT)
-#define PIN_MODE_OUT_OD         (GD_PIN_OUTPUT | PIN_OUTPUT_OD_BITS)
-#define PIN_MODE_OUT_PP         (GD_PIN_OUTPUT)
-#define PIN_MODE_AF_OD          (GD_PIN_AF | PIN_OUTPUT_OD_BITS)
-#define PIN_MODE_AF_PP          (GD_PIN_AF)
-#define PIN_MODE_ANALOG         (GD_PIN_ANALOG)
+#define GD_MODE_INPUT          (GD_PIN_INPUT)
+#define GD_MODE_OUT_OD         (GD_PIN_OUTPUT | PIN_OUTPUT_OD_BITS)
+#define GD_MODE_OUT_PP         (GD_PIN_OUTPUT)
+#define GD_MODE_AF_OD          (GD_PIN_AF | PIN_OUTPUT_OD_BITS)
+#define GD_MODE_AF_PP          (GD_PIN_AF)
+#define GD_MODE_ANALOG         (GD_PIN_ANALOG)
+
+#define GD_VALID_PINNAME(X)   (GD_PORT_GET(X) <= LastPort)
+#define GD_GPIO_PIN(X)        ((uint16_t)(1 << GD_PIN_GET(X)))
 
 #define GD_PIN_FUNC_ANALOG_CH(CHAN)       ((int)(GD_PIN_ANALOG & PIN_MODE_MASK) | ((CHAN & PIN_CHANNEL_MASK) << PIN_CHANNEL_SHIFT) | (((int)PIN_PUPD_NONE & PIN_PULL_UD_MASK) << PIN_PULL_UD_SHIFT))
 

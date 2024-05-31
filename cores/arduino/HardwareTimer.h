@@ -28,7 +28,6 @@ OF SUCH DAMAGE.
 #ifndef HARDWARETIMER_H
 #define HARDWARETIMER_H
 
-#include "Arduino.h"
 #include "timer.h"
 
 // Copied from 1.0.x firmware library for compatibility, but this is

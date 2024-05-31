@@ -38,7 +38,7 @@ HWRTC rtc;
 */
 HWRTC::HWRTC(void)
 {
-  rtc_Init();
+  rtc_Init(SOURCE_LXTAL);
   this->UTCTime = {
     .year    = 1970,
     .month   = 1,

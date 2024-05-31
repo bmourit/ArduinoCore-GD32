@@ -40,6 +40,7 @@ OF SUCH DAMAGE.
 #define SYSTICK_H
 
 #include <stdint.h>
+#include "safe_clocks.h"
 #include "gd32xxyy.h"
 
 #ifdef __cplusplus
@@ -59,12 +60,32 @@ typedef enum {
   SOURCE_HXTAL,
 } clock_source_t;
 
+typedef enum {
+  SYSTICK_FREQ_10HZ = 100U,
+  SYSTICK_FREQ_100HZ = 10U,
+  SYSTICK_FREQ_1KHZ = 1U,
+  SYSTICK_FREQ_DEFAULT = SYSTICK_FREQ_1KHZ
+} systick_freq_t;
+
+extern uint32_t msTickPrio;
+extern systick_freq_t msTickFreq;
+
 /* configure systick */
-void systick_config(void);
+SC_error_t systick_init(uint32_t systick_priority);
+void systick_increase(void);
 uint32_t getCurrentMillis(void);
 uint32_t getCurrentMicros(void);
 
 void clockEnable(clock_source_t clock_source);
+
+/**
+  * @brief  This function checks if the Systick counter flag is active
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t systick_active_counter_flag(void)
+{
+  return ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == (SysTick_CTRL_COUNTFLAG_Msk));
+}
 
 #ifdef __cplusplus
 }

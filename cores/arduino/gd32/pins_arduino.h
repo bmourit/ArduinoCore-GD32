@@ -31,7 +31,7 @@
  * Pin number mask
  * allows to retrieve the pin number without ALTx
  */
-#define PIN_NUM_MASK      0xff
+#define PIN_NUM_MASK      0xFF
 
 /* undefined pin */
 #define PIN_NOT_DEFINED   DIGITAL_PINS_NUM
@@ -148,7 +148,6 @@ PinName analog_pin_to_PinName(uint32_t pin);
 
 /* All pins could manage EXTI */
 #define DIGITAL_PIN_TO_INT(p)       (DIGITAL_PIN_VALID(p) ? p : NOT_INTERRUPT)
-#define DIGITAL_PIN_VALID(p)        (DIGITAL_TO_PINNAME(p) != NC)
 #define DIGITAL_PIN_I2C(p)          (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_I2C_SDA) || \
                                       pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_I2C_SCL))
 #define DIGITAL_PIN_PWM(p)          (pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_PWM))
@@ -159,12 +158,13 @@ PinName analog_pin_to_PinName(uint32_t pin);
                                       pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_SCLK) || \
                                       pin_in_pinmap(DIGITAL_TO_PINNAME(p), PinMap_SPI_SSEL))
 
-#define DIGITAL_PIN_TO_PORT(p)      ((GD_PORT_GET(DIGITAL_TO_PINNAME(p)) < GPIO_PORT_NUM) ? gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(p))] : (uint32_t )NULL)
-#define DIGITAL_PIN_TO_BIT_MASK(p)  (gpio_pin[GD_PIN_GET(DIGITAL_TO_PINNAME(p))])
-#define ANALOG_PINS_TO_BIT(p)       (gpio_pin[GD_PIN_GET(DIGITAL_TO_PINNAME(p))])
+#define DIGITAL_PIN_TO_PORT(p)      (GET_GPIO_PORT(GD_PORT_GET(DIGITAL_TO_PINNAME(p))))
+#define DIGITAL_PIN_TO_BIT_MASK(p)  (GD_GPIO_PIN(DIGITAL_TO_PINNAME(p)))
 
+#define ANALOG_PINS_TO_BIT(p)       (GD_GPIO_PIN(DIGITAL_TO_PINNAME(p)))
 #define PORT_OUTPUT_REG(port)       (GPIO_OCTL(port))
 #define PORT_INPUT_REG(port)        (GPIO_ISTAT(port))
+
 #define PORT_SET_REG(port)          (GPIO_BOP(port))
 #if defined(GD32F4xx)
 /* GPIO register definitions */
@@ -184,14 +184,16 @@ PinName analog_pin_to_PinName(uint32_t pin);
 #endif
 #define PORT_CFG_REG(port)          (PORT_CTL_REG(port))
 
+#define DIGITAL_PIN_VALID(p)        (DIGITAL_TO_PINNAME(p) != NC)
+
 /* since some pins could be duplicated in digital_pins[] */
 /* return the first occurence of linked PinName (PYx) */
 #define ANALOG_PINS_FIRST_LINK(p)   (PINNAME_TO_DIGITAL(DIGITAL_TO_PINNAME(p)))
 
 /* ensure pin is not one of the serial pins */
 #if defined(PIN_SERIAL_RX) && defined(PIN_SERIAL_TX)
-#define PIN_IS_SERIAL(p)            ((ANALOG_PINS_FIRST_LINK(p) == (PIN_SERIAL_RX & PIN_NUM_MASK)) || \
-                                      (ANALOG_PINS_FIRST_LINK(p) == (PIN_SERIAL_TX & PIN_NUM_MASK)))
+#define PIN_IS_SERIAL(p)            ((DIGITAL_TO_PINNAME(p) == DIGITAL_TO_PINNAME(PIN_SERIAL_RX & PIN_NUM_MASK)) || \
+                                      (DIGITAL_TO_PINNAME(p) == DIGITAL_TO_PINNAME(PIN_SERIAL_TX & PIN_NUM_MASK)))
 #endif
 
 /* Convert a digital pin to an analog pin */
@@ -202,9 +204,9 @@ uint32_t digital_pin_to_analog(uint32_t pin);
 #define digitalPinToPinName(P)      (DIGITAL_TO_PINNAME(P))
 #define digitalPinToPort(P)         (DIGITAL_PIN_TO_PORT(P))
 #define digitalPinToBitMask(P)      (DIGITAL_PIN_TO_BIT_MASK(P))
-#define portInputRegister(PORT)     (&PORT_INPUT_REG(PORT))
-#define portOutputRegister(PORT)    (&PORT_OUTPUT_REG(PORT))
-#define portModeRegister(PORT)      (&PORT_CTL_REG(PORT))
+#define portInputRegister(PORT)     (PORT_INPUT_REG(PORT))
+#define portOutputRegister(PORT)    (PORT_OUTPUT_REG(PORT))
+#define portModeRegister(PORT)      (PORT_CTL_REG(PORT))
 
 #ifdef __cplusplus
 }

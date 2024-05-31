@@ -31,10 +31,15 @@
 #include "USBCore.h"
 #endif
 
+#include "gd32xxyy.h"
+
 // Force init to be called *first*, i.e. before static object allocation.
 // Otherwise, statically allocated objects that need libmaple may fail.
 __attribute__((constructor(101))) void premain()
 {
+#ifdef NVIC_PRIGROUP_PRE4_SUB0
+  nvic_priority_group_set(NVIC_PRIGROUP_PRE4_SUB0);
+#endif
   init();
 }
 

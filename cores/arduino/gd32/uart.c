@@ -29,6 +29,7 @@ OF SUCH DAMAGE.
 #include "gd_debug.h"
 #include "uart.h"
 #include "Arduino.h"
+#include "gd32F30x_remap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -874,10 +875,10 @@ void UART_IRQHandler(SPL_UartHandle_t *uart_handle)
   		if (((stat_flags & USART_FLAG_RBNE) != RESET) && ((ctl0_bits & USART_INT_RBNE) != RESET)) {
   			IT_receive(uart_handle);
   		}
-  		dma_request = (((USART_CTL2(uart_handle->instance)) & (USART_CTL2_DENR)) != 0U);
+  		dma_request = ((USART_CTL2(uart_handle->instance) & USART_CTL2_DENR) != 0U);
   		if (((uart_handle->error_code & USART_OVERRUN_ERROR) != RESET) || dma_request) {
   			serial_rx_transfer_end(uart_handle);
-  			if (((USART_CTL2(uart_handle->instance)) & (USART_CTL2_DENR)) != 0U) {
+  			if ((USART_CTL2(uart_handle->instance) & USART_CTL2_DENR) != 0U) {
   				usart_dma_receive_config(uart_handle->instance, USART_RECEIVE_DMA_DISABLE);
   				UART_ErrorCallback(uart_handle);
   			} else {

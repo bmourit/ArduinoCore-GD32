@@ -2,7 +2,7 @@
 #include "gd32f10x_gpio.h"
 #elif defined(GD32F1x0)
 #include "gd32f1x0_gpio.h"
-#elif defined (GD32F20x)
+#elif defined(GD32F20x)
 #include "gd32f20x_gpio.h"
 #elif defined(GD32F3x0)
 #include "gd32f3x0_gpio.h"

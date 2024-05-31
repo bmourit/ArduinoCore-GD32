@@ -37,8 +37,6 @@ using namespace arduino;
 #include "gd32/pins_arduino.h"
 #include "gd32/PeripheralPins.h"
 
-#define EXTENDED_PIN_MODE
-
 #define interrupts()      __enable_irq()
 #define noInterrupts()    __disable_irq()
 
@@ -50,6 +48,9 @@ using namespace arduino;
 
 extern "C" {
 #endif /* __cplusplus */
+
+//#define EXTENDED_PIN_MODE
+
 #include "gd32/systick.h"
 #include "analog.h"
 #include "wiring_analog_extra.h"
@@ -63,10 +64,16 @@ extern "C" {
 #endif /* __cplusplus */
 
 #ifdef __cplusplus
+extern "C" {
+#endif
+//extern void init(void);
+extern void setup(void);
+extern void loop(void);
+#ifdef __cplusplus
+}
+#endif
 
-void init(void);
-void setup();
-void loop();
+#ifdef __cplusplus
 
 #include "variant.h"
 #include "HardwareSerial.h"

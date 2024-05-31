@@ -31,10 +31,7 @@ OF SUCH DAMAGE.
 #ifndef __ANALOG_H
 #define __ANALOG_H
 
-#include "gd32xxyy.h"
-#include "PinNames.h"
-#include "PeripheralPins.h"
-#include "HardwareTimer.h"
+#include "PeripheralNames.h"
 #include "timer.h"
 
 #ifdef __cplusplus
@@ -46,10 +43,10 @@ typedef struct {
 } analog_t;
 
 /* adc */
-uint8_t get_adc_channel(PinName pn);
+uint32_t get_adc_channel(PinName pn);
 uint8_t get_adc_index(uint32_t instance);
-uint16_t get_adc_value(PinName pn);
-void adc_clock_enable(uint32_t instance);
+uint16_t get_adc_value(PinName pn, uint32_t resolution);
+void adc_clock_enable(ADCName instance);
 /* dac */
 void set_dac_value(PinName pn, uint16_t value, uint8_t needs_init);
 uint8_t get_dac_index(uint32_t instance);

@@ -26,7 +26,6 @@
 
 #include <inttypes.h>
 
-#include "Arduino.h"
 #include "api/Stream.h"
 #include "uart.h"
 

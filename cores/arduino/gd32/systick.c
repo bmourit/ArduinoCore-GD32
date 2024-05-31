@@ -39,7 +39,13 @@ OF SUCH DAMAGE.
 #include "backup_domain.h"
 #include "systick.h"
 
-volatile uint32_t gd_ticks;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+__IO uint32_t msTicks;
+uint32_t msTickPrio = (1UL << __NVIC_PRIO_BITS);
+systick_freq_t msTickFreq = SYSTICK_FREQ_DEFAULT;
 
 /*!
   \brief      configure systick
@@ -47,31 +53,42 @@ volatile uint32_t gd_ticks;
   \param[out] none
   \retval     none
 */
-void systick_config(void)
+SC_error_t systick_init(uint32_t systick_priority)
 {
   /* setup systick timer for 1000Hz interrupts */
-  if (SysTick_Config(SystemCoreClock / 1000U) > 0U) {
-    /* capture error */
-    //while (1) {
-    //}
-    return;
+  if (SysTick_Config(SystemCoreClock / (1000U / msTickFreq)) > 0U) {
+    return SC_ERROR;
   }
-  /* configure the systick handler priority */
-  NVIC_SetPriority(SysTick_IRQn, 0x00U);
+
+  if (systick_priority < (1UL << __NVIC_PRIO_BITS)) {
+    uint32_t priority_group = NVIC_GetPriorityGrouping();
+    /* configure the systick handler priority */
+    NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(priority_group, systick_priority, 0U));
+    msTickPrio = systick_priority;
+  } else {
+    return SC_ERROR;
+  }
+
+  return SC_OK;
+}
+
+void systick_increase(void)
+{
+  msTicks += msTickFreq; // 1ms increases
 }
 
 void noOsSystickHandler(){}
+
 void osSystickHandler() __attribute__((weak, alias("noOsSystickHandler")));
 
 /*!
   \brief      this function handles SysTick exception
   \param[in]  none
-  \param[out] none
   \retval     none
 */
 void SysTick_Handler(void)
 {
-  gd_ticks++;
+  systick_increase();
   osSystickHandler();
 }
 
@@ -83,7 +100,7 @@ void SysTick_Handler(void)
 */
 uint32_t getCurrentMillis(void)
 {
-  return gd_ticks;
+  return msTicks;
 }
 
 /*!
@@ -94,68 +111,64 @@ uint32_t getCurrentMillis(void)
 */
 uint32_t getCurrentMicros(void)
 {
-  uint32_t ms = gd_ticks;
-  uint32_t systick_value = SysTick->VAL;
-  uint32_t systick_load = SysTick->LOAD + 1;
-  uint32_t us = ((systick_load - systick_value) * 1000) / systick_load;
-  return (ms * 1000 + us);
+  systick_active_counter_flag();
+  uint32_t ms = msTicks;
+  const uint32_t systick_load = SysTick->LOAD + 1;
+  __IO uint32_t us = systick_load - SysTick->VAL;
+  if (systick_active_counter_flag()) {
+    ms = msTicks;
+    us = systick_load - SysTick->VAL;
+  }
+  return (ms * 1000 + (us * 1000) / systick_load);
 }
 
 void clockEnable(clock_source_t clock_source)
 {
-  rcu_osci_type_enum osci = RCU_IRC8M;
+  SC_oscillator_params_t osc_params = {0};
+  osc_params.pll_params.pll_status = RCU_PLL_NONE;
+
   backup_domain_enable();
 
   switch(clock_source) {
-  case SOURCE_PLL_CK:
-    if (rcu_flag_get(RCU_FLAG_PLLSTB) == RESET) {
-      osci = RCU_PLL_CK;
-    }
-    break;
-#ifdef GD32F30X_CL
-  case SOURCE_PLL1_CK:
-    if (rcu_flag_get(RCU_FLAG_PLL1STB) == RESET) {
-      osci = RCU_PLL1_CK;
-    }
-    break;
-  case SOURCE_PLL2_CK:
-    if (rcu_flag_get(RCU_FLAG_PLL2STB) == RESET) {
-      osci = RCU_PLL2_CK;
-    }
-    break;
-#endif
-  case SOURCE_IRC40K:
-    if (rcu_flag_get(RCU_FLAG_IRC40KSTB) == RESET) {
-      osci = RCU_IRC40K;
-    }
-    break;
-  case SOURCE_IRC48M:
-    if (rcu_flag_get(RCU_FLAG_IRC48MSTB) == RESET) {
-      osci = RCU_IRC48M;
-    }
-    break;
-  case SOURCE_IRC8M:
-    if (rcu_flag_get(RCU_FLAG_IRC8MSTB) == RESET) {
-      osci = RCU_IRC8M;
-    }
-    break;
+    case SOURCE_IRC40K:
+      if (rcu_flag_get(RCU_FLAG_IRC40KSTB) == RESET) {
+        osc_params.osc = RCU_OSC_IRC40K;
+        osc_params.IRC40K_state = RCU_IRC40K_ON;
+      }
+      break;
+    case SOURCE_IRC8M:
+      if (rcu_flag_get(RCU_FLAG_IRC8MSTB) == RESET) {
+        osc_params.osc = RCU_OSC_IRC8M;
+        osc_params.IRC8M_state = RCU_IRC8M_ON;
+        osc_params.IRC8M_calibration = 16U;
+      }
+      break;
   case SOURCE_LXTAL:
-    if (rcu_flag_get(RCU_FLAG_LXTALSTB) == RESET) {
-      osci = RCU_LXTAL;
-    }
-    break;
+      if (rcu_flag_get(RCU_FLAG_LXTALSTB) == RESET) {
+#ifdef USE_LXTAL_DRIVE_CAP
+        rcu_lxtal_drive_capability_config(RCU_LXTAL_LOWDRI);
+#endif
+        osc_params.osc = RCU_OSC_LXTAL;
+        osc_params.LXTAL_state = RCU_LXTAL_ON;
+      }
+      break;
   case SOURCE_HXTAL:
-    if (rcu_flag_get(RCU_FLAG_HXTALSTB) == RESET) {
-      osci = RCU_HXTAL;
-    }
-    break;
+      if (rcu_flag_get(RCU_FLAG_HXTALSTB) == RESET) {
+        osc_params.osc = RCU_OSC_HXTAL;
+        osc_params.HXTAL_state = RCU_HXTAL_ON;
+      }
+      break;
   default:
-    break;
+      break;
   }
 
-  rcu_osci_on(osci);
-
-  if (rcu_osci_stab_wait(osci) != SUCCESS) {
-    Error_Handler();
+  if (osc_params.osc != RCU_OSC_NONE) {
+    if (SC_Osc_Params(&osc_params) != SC_OK) {
+      Error_Handler();
+    }
   }
 }
+
+#ifdef __cplusplus
+}
+#endif

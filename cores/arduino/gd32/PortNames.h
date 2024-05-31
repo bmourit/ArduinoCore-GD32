@@ -28,14 +28,15 @@ OF SUCH DAMAGE.
 #ifndef _PORTNAMES_H
 #define _PORTNAMES_H
 
+#include "gd32_def.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "gd32_def.h"
-
 typedef enum {
-  PORTA = 0x00,
+  FirstPort = 0x00,
+  PORTA = FirstPort,
   PORTB,
   PORTC,
 #if defined GPIOD
@@ -60,9 +61,12 @@ typedef enum {
   LastPort = PORTEND - 1
 } PortName;
 
-#define GPIO_PORT_NUM (PORTEND)
+#define GPIO_PORT_NUM (LastPort - FirstPort + 1)
+
+#define GET_GPIO_PORT(p)  ((p < GPIO_PORT_NUM) ? gpio_port[p] : (uint32_t)NULL)
 
 #ifdef __cplusplus
 }
 #endif
+
 #endif

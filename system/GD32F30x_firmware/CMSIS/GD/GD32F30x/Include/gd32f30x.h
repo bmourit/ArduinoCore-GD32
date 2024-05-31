@@ -104,7 +104,6 @@ OF SUCH DAMAGE.
 
 /* configuration of the Cortex-M4 processor and core peripherals */
 #define __CM4_REV                 0x0001   /*!< Core revision r0p1                                       */
-//#define __MPU_PRESENT           1      /*!< GD32F30x provide MPU                                       */
 #define __MPU_PRESENT             0        /*!< GD32F30x provide MPU                                     */
 #define __NVIC_PRIO_BITS          4        /*!< GD32F30x uses 4 bits for the priority levels             */
 #define __Vendor_SysTickConfig    0        /*!< set to 1 if different sysTick config is used             */
@@ -120,7 +119,7 @@ typedef enum IRQn
 	BusFault_IRQn                = -11,    /*!< 5 Cortex-M4 Bus Fault Interrupt                          */
 	UsageFault_IRQn              = -10,    /*!< 6 Cortex-M4 Usage Fault Interrupt                        */
 	SVCall_IRQn                  = -5,     /*!< 11 Cortex-M4 SV call interrupt                           */
-	DebugMonitor_IRQn            = -4,     /*!< 12 Cortex-M4 Debug mMonitor Interrupt                     */
+	DebugMonitor_IRQn            = -4,     /*!< 12 Cortex-M4 Debug mMonitor Interrupt                    */
 	PendSV_IRQn                  = -2,     /*!< 14 Cortex-M4 Pend SV Interrupt                           */
 	SysTick_IRQn                 = -1,     /*!< 15 Cortex-M4 System Tick Interrupt                       */
 
