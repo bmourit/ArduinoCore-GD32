@@ -67,12 +67,18 @@ typedef enum {
   SYSTICK_FREQ_DEFAULT = SYSTICK_FREQ_1KHZ
 } systick_freq_t;
 
+#define MAX_TICK_DELAY    0xFFFFFFFFU
+
 extern uint32_t msTickPrio;
 extern systick_freq_t msTickFreq;
 
 /* configure systick */
-SC_error_t systick_init(uint32_t systick_priority);
-void systick_increase(void);
+SC_error_t tickInit(uint32_t systick_priority);
+void tickInc(void);
+uint32_t getSysTickPrio(void);
+SC_error_t setTickFreq(systick_freq_t freq);
+systick_freq_t getTickFreq(void);
+void tickDelay(uint32_t delay)
 uint32_t getCurrentMillis(void);
 uint32_t getCurrentMicros(void);
 

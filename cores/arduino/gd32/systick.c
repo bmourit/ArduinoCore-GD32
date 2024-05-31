@@ -53,7 +53,7 @@ systick_freq_t msTickFreq = SYSTICK_FREQ_DEFAULT;
   \param[out] none
   \retval     none
 */
-SC_error_t systick_init(uint32_t systick_priority)
+SC_error_t tickInit(uint32_t systick_priority)
 {
   /* setup systick timer for 1000Hz interrupts */
   if (SysTick_Config(SystemCoreClock / (1000U / msTickFreq)) > 0U) {
@@ -72,7 +72,7 @@ SC_error_t systick_init(uint32_t systick_priority)
   return SC_OK;
 }
 
-void systick_increase(void)
+void tickInc(void)
 {
   msTicks += msTickFreq; // 1ms increases
 }
@@ -88,8 +88,51 @@ void osSystickHandler() __attribute__((weak, alias("noOsSystickHandler")));
 */
 void SysTick_Handler(void)
 {
-  systick_increase();
+  tickInc();
   osSystickHandler();
+}
+
+/*!
+  \brief      get the current tick priority
+  \param[in]  none
+  \param[out] none
+  \retval     tick priority
+*/
+uint32_t getSysTickPrio(void)
+{
+  return msTickPrio;
+}
+
+SC_error_t setTickFreq(systick_freq_t freq)
+{
+  SC_error_t status = SC_OK;
+
+  if (freq != msTickFreq) {
+    status = tickInit(msTickPrio);
+    if (status == SC_OK) {
+      msTickFreq = freq;
+    }
+  }
+  return status;
+}
+
+systick_freq_t getTickFreq(void)
+{
+  return msTickFreq;
+}
+
+void tickDelay(uint32_t delay)
+{
+  uint32_t tstart = getCurrentMillis();
+  uint32_t tdelay = delay;
+
+  if (tdelay < MAX_TICK_DELAY) {
+    tdelay += (uint32_t)(msTickFreq);
+  }
+
+  while ((getCurrentMillis() - tstart) < wait)
+  {
+  }
 }
 
 /*!
