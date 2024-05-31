@@ -78,7 +78,7 @@ void tickInc(void);
 uint32_t getSysTickPrio(void);
 SC_error_t setTickFreq(systick_freq_t freq);
 systick_freq_t getTickFreq(void);
-void tickDelay(uint32_t delay)
+void tickDelay(uint32_t delay);
 uint32_t getCurrentMillis(void);
 uint32_t getCurrentMicros(void);
 

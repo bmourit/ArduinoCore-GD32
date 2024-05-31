@@ -130,7 +130,7 @@ void tickDelay(uint32_t delay)
     tdelay += (uint32_t)(msTickFreq);
   }
 
-  while ((getCurrentMillis() - tstart) < wait)
+  while ((getCurrentMillis() - tstart) < tdelay)
   {
   }
 }
