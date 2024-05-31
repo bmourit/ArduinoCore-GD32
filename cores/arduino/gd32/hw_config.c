@@ -50,16 +50,10 @@ extern "C" {
   */
 void hw_config_init(void)
 {
+  /* start the free running time keeping clock */
+  tickInit(0x00U);
   /* Configure the system clock */
   SystemClock_Config();
-  /**
-   * start the time keeping tick counter
-   * since this is based on the value of
-   * SystemCoreClock, we need to start
-   * this after the clocks are properly
-   * set, or risk timing maddness!
-   */
-  systick_init(0x00U);
 }
 
 #ifdef __cplusplus
