@@ -68,9 +68,7 @@ extern "C" {
 static rcu_periph_enum usart_clk[UART_NUM] = {
   RCU_USART0,
   RCU_USART1,
-#ifdef USART2
   RCU_USART2,
-#endif
 #ifdef UART3
   RCU_UART3,
 #elif USART3
@@ -86,9 +84,7 @@ static rcu_periph_enum usart_clk[UART_NUM] = {
 static IRQn_Type usart_irq_n[UART_NUM] = {
   USART0_IRQn,
   USART1_IRQn,
-#ifdef USART2
   USART2_IRQn,
-#endif
 #ifdef UART3
   UART3_IRQn,
 #elif USART3
@@ -249,28 +245,22 @@ void serial_init(serial_t *obj, uint32_t baudrate, uint32_t databits, uint32_t p
 
 	/* set uart index */
 	switch (obj->uart) {
-#if defined(USART0)
-		case USART0:
+		case UART_0:
 			obj->index = UART0_INDEX;
 			break;
-#endif
-#if defined(USART1)
-		case USART1:
+		case UART_1:
 			obj->index = UART1_INDEX;
 			break;
-#endif
-#if defined(USART2)
-		case USART2:
+		case UART_2:
 			obj->index = UART2_INDEX;
 			break;
-#endif
-#if defined(UART3)
-		case UART3:
+#if (defined(UART3) || defined(USART3))
+		case UART_3:
 			obj->index = UART3_INDEX;
 			break;
 #endif
-#if defined(UART4)
-		case UART4:
+#if (defined(UART4) || defined(USART4))
+		case UART_4:
 			obj->index = UART4_INDEX;
 			break;
 #endif
@@ -323,42 +313,26 @@ static void serial_deinit(SPL_UartHandle_t *uart_handle)
 */
 void serial_free(serial_t *obj)
 {
-	uint32_t uartReg = 0U;
+	UARTName uartReg = 0U;
 
 	switch (obj->index) {
-#if defined(USART0)
 	case UART0_INDEX:
-		uartReg = USART0;
+		uartReg = UART_0;
 		break;
-#endif
-#if defined(USART1)
 	case UART1_INDEX:
-		uartReg = USART1;
+		uartReg = UART_1;
 		break;
-#endif
-#if defined(USART2)
 	case UART2_INDEX:
-		uartReg = USART2;
+		uartReg = UART_2;
 		break;
-#endif
-#if defined(UART3)
+#if (defined(UART3) || defined(USART3))
 	case UART3_INDEX:
-		uartReg = UART3;
+		uartReg = UART_3;
 		break;
 #endif
-#if defined(USART3)
-	case UART3_INDEX:
-		uartReg = USART3;
-		break;
-#endif
-#if defined(UART4)
+#if (defined(UART4) || defined(USART4))
 	case UART4_INDEX:
-		uartReg = UART4;
-		break;
-#endif
-#if defined(USART4)
-	case UART4_INDEX:
-		uartReg = USART4;
+		uartReg = UART_4;
 		break;
 #endif
 	}

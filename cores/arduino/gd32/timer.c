@@ -153,6 +153,8 @@ extern "C" {
 #define NO_TIMER_5
 #endif
 
+static uint32_t getTimerRCUClockName(TIMERName instance);
+
 timerDevice_t *get_timer_object(SPL_TimerHandle_t *timer_handle)
 {
   timerDevice_t *timerObj;
@@ -168,97 +170,7 @@ timerDevice_t *get_timer_object(SPL_TimerHandle_t *timer_handle)
 */
 void Timer_clock_enable(SPL_TimerHandle_t *timer_handle)
 {
-  uint32_t temp = 0;
-  switch (timer_handle->timer_instance) {
-#if defined(TIMER0)
-    case TIMER0:
-      temp = RCU_TIMER0;
-      break;
-#endif
-#if defined(TIMER1)
-    case TIMER1:
-      temp = RCU_TIMER1;
-      break;
-#endif
-#if defined(TIMER2)
-    case TIMER2:
-      temp = RCU_TIMER2;
-      break;
-#endif
-#if defined(TIMER3)
-    case TIMER3:
-      temp = RCU_TIMER3;
-      break;
-#endif
-#if defined(TIMER4)
-    case TIMER4:
-      temp = RCU_TIMER4;
-      break;
-#endif
-#if defined(TIMER5) && !defined(NO_TIMER_5)
-    case TIMER5:
-      temp = RCU_TIMER5;
-      break;
-#endif
-#if defined(TIMER6)
-    case TIMER6:
-      temp = RCU_TIMER6;
-      break;
-#endif
-#if defined(TIMER7)
-    case TIMER7:
-      temp = RCU_TIMER7;
-      break;
-#endif
-#if defined(TIMER8)&& defined(HAS_TIMER_8) /* ToDO: Fix this so for non-F30x series that also have TIMER8 *and* RCU_TIMER8 */
-    case TIMER8:
-      temp = RCU_TIMER8;
-      break;
-#endif
-#if defined(TIMER9)&& defined(HAS_TIMER_9)
-    case TIMER9:
-      temp = RCU_TIMER9;
-      break;
-#endif
-#if defined(TIMER10)&& defined(HAS_TIMER_10) 
-    case TIMER10:
-      temp = RCU_TIMER10;
-      break;
-#endif
-#if defined(TIMER11)&& defined(HAS_TIMER_11)
-    case TIMER11:
-      temp = RCU_TIMER11;
-      break;
-#endif
-#if defined(TIMER12)&& defined(HAS_TIMER_12)
-    case TIMER12:
-      temp = RCU_TIMER12;
-      break;
-#endif
-#if defined(TIMER13)&& defined(HAS_TIMER_13)
-    case TIMER13:
-      temp = RCU_TIMER13;
-      break;
-#endif
-#if defined(TIMER14)
-    case TIMER14:
-      temp = RCU_TIMER14;
-      break;
-#endif
-#if defined(TIMER15)
-    case TIMER15:
-      temp = RCU_TIMER15;
-      break;
-#endif
-#if defined(TIMER16)
-    case TIMER16:
-      temp = RCU_TIMER16;
-      break;
-#endif
-    default:
-      break;
-  }
-  rcu_periph_clock_enable(temp);
+  rcu_periph_clock_enable(getTimerRCUClockName(timer_handle->timer_instance));
 }
 
 /*!
@@ -269,97 +181,110 @@ void Timer_clock_enable(SPL_TimerHandle_t *timer_handle)
 */
 void Timer_clock_disable(SPL_TimerHandle_t *timer_handle)
 {
-  uint32_t temp = 0;
-  switch (timer_handle->timer_instance) {
+  rcu_periph_clock_disable(getTimerRCUClockName(timer_handle->timer_instance));
+}
+
+/*!
+  \brief      function too get RCU timer clock
+  \           helps to avoid code repetition
+  \param[in]  name of the timer instance
+  \retval     returns the RCU clock name
+*/
+static uint32_t getTimerRCUClockName(TIMERName instance)
+{
+  uint32_t rcuclk = 0U;
+
+  switch (instance) {
 #if defined(TIMER0)
-    case TIMER0:
-      temp = RCU_TIMER0;
+    case TIMER_0:
+      rcuclk = RCU_TIMER0;
       break;
 #endif
 #if defined(TIMER1)
-    case TIMER1:
-      temp = RCU_TIMER1;
+    case TIMER_1:
+      rcuclk = RCU_TIMER1;
       break;
 #endif
 #if defined(TIMER2)
-    case TIMER2:
-      temp = RCU_TIMER2;
+    case TIMER_2:
+      rcuclk = RCU_TIMER2;
       break;
 #endif
 #if defined(TIMER3)
-    case TIMER3:
-      temp = RCU_TIMER3;
+    case TIMER_3:
+      rcuclk = RCU_TIMER3;
       break;
 #endif
 #if defined(TIMER4)
-    case TIMER4:
-      temp = RCU_TIMER4;
+    case TIMER_4:
+      rcuclk = RCU_TIMER4;
       break;
 #endif
 #if defined(TIMER5) && !defined(NO_TIMER_5)
-    case TIMER5:
-      temp = RCU_TIMER5;
+    case TIMER_5:
+      rcuclk = RCU_TIMER5;
       break;
 #endif
 #if defined(TIMER6)
-    case TIMER6:
-      temp = RCU_TIMER6;
+    case TIMER_6:
+      rcuclk = RCU_TIMER6;
       break;
 #endif
 #if defined(TIMER7)
-    case TIMER7:
-      temp = RCU_TIMER7;
+    case TIMER_7:
+      rcuclk = RCU_TIMER7;
       break;
 #endif
 #if defined(TIMER8)&& defined(HAS_TIMER_8) /* ToDO: Fix this so for non-F30x series that also have TIMER8 *and* RCU_TIMER8 */
-    case TIMER8:
-      temp = RCU_TIMER8;
+    case TIMER_8:
+      rcuclk = RCU_TIMER8;
       break;
 #endif
 #if defined(TIMER9)&& defined(HAS_TIMER_9)
-    case TIMER9:
-      temp = RCU_TIMER9;
+    case TIMER_9:
+      rcuclk = RCU_TIMER9;
       break;
 #endif
 #if defined(TIMER10)&& defined(HAS_TIMER_10) 
-    case TIMER10:
-      temp = RCU_TIMER10;
+    case TIMER_10:
+      rcuclk = RCU_TIMER10;
       break;
 #endif
 #if defined(TIMER11)&& defined(HAS_TIMER_11)
-    case TIMER11:
-      temp = RCU_TIMER11;
+    case TIMER_11:
+      rcuclk = RCU_TIMER11;
       break;
 #endif
 #if defined(TIMER12)&& defined(HAS_TIMER_12)
-    case TIMER12:
-      temp = RCU_TIMER12;
+    case TIMER_12:
+      rcuclk = RCU_TIMER12;
       break;
 #endif
 #if defined(TIMER13)&& defined(HAS_TIMER_13)
-    case TIMER13:
-      temp = RCU_TIMER13;
+    case TIMER_13:
+      rcuclk = RCU_TIMER13;
       break;
 #endif
 #if defined(TIMER14)
-    case TIMER14:
-      temp = RCU_TIMER14;
+    case TIMER_14:
+      rcuclk = RCU_TIMER14;
       break;
 #endif
 #if defined(TIMER15)
-    case TIMER15:
-      temp = RCU_TIMER15;
+    case TIMER_15:
+      rcuclk = RCU_TIMER15;
       break;
 #endif
 #if defined(TIMER16)
-    case TIMER16:
-      temp = RCU_TIMER16;
+    case TIMER_16:
+      rcuclk = RCU_TIMER16;
       break;
 #endif
     default:
       break;
   }
-  rcu_periph_clock_disable(temp);
+
+  return rcuclk;
 }
 
 /*!
@@ -395,7 +320,7 @@ void Timer_init(SPL_TimerHandle_t *timer_handle)
   \param[out] none
   \retval     none
 */
-void Timer_enableUpdateIT(uint32_t instance)
+void Timer_enableUpdateIT(TIMERName instance)
 {
   timer_flag_clear(instance, TIMER_INT_FLAG_UP);
   timer_interrupt_enable(instance, TIMER_INT_UP);
@@ -407,7 +332,7 @@ void Timer_enableUpdateIT(uint32_t instance)
   \param[out] none
   \retval     none
 */
-void Timer_disableUpdateIT(uint32_t instance)
+void Timer_disableUpdateIT(TIMERName instance)
 {
   timer_flag_clear(instance, TIMER_INT_FLAG_UP);
   timer_interrupt_disable(instance, TIMER_INT_UP);
@@ -420,7 +345,7 @@ void Timer_disableUpdateIT(uint32_t instance)
   \param[out] none
   \retval     none
 */
-void Timer_enableCaptureIT(uint32_t instance, uint32_t interrupt)
+void Timer_enableCaptureIT(TIMERName instance, uint32_t interrupt)
 {
   uint32_t interrupt_flag;
   switch (interrupt) {
@@ -451,7 +376,7 @@ void Timer_enableCaptureIT(uint32_t instance, uint32_t interrupt)
   \param[out] none
   \retval     none
 */
-void Timer_disableCaptureIT(uint32_t instance, uint32_t interrupt)
+void Timer_disableCaptureIT(TIMERName instance, uint32_t interrupt)
 {
   uint32_t interrupt_flag;
   switch (interrupt) {
@@ -481,7 +406,7 @@ void Timer_disableCaptureIT(uint32_t instance, uint32_t interrupt)
   \param[out] none
   \retval     none
 */
-uint32_t getTimerClkFrequency(uint32_t instance)
+uint32_t getTimerClkFrequency(TIMERName instance)
 {
   rcu_clock_freq_enum timerclkSrc = 0xf;
   uint32_t APBx_PSC = 0;
@@ -490,58 +415,58 @@ uint32_t getTimerClkFrequency(uint32_t instance)
   if (instance != -1) {
     switch (instance) {
 #if defined(TIMER0)
-      case (uint32_t)TIMER0:
+      case TIMER_0:
 #endif
 #if defined(TIMER7)
-      case (uint32_t)TIMER7:
+      case TIMER_7:
 #endif
 #if defined(TIMER8)
-      case (uint32_t)TIMER8:
+      case TIMER_8:
 #endif
 #if defined(TIMER9)
-      case (uint32_t)TIMER9:
+      case TIMER_9:
 #endif
 #if defined(TIMER10)
-      case (uint32_t)TIMER10:
+      case TIMER_10:
 #endif
         timerclkSrc = CK_APB2;
         APBx_PSC = (RCU_CFG0 & RCU_CFG0_APB2PSC) >> 11;
         break;
 #if defined(TIMER1)
-      case (uint32_t)TIMER1:
+      case TIMER_1:
 #endif
 #if defined(TIMER2)
-      case (uint32_t)TIMER2:
+      case TIMER_2:
 #endif
 #if defined(TIMER3)
-      case (uint32_t)TIMER3:
+      case TIMER_3:
 #endif
 #if defined(TIMER4)
-      case (uint32_t)TIMER4:
+      case TIMER_4:
 #endif
 #if defined(TIMER5) && !defined(NO_TIMER_5)
-      case (uint32_t)TIMER5:
+      case TIMER_5:
 #endif
 #if defined(TIMER6)
-      case (uint32_t)TIMER6:
+      case TIMER_6:
 #endif
 #if defined(TIMER11)
-      case (uint32_t)TIMER11:
+      case TIMER_11:
 #endif
 #if defined(TIMER12)
-      case (uint32_t)TIMER12:
+      case TIMER_12:
 #endif
 #if defined(TIMER13)
-      case (uint32_t)TIMER13:
+      case TIMER_13:
 #endif
 #if defined(TIMER14)
-      case (uint32_t)TIMER14:
+      case TIMER_14:
 #endif
 #if defined(TIMER15)
-      case (uint32_t)TIMER15:
+      case TIMER_15:
 #endif
 #if defined(TIMER16)
-      case (uint32_t)TIMER16:
+      case TIMER_16:
 #endif
         timerclkSrc = CK_APB1;
         APBx_PSC = (RCU_CFG0 & RCU_CFG0_APB1PSC) >> 8;
@@ -565,65 +490,65 @@ uint32_t getTimerClkFrequency(uint32_t instance)
   \param[out] none
   \retval     timer update IRQn
 */
-IRQn_Type getTimerUpIrq(uint32_t timer)
+IRQn_Type getTimerUpIrq(TIMERName timer)
 {
   IRQn_Type IRQn = NonMaskableInt_IRQn;
 
   if (timer != (uint32_t)NC) {
     switch (timer) {
 #if defined(TIMER0)
-      case (uint32_t)TIMER0:
+      case TIMER_0:
         //differing update interrupt for Timer0 on some devices
         IRQn = TIMER0_Update_IRQ_Name;
         break;
 #endif
 #if defined(TIMER1)
-      case (uint32_t)TIMER1:
+      case TIMER_1:
         IRQn = TIMER1_IRQn;
         break;
 #endif
 #if defined(TIMER2)
-      case (uint32_t)TIMER2:
+      case TIMER_2:
         IRQn = TIMER2_IRQn;
         break;
 #endif
 #if defined(TIMER3)
-      case (uint32_t)TIMER3:
+      case TIMER_3:
         IRQn = TIMER3_IRQn;
         break;
 #endif
 #if defined(TIMER4)
-      case (uint32_t)TIMER4:
+      case TIMER_4:
         IRQn = TIMER4_IRQn;
         break;
 #endif
 #if defined(TIMER5) && !defined(NO_TIMER_5)
-      case (uint32_t)TIMER5:
+      case TIMER_5:
         IRQn = TIMER5_IRQ_Name;
         break;
 #endif
 #if defined(TIMER6)
-      case (uint32_t)TIMER6:
+      case TIMER_6:
         IRQn = TIMER6_IRQn;
         break;
 #endif
 #if defined(TIMER7)
-      case (uint32_t)TIMER7:
+      case TIMER_7:
         IRQn = TIMER7_UP_IRQ_NAME;
         break;
 #endif
 #if defined(TIMER8) && defined(HAS_TIMER_8)
-      case (uint32_t)TIMER8:
+      case TIMER_8:
         IRQn = TIMER8_IRQn;
         break;
 #endif
 #if defined(TIMER9) && defined(HAS_TIMER_9)
-      case (uint32_t)TIMER9:
+      case TIMER_9:
         IRQn = TIMER9_IRQn;
         break;
 #endif
 #if defined(TIMER10) && defined(HAS_TIMER_10)
-      case (uint32_t)TIMER10:
+      case TIMER_10:
       #ifdef TIMER10_IRQ_NAME //TODO: repeat this for other timers...
         IRQn = TIMER10_IRQ_NAME;
       #else
@@ -632,17 +557,17 @@ IRQn_Type getTimerUpIrq(uint32_t timer)
         break;
 #endif
 #if defined(TIMER11) && defined(HAS_TIMER_11)
-      case (uint32_t)TIMER11:
+      case TIMER_11:
         IRQn = TIMER11_IRQn;
         break;
 #endif
 #if defined(TIMER12) && defined(HAS_TIMER_12)
-      case (uint32_t)TIMER12:
+      case TIMER_12:
         IRQn = TIMER12_IRQn;
         break;
 #endif
 #if defined(TIMER13) && defined(HAS_TIMER_13)
-      case (uint32_t)TIMER13:
+      case TIMER_13:
         IRQn = TIMER13_IRQn;
         break;
 #endif
@@ -650,6 +575,7 @@ IRQn_Type getTimerUpIrq(uint32_t timer)
         break;
     }
   }
+
   return IRQn;
 }
 
@@ -659,94 +585,94 @@ IRQn_Type getTimerUpIrq(uint32_t timer)
   \param[out] none
   \retval     timer capture/compare IRQn
 */
-IRQn_Type getTimerCCIrq(uint32_t timer)
+IRQn_Type getTimerCCIrq(TIMERName timer)
 {
   IRQn_Type IRQn = NonMaskableInt_IRQn;
 
-  if (timer != (uint32_t)NC) {
+  if (timer != (TIMERName)NC) {
     switch (timer) {
 #if defined(TIMER0)
-      case (uint32_t)TIMER0:
+      case TIMER_0:
         IRQn = TIMER0_Channel_IRQn;
         break;
 #endif
 #if defined(TIMER1)
-      case (uint32_t)TIMER1:
+      case TIMER_1:
         IRQn = TIMER1_IRQn;
         break;
 #endif
 #if defined(TIMER2)
-      case (uint32_t)TIMER2:
+      case TIMER_2:
         IRQn = TIMER2_IRQn;
         break;
 #endif
 #if defined(TIMER3)
-      case (uint32_t)TIMER3:
+      case TIMER_3:
         IRQn = TIMER3_IRQn;
         break;
 #endif
 #if defined(TIMER4)
-      case (uint32_t)TIMER4:
+      case TIMER_4:
         IRQn = TIMER4_IRQn;
         break;
 #endif
 #if defined(TIMER5) && !defined(NO_TIMER_5)
-      case (uint32_t)TIMER5:
+      case TIMER_5:
         IRQn = TIMER5_IRQ_Name;
         break;
 #endif
 #if defined(TIMER6)
-      case (uint32_t)TIMER6:
+      case TIMER_6:
         IRQn = TIMER6_IRQn;
         break;
 #endif
 #if defined(TIMER7)
-      case (uint32_t)TIMER7:
+      case TIMER_7:
         IRQn = TIMER7_IRQ_NAME;
         break;
 #endif
 #if defined(TIMER8) && defined(HAS_TIMER_8)
-      case (uint32_t)TIMER8:
+      case TIMER_8:
         IRQn = TIMER8_IRQn;
         break;
 #endif
 #if defined(TIMER9) && defined(HAS_TIMER_9)
-      case (uint32_t)TIMER9:
+      case TIMER_9:
         IRQn = TIMER9_IRQn;
         break;
 #endif
 #if defined(TIMER10) && defined(HAS_TIMER_10)
-      case (uint32_t)TIMER10:
+      case TIMER_10:
         IRQn = TIMER10_IRQn;
         break;
 #endif
 #if defined(TIMER11) && defined(HAS_TIMER_11)
-      case (uint32_t)TIMER11:
+      case TIMER_11:
         IRQn = TIMER11_IRQn;
         break;
 #endif
 #if defined(TIMER12) && defined(HAS_TIMER_12)
-      case (uint32_t)TIMER12:
+      case TIMER_12:
         IRQn = TIMER12_IRQn;
         break;
 #endif
 #if defined(TIMER13) && defined(HAS_TIMER_13)
-      case (uint32_t)TIMER13:
+      case TIMER_13:
         IRQn = TIMER13_IRQn;
         break;
 #endif
 #if defined(TIMER14)
-      case (uint32_t)TIMER14:
+      case TIMER_14:
         IRQn = TIMER14_IRQn;
         break;
 #endif
 #if defined(TIMER15)
-      case (uint32_t)TIMER15:
+      case TIMER_15:
         IRQn = TIMER15_IRQn;
         break;
 #endif
 #if defined(TIMER16)
-      case (uint32_t)TIMER16:
+      case TIMER_16:
         IRQn = TIMER16_IRQn;
         break;
 #endif
@@ -754,6 +680,7 @@ IRQn_Type getTimerCCIrq(uint32_t timer)
         break;
     }
   }
+
   return IRQn;
 }
 

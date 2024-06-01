@@ -140,11 +140,11 @@
 #endif
 
 #ifndef ADC_CHANNEL_TEMPSENSOR
-#define ADC_CHANNEL_TEMPSENSOR
+#define ADC_CHANNEL_TEMPSENSOR    ADC_CHANNEL_16
 #endif
 
 #ifndef ADC_CHANNEL_VREFINT
-#define ADC_CHANNEL_VREFINT
+#define ADC_CHANNEL_VREFINT       ADC_CHANNEL_17
 #endif
 
 // Override default Arduino configuration

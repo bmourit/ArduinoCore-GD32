@@ -52,11 +52,11 @@ void pinMode(pin_size_t pin, PinMode ulMode)
       case OUTPUT:
         pin_function(p, GD_PIN_DATA(GD_MODE_OUT_PP, PIN_PUPD_NONE, 0));
         break;
-#pragma GCC diagnostic ignored "-Wswitch"
+//#pragma GCC diagnostic ignored "-Wswitch"
       case INPUT_ANALOG: // From PinModeExtension
         pin_function(p, GD_PIN_DATA(GD_MODE_ANALOG, PIN_PUPD_NONE, 0));
       break;
-#pragma GCC diagnostic ignored "-Wswitch"
+//#pragma GCC diagnostic ignored "-Wswitch"
       case OUTPUT_OPEN_DRAIN: // From PinModeExtension
         pin_function(p, GD_PIN_DATA(GD_MODE_OUT_OD, PIN_PUPD_NONE, 0));
         break;

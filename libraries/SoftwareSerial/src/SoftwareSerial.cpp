@@ -33,6 +33,7 @@
 
 #include "SoftwareSerial.h"
 
+
 #define OVERSAMPLE 3      // in RX, Timer will generate interruption OVERSAMPLE time during a bit. Thus OVERSAMPLE ticks in a bit. (interrupt not synchonized with edge).
 
 // It's best to define TIMER_SERIAL in variant.h. If not defined, we choose one here
@@ -40,39 +41,39 @@
 // because we only need an update interrupt
 #if !defined(TIMER_SERIAL)
   #if defined(TIMER6)
-  #define TIMER_SERIAL TIMER6
+  #define TIMER_SERIAL TIMER_6
   #elif defined(TIMER5)
-  #define TIMER_SERIAL TIMER5
+  #define TIMER_SERIAL TIMER_5
   #elif defined(TIMER13)
-  #define TIMER_SERIAL TIMER13
+  #define TIMER_SERIAL TIMER_13
   #elif defined(TIMER12)
-  #define TIMER_SERIAL TIMER12
+  #define TIMER_SERIAL TIMER_12
   #elif defined(TIMER10)
-  #define TIMER_SERIAL TIMER10
+  #define TIMER_SERIAL TIMER_10
   #elif defined(TIMER9)
-  #define TIMER_SERIAL TIMER9
+  #define TIMER_SERIAL TIMER_9
   #elif defined(TIMER11)
-  #define TIMER_SERIAL TIMER11
+  #define TIMER_SERIAL TIMER_11
   #elif defined(TIMER8)
-  #define TIMER_SERIAL TIMER8
+  #define TIMER_SERIAL TIMER_8
   #elif defined(TIMER4)
-  #define TIMER_SERIAL TIMER4
+  #define TIMER_SERIAL TIMER_4
   #elif defined(TIMER3)
-  #define TIMER_SERIAL TIMER3
+  #define TIMER_SERIAL TIMER_3
   #elif defined(TIMER2)
-  #define TIMER_SERIAL TIMER2
+  #define TIMER_SERIAL TIMER_2
   #elif defined(TIMER1)
-  #define TIMER_SERIAL TIMER1
+  #define TIMER_SERIAL TIMER_1
   #elif defined(TIMER7)
-  #define TIMER_SERIAL TIMER7
+  #define TIMER_SERIAL TIMER_7
   #elif defined(TIMER0)
-  #define TIMER_SERIAL TIMER0
+  #define TIMER_SERIAL TIMER_0
   #else
   #error No suitable timer found for SoftwareSerial, define TIMER_SERIAL in variant.h
   #endif
 #endif
 
-HardwareTimer SoftwareSerial::timer(TIMER_SERIAL);
+HardwareTimer SoftwareSerial::timer((TIMERName)TIMER_SERIAL);
 SoftwareSerial *SoftwareSerial::active_listener = nullptr;
 SoftwareSerial *volatile SoftwareSerial::active_out = nullptr;
 SoftwareSerial *volatile SoftwareSerial::active_in = nullptr;

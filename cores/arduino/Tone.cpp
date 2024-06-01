@@ -12,6 +12,7 @@ typedef struct {
 
 static void timerTonePinInit(PinName p, uint32_t frequency, uint32_t duration);
 static void tonePeriodElapsedCallback();
+
 static timerPinInfo_t TimerTone_pinInfo = { NC, 0 };
 static HardwareTimer *TimerTone = NULL;
 
@@ -79,7 +80,7 @@ void tone(uint8_t _pin, unsigned int frequency, unsigned long duration)
   PinName p = DIGITAL_TO_PINNAME(_pin);
 
   if (TimerTone == NULL) {
-    TimerTone = new HardwareTimer(TIMER_TONE);
+    TimerTone = new HardwareTimer((TIMERName)TIMER_TONE);
   }
 
   if (p != NC) {

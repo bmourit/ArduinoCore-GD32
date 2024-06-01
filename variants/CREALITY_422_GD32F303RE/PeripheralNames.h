@@ -56,20 +56,21 @@ typedef enum {
 } I2CName;
 
 typedef enum {
-    PWM_0 = (int)TIMER0,
-    PWM_1 = (int)TIMER1,
-    PWM_2 = (int)TIMER2,
-    PWM_3 = (int)TIMER3,
-    PWM_4 = (int)TIMER4,
-    PWM_7 = (int)TIMER7,
-    PWM_8 = (int)TIMER8,
-    PWM_9 = (int)TIMER9,
-    PWM_10 = (int)TIMER10,
-    PWM_11 = (int)TIMER11,
-    PWM_12 = (int)TIMER12,
-    PWM_13 = (int)TIMER13,
-} PWMName;
-
+    TIMER_0 = (int)TIMER0,
+    TIMER_1 = (int)TIMER1,
+    TIMER_2 = (int)TIMER2,
+    TIMER_3 = (int)TIMER3,
+    TIMER_4 = (int)TIMER4,
+    TIMER_5 = (int)TIMER5,
+    TIMER_6 = (int)TIMER6,
+    TIMER_7 = (int)TIMER7,
+    TIMER_8 = (int)TIMER8,
+    TIMER_9 = (int)TIMER9,
+    TIMER_10 = (int)TIMER10,
+    TIMER_11 = (int)TIMER11,
+    TIMER_12 = (int)TIMER12,
+    TIMER_13 = (int)TIMER13
+} TIMERName;
 
 #ifdef __cplusplus
 }

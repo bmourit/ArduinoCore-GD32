@@ -177,7 +177,8 @@ PinName analog_pin_to_PinName(uint32_t pin);
 // Config bits split across two registers:
 // CTL0: pin 0..7
 // CTL1: pin 8..15
-// Return only CTL0
+// Return only CTL0 since we know
+// CTL1 comes immediately after
 #define PORT_CTL_REG(port)          (GPIO_CTL0(port))
 #else
 #define PORT_CTL_REG(port)          (GPIO_CTL(port))
@@ -207,6 +208,7 @@ uint32_t digital_pin_to_analog(uint32_t pin);
 #define portInputRegister(PORT)     (PORT_INPUT_REG(PORT))
 #define portOutputRegister(PORT)    (PORT_OUTPUT_REG(PORT))
 #define portModeRegister(PORT)      (PORT_CTL_REG(PORT))
+#define analogInputToDigitalPin(p)  (ANALOG_PIN_TO_DIGITAL(p))
 
 #ifdef __cplusplus
 }

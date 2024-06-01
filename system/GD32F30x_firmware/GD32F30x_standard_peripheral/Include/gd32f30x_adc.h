@@ -147,7 +147,6 @@ extern "C" {
 #define ADC_OVSAMPCTL_TOVS              BIT(9)                           /*!< triggered oversampling */
 #define ADC_OVSAMPCTL_DRES              BITS(12,13)                      /*!< oversampling shift */
 
-
 /* constants definitions */
 /* ADC status flag */
 #define ADC_FLAG_WDE                    ADC_STAT_WDE                     /*!< analog watchdog event flag */

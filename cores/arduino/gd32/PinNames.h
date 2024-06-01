@@ -206,14 +206,18 @@ typedef enum {
 #endif
   /* ADC internal channels */
   ADC_PINS_BASE = PINNAME_ANALOG_INT,
+#if defined(ADC_CHANNEL_TEMPSENSOR) || defined(ADC_CHANNEL_TEMPSENSOR_ADC1)
   ADC_TEMP,
+#endif
+#if defined(ADC_CHANNEL_VREFINT)
   ADC_VREF,
+#endif
   ADC_START_ANALOG,
 /* pin names specific to the variant */
 #if __has_include("PinNamesVar.h")
 #include "PinNamesVar.h"
 #endif
-  NC = 0xFFFFFFFF
+  NC = (int)0xFFFFFFFF
 } PinName;
 
 /* pin mode */
@@ -286,10 +290,10 @@ typedef enum {
  * This typedef is used to extend the PinMode typedef enum
  * in the ArduinoAPI, since they don't have constants
  */
-typedef enum {
-  OUTPUT_OPEN_DRAIN = 4,  // This was merged into Arduino API, so we know it will have this value in the future.
-  INPUT_ANALOG,           // With the merge of both GD32 pin APIs, I believe we can get rid of this Analog define.
-} PinModeExtension;
+//typedef enum {
+//  OUTPUT_OPEN_DRAIN = 4,  // This was merged into Arduino API, so we know it will have this value in the future.
+//  INPUT_ANALOG,           // With the merge of both GD32 pin APIs, I believe we can get rid of this Analog define.
+//} PinModeExtension;
 
 /* GPIO pull-up/pull-down/none */
 #define PIN_PUPD_NONE       0

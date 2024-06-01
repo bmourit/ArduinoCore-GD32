@@ -54,12 +54,12 @@
 
 /* ADC internal channels */
 /* only used for analogRead() */
-//#if defined(ADC_CHANNEL_TEMPSENSOR) || defined(ADC_CHANNEL_TEMPSENSOR_ADC0)
+#if defined(ADC_CHANNEL_TEMPSENSOR) || defined(ADC_CHANNEL_TEMPSENSOR_ADC0)
   #define ATEMP   (ANALOG_INTERNAL_START)
-//#endif
-//#ifdef ADC_CHANNEL_VREFINT
+#endif
+#if defined(ADC_CHANNEL_VREFINT)
   #define AVREF   (ANALOG_INTERNAL_START + 1)
-//#endif
+#endif
 
 #if ANALOG_PINS_NUM > 0
   #define PIN_A0  ANALOG_PIN_NUM_BASE

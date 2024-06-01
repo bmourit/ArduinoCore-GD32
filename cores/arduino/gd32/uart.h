@@ -55,18 +55,14 @@ extern "C" {
 #define SERIAL_EVENT_ERROR (1 << 1)
 
 /**
- * @defgroup SerialTXEvents Serial TX Events Macros
- *
- * @{
+ * SerialTXEvents Serial TX Events Macros
  */
 #define SERIAL_EVENT_TX_COMPLETE (1 << (SERIAL_EVENT_TX_SHIFT + 0))
 #define SERIAL_EVENT_TX_ALL      (SERIAL_EVENT_TX_COMPLETE)
 /**@}*/
 
 /**
- * @defgroup SerialRXEvents Serial RX Events Macros
- *
- * @{
+ * SerialRXEvents Serial RX Events Macros
  */
 #define SERIAL_EVENT_RX_COMPLETE        (1 << (SERIAL_EVENT_RX_SHIFT + 0))
 #define SERIAL_EVENT_RX_OVERRUN_ERROR   (1 << (SERIAL_EVENT_RX_SHIFT + 1))
@@ -77,7 +73,6 @@ extern "C" {
 #define SERIAL_EVENT_RX_ALL             (SERIAL_EVENT_RX_OVERFLOW | SERIAL_EVENT_RX_PARITY_ERROR | \
                      SERIAL_EVENT_RX_FRAMING_ERROR | SERIAL_EVENT_RX_OVERRUN_ERROR | \
                      SERIAL_EVENT_RX_COMPLETE | SERIAL_EVENT_RX_CHARACTER_MATCH)
-/**@}*/
 
 #define SERIAL_RESERVED_CHAR_MATCH (255)
 
@@ -87,9 +82,8 @@ extern "C" {
 #define USART_FRAME_ERROR         0x04U
 #define USART_OVERRUN_ERROR       0x08U
 #define USART_DMA_TRANSFER_ERROR  0x10U
-//#define USART_NOISE_ERROR     0x20U
 
-/* these are the same for all supported chip */
+/* these are the same for all supported chips */
 #define USART_RX_MODE             ((uint32_t)USART_CTL0_REN)
 #define USART_TX_MODE             ((uint32_t)USART_CTL0_TEN)
 #define USART_RXTX_MODE           ((uint32_t)(USART_CTL0_REN | USART_CTL0_TEN))
@@ -176,19 +170,13 @@ struct serial_s {
 };
 
 typedef enum {
-#if defined(USART0)
   UART0_INDEX,
-#endif
-#if defined(USART1)
   UART1_INDEX,
-#endif
-#if defined(USART2)
   UART2_INDEX,
-#endif
-#if defined(UART3) || defined(USART3)
+#if (defined(UART3) || defined(USART3))
   UART3_INDEX,
 #endif
-#if defined(UART4) || defined(USART4)
+#if (defined(UART4) || defined(USART4))
   UART4_INDEX,
 #endif
   UART_NUM
@@ -225,7 +213,7 @@ gd_status_enum IT_serial_receive(SPL_UartHandle_t *uart_handle, uint8_t *pData, 
 gd_status_enum IT_transmit(SPL_UartHandle_t *uart_handle);
 gd_status_enum IT_receive(SPL_UartHandle_t *uart_handle);
 gd_status_enum serial_wait_flag_timeout(SPL_UartHandle_t *uart_handle,
-    uint32_t flag, FlagStatus status, uint32_t timeout);
+                                        uint32_t flag, FlagStatus status, uint32_t timeout);
 
 void UART_TX_TCCallback(SPL_UartHandle_t *uart_handle);
 void UART_ErrorCallback(SPL_UartHandle_t *uart_handle);

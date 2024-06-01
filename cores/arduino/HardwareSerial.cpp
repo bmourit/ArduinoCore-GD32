@@ -51,20 +51,12 @@ void serialEvent3() __attribute__((weak));
 #endif
 
 #if defined(HAVE_HWSERIAL4)
-#if defined(USART3)
 HardwareSerial Serial4(UART_3);
-#else
-HardwareSerial Serial4(UART_3);
-#endif
 void serialEvent4() __attribute__((weak));
 #endif
 
 #if defined(HAVE_HWSERIAL5)
-#if defined(USART4)
 HardwareSerial Serial5(UART_4);
-#else
-HardwareSerial Serial5(UART_4);
-#endif
 void serialEvent5() __attribute__((weak));
 #endif
 
@@ -115,7 +107,7 @@ HardwareSerial::HardwareSerial(UARTName periph, uart_halfduplex_flag hdFlag)
     setTx(PIN_SERIAL3_TX);
   } else
 #endif
-#if defined(PIN_SERIAL4_TX) && defined(USART3)
+#if defined(PIN_SERIAL4_TX) && (defined(UART3) || defined(USART3))
   if (periph == UART_3) {
 #if defined(PIN_SERIAL4_RX)
     serRx(PIN_SERIAL4_RX);
@@ -123,23 +115,7 @@ HardwareSerial::HardwareSerial(UARTName periph, uart_halfduplex_flag hdFlag)
     setTx(PIN_SERIAL4_TX);
   } else
 #endif
-#if defined(PIN_SERIAL4_TX) && defined(UART3)
-  if (periph == UART_3) {
-#if defined(PIN_SERIAL4_RX)
-    serRx(PIN_SERIAL4_RX);
-#endif
-    setTx(PIN_SERIAL4_TX);
-  } else
-#endif
-#if defined(PIN_SERIAL5_TX) && defined(USART4)
-  if (periph == UART_4) {
-#if defined(PIN_SERIAL5_RX)
-    serRx(PIN_SERIAL5_RX);
-#endif
-    setTx(PIN_SERIAL5_TX);
-  } else
-#endif
-#if defined(PIN_SERIAL5_TX) && defined(UART4)
+#if defined(PIN_SERIAL5_TX) && (defined(UART4) || defined(USART4))
   if (periph == UART_4) {
 #if defined(PIN_SERIAL5_RX)
     serRx(PIN_SERIAL5_RX);

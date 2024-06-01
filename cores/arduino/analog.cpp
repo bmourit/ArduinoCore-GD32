@@ -202,12 +202,12 @@ uint32_t get_pwm_channel(PinName pin)
 /* pwm start */
 void pwm_start(PinName pin, uint32_t PWM_freq, uint32_t value, enum captureCompareFormat resolution)
 {
-  uint32_t instance = (uint32_t)pinmap_peripheral(pin, PinMap_PWM);
+  TIMERName instance = (TIMERName)pinmap_peripheral(pin, PinMap_PWM);
   HardwareTimer *HWT;
   captureMode previous;
   uint32_t index = get_timer_index(instance);
   if (HWTimer_Handle[index] == NULL) {
-    HWTimer_Handle[index]->_timer_instance = new HardwareTimer((uint32_t)pinmap_peripheral(pin, PinMap_PWM));
+    HWTimer_Handle[index]->_timer_instance = new HardwareTimer((TIMERName)pinmap_peripheral(pin, PinMap_PWM));
   }
   HWT = (HardwareTimer *)(HWTimer_Handle[index]->_timer_instance);
   uint32_t channel = GD_PIN_CHANNEL_GET(pinmap_function(pin, PinMap_PWM));
@@ -226,11 +226,11 @@ void pwm_start(PinName pin, uint32_t PWM_freq, uint32_t value, enum captureCompa
 /* pwm stop */
 void pwm_stop(PinName pin)
 {
-  uint32_t instance = (uint32_t)pinmap_peripheral(pin, PinMap_PWM);
+  TIMERName instance = (TIMERName)pinmap_peripheral(pin, PinMap_PWM);
   HardwareTimer *HWT;
   uint32_t index = get_timer_index(instance);
   if (HWTimer_Handle[index] == NULL) {
-    HWTimer_Handle[index]->_timer_instance = new HardwareTimer((uint32_t)pinmap_peripheral(pin, PinMap_PWM));
+    HWTimer_Handle[index]->_timer_instance = new HardwareTimer((TIMERName)pinmap_peripheral(pin, PinMap_PWM));
   }
   HWT = (HardwareTimer *)(HWTimer_Handle[index]->_timer_instance);
   if (HWT != NULL) {
@@ -251,12 +251,16 @@ uint16_t get_adc_value(PinName pn, uint32_t resolution)
   if ((pn & ADC_PINS_BASE) && (pn < ADC_START_ANALOG)) {
     adc_periph = ADC0;
     switch (pn) {
+#if defined(ADC_CHANNEL_TEMPSENSOR)
     case ADC_TEMP:
-      channel = ADC_CHANNEL_16;
+      channel = ADC_CHANNEL_TEMPSENSOR;
       break;
+#endif
+#if defined(ADC_CHANNEL_VREFINT)
     case ADC_VREF:
-      channel = ADC_CHANNEL_17;
+      channel = ADC_CHANNEL_VREFINT;
       break;
+#endif
     default:
       channel = 0;
       break;

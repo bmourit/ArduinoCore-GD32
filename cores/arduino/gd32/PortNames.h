@@ -39,22 +39,22 @@ typedef enum {
   PORTA = FirstPort,
   PORTB,
   PORTC,
-#if defined GPIOD
+#if defined(GPIOD)
   PORTD,
 #endif
-#if defined GPIOE
+#if defined(GPIOE)
   PORTE,
 #endif
-#if defined GPIOF
+#if defined(GPIOF)
   PORTF,
 #endif
-#if defined GPIOG
+#if defined(GPIOG)
   PORTG,
 #endif
-#if defined GPIOH
+#if defined(GPIOH)
   PORTH,
 #endif
-#if defined GPIOI
+#if defined(GPIOI)
   PORTI,
 #endif
   PORTEND,

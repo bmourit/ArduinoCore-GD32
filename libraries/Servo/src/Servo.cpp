@@ -28,7 +28,7 @@
 static servo_t servos[MAX_SERVOS];                          // static array of servo structures
 static volatile int8_t timerChannel[_Nbr_16timers] = {-1};  // counter for the servo being pulsed for each timer (or -1 if refresh interval)
 
-static HardwareTimer TimerServo(TIMER_SERVO);
+static HardwareTimer TimerServo((TIMERName)TIMER_SERVO);
 
 uint8_t ServoCount = 0;                                     // the total number of attached servos
 

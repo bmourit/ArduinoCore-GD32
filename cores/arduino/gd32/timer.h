@@ -30,6 +30,7 @@ OF SUCH DAMAGE.
 
 #include "gd32xxyy.h"
 #include "PeripheralPins.h"
+#include "PeripheralNames.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -224,7 +225,7 @@ typedef enum {
 } timer_active_channel_t;
 
 typedef struct {
-	uint32_t timer_instance;
+	TIMERName timer_instance;
 	uint32_t Channel;
 	bool isTimerActive;
 	timer_parameter_struct init_params;
@@ -244,14 +245,14 @@ void Timer_clock_disable(SPL_TimerHandle_t *timerHandle);			// disable timer clo
 
 void Timer_init(SPL_TimerHandle_t *timerHandle);						// initialize timer
 
-void Timer_enableUpdateIT(uint32_t instance);								// enable timer update interrupt
-void Timer_disableUpdateIT(uint32_t instance);								// disable timer update interrupt
-void Timer_enableCaptureIT(uint32_t instance, uint32_t interrupt);	// enable timer channel capture interrupt
-void Timer_disableCaptureIT(uint32_t instance, uint32_t interrupt);	// disable timer channel capture interrupt
+void Timer_enableUpdateIT(TIMERName instance);								// enable timer update interrupt
+void Timer_disableUpdateIT(TIMERName instance);								// disable timer update interrupt
+void Timer_enableCaptureIT(TIMERName instance, uint32_t interrupt);	// enable timer channel capture interrupt
+void Timer_disableCaptureIT(TIMERName instance, uint32_t interrupt);	// disable timer channel capture interrupt
 
-uint32_t  getTimerClkFrequency(uint32_t instance);		// get timer clock frequency
-IRQn_Type getTimerUpIrq(uint32_t timer);					// get timer update IRQn
-IRQn_Type getTimerCCIrq(uint32_t timer);					// get timer capture/compare IRQn
+uint32_t  getTimerClkFrequency(TIMERName instance);		// get timer clock frequency
+IRQn_Type getTimerUpIrq(TIMERName timer);					// get timer update IRQn
+IRQn_Type getTimerCCIrq(TIMERName timer);					// get timer capture/compare IRQn
 
 void timerInterruptHandler(SPL_TimerHandle_t *timer_handle);
 void timer_captureHandle(SPL_TimerHandle_t *timer_handle);

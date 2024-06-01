@@ -33,7 +33,6 @@ OF SUCH DAMAGE.
 
 #define PERIOD_MAX  ((1 << 16) - 1)
 
-//HardwareTimer *hardwaretimerObj[TIMER_NUM] = { NULL };
 timerDevice_t *HWTimer_Handle[TIMER_NUM] = {NULL};
 
 /*!
@@ -41,7 +40,7 @@ timerDevice_t *HWTimer_Handle[TIMER_NUM] = {NULL};
   \param[in]  instance: TIMERx(x=0..13)
   \retval     none
 */
-HardwareTimer::HardwareTimer(uint32_t instance)
+HardwareTimer::HardwareTimer(TIMERName instance)
 {
   _timerObj._timer_instance = (void *)this;
   _timerObj.handle.timer_instance = instance;
@@ -245,6 +244,7 @@ int HardwareTimer::getLinkedChannel(uint32_t channel)
   default:
     linked = -1;
   }
+
   return linked;
 }
 
@@ -1002,76 +1002,76 @@ uint32_t HardwareTimer::getTimerClkFreq(void)
   \param[in]  instance: timer instance
   \retval     returns the timer index
 */
-timer_index_t get_timer_index(uint32_t instance)
+timer_index_t get_timer_index(TIMERName instance)
 {
   timer_index_t index = UNKNOWN_TIMER;
 #if defined(TIMER0)
-  if (instance == TIMER0) {
+  if (instance == TIMER_0) {
     index = TIMER0_INDEX;
   }
 #endif
 #if defined(TIMER1)
-  if (instance == TIMER1) {
+  if (instance == TIMER_1) {
     index = TIMER1_INDEX;
   }
 #endif
 #if defined(TIMER2)
-  if (instance == TIMER2) {
+  if (instance == TIMER_2) {
     index = TIMER2_INDEX;
   }
 #endif
 #if defined(TIMER3)
-  if (instance == TIMER3) {
+  if (instance == TIMER_3) {
     index = TIMER3_INDEX;
   }
 #endif
 #if defined(TIMER4)
-  if (instance == TIMER4) {
+  if (instance == TIMER_4) {
     index = TIMER4_INDEX;
   }
 #endif
 #if defined(TIMER5)
-  if (instance == TIMER5) {
+  if (instance == TIMER_5) {
     index = TIMER5_INDEX;
   }
 #endif
 #if defined(TIMER6)
-  if (instance == TIMER6) {
+  if (instance == TIMER_6) {
     index = TIMER6_INDEX;
   }
 #endif
 #if defined(TIMER7)
-  if (instance == TIMER7) {
+  if (instance == TIMER_7) {
     index = TIMER7_INDEX;
   }
 #endif
 #if defined(TIMER8)
-  if (instance == TIMER8) {
+  if (instance == TIMER_8) {
     index = TIMER8_INDEX;
   }
 #endif
 #if defined(TIMER9)
-  if (instance == TIMER9) {
+  if (instance == TIMER_9) {
     index = TIMER9_INDEX;
   }
 #endif
 #if defined(TIMER10)
-  if (instance == TIMER10) {
+  if (instance == TIMER_10) {
     index = TIMER10_INDEX;
   }
 #endif
 #if defined(TIMER11)
-  if (instance == TIMER11) {
+  if (instance == TIMER_11) {
     index = TIMER11_INDEX;
   }
 #endif
 #if defined(TIMER12)
-  if (instance == TIMER12) {
+  if (instance == TIMER_12) {
     index = TIMER12_INDEX;
   }
 #endif
 #if defined(TIMER13)
-  if (instance == TIMER13) {
+  if (instance == TIMER_13) {
     index = TIMER13_INDEX;
   }
 #endif

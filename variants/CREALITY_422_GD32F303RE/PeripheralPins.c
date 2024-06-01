@@ -42,7 +42,7 @@ const int GD_GPIO_SPEED[] = {
 
 /* =====
  * Note: Commented lines are alternative possibilities which are not used per default.
- *       If you change them, you will have to know what you are doing
+ *       If you change them, it will be up to you to handle.
  * =====
  */
 
