@@ -37,6 +37,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_spi.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #define SPI_ERROR_HANDLE(s)           do{}while(1)
 
 /* SPI/I2S parameter initialization mask */
@@ -871,3 +875,7 @@ FlagStatus spi_i2s_flag_get(uint32_t spi_periph, uint32_t flag)
         return RESET;
     }
 }
+
+#ifdef __cplusplus
+}
+#endif

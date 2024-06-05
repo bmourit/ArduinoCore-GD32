@@ -37,6 +37,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_rcu.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /* define clock source */
 #define SEL_IRC8M                   ((uint16_t)0U)  /* IRC8M is selected as CK_SYS */
 #define SEL_HXTAL                   ((uint16_t)1U)  /* HXTAL is selected as CK_SYS */
@@ -1330,3 +1334,7 @@ void rcu_interrupt_disable(rcu_int_enum interrupt)
 {
     RCU_REG_VAL(interrupt) &= ~BIT(RCU_BIT_POS(interrupt));
 }
+
+#ifdef __cplusplus
+}
+#endif

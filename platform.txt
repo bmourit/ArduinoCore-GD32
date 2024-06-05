@@ -1,6 +1,6 @@
 # https://arduino.github.io/arduino-cli/latest/platform-specification/
 
-name=GD32 boards group
+name=GD32 Boards (selected from submenu)
 version=1.0.0
 
 # GD compile variables
@@ -21,7 +21,7 @@ compiler.optimization_flags.release={build.flags.optimize} {build.flags.debug}
 compiler.optimization_flags.debug=-Og -g
 
 # compile path/command
-compiler.path={runtime.tools.xpack-arm-none-eabi-gcc-13.2.1-1.1.path}/bin/
+compiler.path={runtime.tools.xpack-arm-none-eabi-gcc-9.2.1-1.1.path}/bin/
 
 compiler.S.cmd=arm-none-eabi-gcc
 compiler.c.cmd=arm-none-eabi-gcc
@@ -35,13 +35,13 @@ compiler.libraries.ldflags=
 compiler.size.cmd=arm-none-eabi-size
 compiler.readelf.cmd=arm-none-eabi-readelf
 
-compiler.extra_flags=-mcpu={build.mcu} {build.fpu} {build.float-abi} -DVECT_TAB_OFFSET={build.flash_offset} -mthumb -masm-syntax-unified
+compiler.extra_flags=-mcpu={build.mcu} {build.fpu} {build.float-abi} -DVECT_TAB_OFFSET={build.flash_offset} -mthumb
 
 compiler.S.flags={compiler.extra_flags} -c -x assembler-with-cpp {compiler.gd.extra_include}
 
-compiler.c.flags={compiler.extra_flags} -c {compiler.optimization_flags} {compiler.warning_flags} -std={compiler.c.std} -ffunction-sections -fdata-sections --param max-inline-insns-single=500 -MMD {compiler.gd.extra_include}
+compiler.c.flags={compiler.extra_flags} -c {compiler.optimization_flags} {compiler.warning_flags} -std={compiler.c.std} -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -MMD {compiler.gd.extra_include}
 
-compiler.cpp.flags={compiler.extra_flags} -c {compiler.optimization_flags}  {compiler.warning_flags} -std={compiler.cpp.std} -ffunction-sections -fdata-sections -fno-threadsafe-statics --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -fno-use-cxa-atexit -MMD {compiler.gd.extra_include}
+compiler.cpp.flags={compiler.extra_flags} -c {compiler.optimization_flags}  {compiler.warning_flags} -std={compiler.cpp.std} -ffunction-sections -fdata-sections -nostdlib -fno-threadsafe-statics --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -fno-use-cxa-atexit -MMD {compiler.gd.extra_include}
 
 compiler.ar.flags=rcs
 
@@ -52,7 +52,7 @@ compiler.objcopy.eep.flags=-O ihex -j .eeprom --set-section-flags=.eeprom=alloc,
 compiler.elf2bin.flags=-O binary
 compiler.elf2hex.flags=-O ihex
 
-compiler.ldflags=-Wl,--no-warn-rwx-segments
+compiler.ldflags=
 compiler.size.cmd=arm-none-eabi-size
 compiler.define=-DARDUINO=
 
@@ -65,10 +65,10 @@ build.ldscript=ldscript.ld
 # These can be overridden in platform.local.txt
 compiler.c.gd_extra_flags={build.peripheral_pins}
 compiler.c.extra_flags=
-compiler.c.std=gnu17
+compiler.c.std=gnu11
 compiler.c.elf.extra_flags=
 compiler.cpp.extra_flags=
-compiler.cpp.std=gnu++17
+compiler.cpp.std=gnu++14
 compiler.S.gd_extra_flags={build.startup_file}
 compiler.S.extra_flags=
 compiler.ar.extra_flags=

@@ -17,10 +17,15 @@
  *
  * Based on mbed-os/hal/mbed_pinmap_common.c
  */
-#include "pinmap.h"
-#include "gd32f30x_remap.h"
+#include "PeripheralPins.h"
+//#include "pinmap.h"
+//#include "gd32f30x_remap.h"
 #include <gd_debug.h>
 #include <gd32xxyy_gpio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //extern const int GD_GPIO_MODE[];
 extern const int GD_GPIO_SPEED[];
@@ -35,7 +40,7 @@ extern const int GD_GPIO_AF[];
 
 bool pin_in_pinmap(PinName pin, const PinMap *map)
 {
-	if (pin != (PinName)NC) {
+	if (pin != NC) {
 		while (map->pin != NC) {
 			if (map->pin == pin) {
 				return true;
@@ -53,18 +58,18 @@ bool pin_in_pinmap(PinName pin, const PinMap *map)
  */
 void pin_function(PinName pin, int function)
 {
-	uint32_t mode = GD_PIN_MODE_GET(function);
-	uint32_t af = GD_PIN_AF_GET(function);
-	uint32_t port = GD_PORT_GET(pin);
+	uint8_t mode = GD_PIN_MODE_GET(function);
+	uint8_t af = GD_PIN_AF_GET(function);
+	uint8_t port = GD_PORT_GET(pin);
 	uint32_t spl_pin = gpio_pin[GD_PIN_GET(pin)];
-	uint8_t spl_mode = 0;
-	uint32_t output = GD_PIN_OUTPUT_OD_GET(function);
-	uint32_t pull = GD_PIN_PULL_UD_GET(function);
+	uint32_t spl_mode = 0;
+	uint8_t output = GD_PIN_OUTPUT_OD_GET(function);
+	uint8_t pull = GD_PIN_PULL_UD_GET(function);
 	/**
 	 * since we dont encode the speed in the function,
 	 * we can simply set it to MAX here
 	 */
-	uint8_t speed = GPIO_OSPEED_MAX;
+	uint32_t speed = GPIO_OSPEED_MAX;
 
 	if (pin == (PinName)NC) {
 		Error_Handler();
@@ -237,7 +242,7 @@ uint32_t pinmap_function(PinName pin, const PinMap *map)
 {
 		uint32_t function = NC;
 
-		if (pin != (PinName)NC) {
+		if (pin != NC) {
 			function = pinmap_find_function(pin, map);
 		}
 		return function;
@@ -256,7 +261,7 @@ PinName pinmap_find_pin(uint32_t peripheral, const PinMap *map)
 
 PinName pinmap_pin(uint32_t peripheral, const PinMap *map)
 {
-  PinName pin = (PinName)NC;
+  PinName pin = NC;
 
   if (peripheral != NP) {
     pin = pinmap_find_pin(peripheral, map);
@@ -312,5 +317,10 @@ uint32_t gpio_clock_enable(uint32_t port)
 		gd_debug("port number does not exist");
 		break;
 	}
+
 	return gpiox;
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -31,7 +31,9 @@
 #include "USBCore.h"
 #endif
 
+extern "C" {
 #include "gd32xxyy.h"
+}
 
 // Force init to be called *first*, i.e. before static object allocation.
 // Otherwise, statically allocated objects that need libmaple may fail.

@@ -30,12 +30,14 @@ OF SUCH DAMAGE.
 
 #include "Arduino.h"
 #include "analog.h"
-#include "gd32xxyy.h"
 #include "PinNames.h"
 #include "PeripheralPins.h"
 #include "HardwareTimer.h"
+extern "C" {
+#include "gd32xxyy.h"
 #include "gd_debug.h"
 #include "gd32f30x_remap.h"
+}
 
 #ifdef __cplusplus
 extern "C" {
@@ -193,9 +195,13 @@ uint32_t get_pwm_channel(PinName pin)
       channel = TIMER_CH_3;
       break;
     default:
-      channel = -1;
       break;
   }
+
+  if (channel == -1) {
+    Error_Handler();
+  }
+
   return channel;
 }
 
@@ -207,7 +213,7 @@ void pwm_start(PinName pin, uint32_t PWM_freq, uint32_t value, enum captureCompa
   captureMode previous;
   uint32_t index = get_timer_index(instance);
   if (HWTimer_Handle[index] == NULL) {
-    HWTimer_Handle[index]->_timer_instance = new HardwareTimer((TIMERName)pinmap_peripheral(pin, PinMap_PWM));
+    HWTimer_Handle[index]->_timer_instance = new HardwareTimer(pinmap_peripheral(pin, PinMap_PWM));
   }
   HWT = (HardwareTimer *)(HWTimer_Handle[index]->_timer_instance);
   uint32_t channel = GD_PIN_CHANNEL_GET(pinmap_function(pin, PinMap_PWM));
@@ -230,7 +236,7 @@ void pwm_stop(PinName pin)
   HardwareTimer *HWT;
   uint32_t index = get_timer_index(instance);
   if (HWTimer_Handle[index] == NULL) {
-    HWTimer_Handle[index]->_timer_instance = new HardwareTimer((TIMERName)pinmap_peripheral(pin, PinMap_PWM));
+    HWTimer_Handle[index]->_timer_instance = new HardwareTimer(pinmap_peripheral(pin, PinMap_PWM));
   }
   HWT = (HardwareTimer *)(HWTimer_Handle[index]->_timer_instance);
   if (HWT != NULL) {
@@ -300,7 +306,7 @@ uint16_t get_adc_value(PinName pn, uint32_t resolution)
    * to prevent startup errors
    */
   rcu_adc_clock_config(ADC_PRESCALE_DIV);
-  adc_clock_enable((ADCName)adc_periph);
+  adc_clock_enable(adc_periph);
 
   index = get_adc_index(adc_periph);
   if (!(ADC_[index].isactive & ADC_PINS_BASE)) {
@@ -340,16 +346,17 @@ uint16_t get_adc_value(PinName pn, uint32_t resolution)
 #endif
     ADC_[index].isactive = true;
   }
+
 #if defined(GD32F30x) || defined(GD32E50X)
   if ((pn == ADC_TEMP) | (pn == ADC_VREF)) {
       adc_tempsensor_vrefint_enable();
       delay(1U);
   }
-
   adc_software_trigger_enable(adc_periph, ADC_REGULAR_CHANNEL);
   while (!adc_flag_get(adc_periph, ADC_FLAG_EOC));
   adc_flag_clear(adc_periph, ADC_FLAG_EOC);
   value = adc_regular_data_read(adc_periph);
+
 #elif defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32E23x)
   adc_regular_channel_config(0U, channel, sampling_time);
   if (pn == ADC_TEMP || pn == ADC_VREF) {
@@ -361,60 +368,50 @@ uint16_t get_adc_value(PinName pn, uint32_t resolution)
   adc_flag_clear(ADC_FLAG_EOC);
   value = adc_regular_data_read();
 #endif
+
   return value;
 }
 
 /* get adc index value */
-uint8_t get_adc_index(uint32_t instance)
+uint8_t get_adc_index(ADCName instance)
 {
   uint8_t index;
   switch (instance) {
-#ifdef ADC
-  case ADC:
-    index = 0;
-    break;
-#endif
-#ifdef ADC0
-  case ADC0:
+#if defined(ADC) || defined(ADC0)
+  case ADC_0:
     index = 0;
     break;
 #endif
 #ifdef ADC1
-  case ADC1:
+  case ADC_1:
     index = 1;
     break;
 #endif
-#if (defined(GD32F30X_HD) || defined(GD32F30X_XD))
 #ifdef ADC2
-  case ADC2:
+  case ADC_2:
     index = 2;
     break;
-#endif
 #endif
   default:
     index = 0;
     break;
   }
+
   return index;
 }
 
 /* get dac index value */
-uint8_t get_dac_index(uint32_t instance)
+uint8_t get_dac_index(DACName instance)
 {
   uint8_t index;
   switch (instance) {
-#if defined(DAC) && !defined(DAC0)  /* GD32F350 series had DAC. GD32F30x series has both DAC and DAC0 defined */
-  case DAC:
-    index = 0;
-    break;
-#endif
-#ifdef DAC0
-  case DAC0:
+#if defined(DAC) || defined(DAC0)
+  case DAC_0:
     index = 0;
     break;
 #endif
 #ifdef DAC1
-  case DAC1:
+  case DAC_1:
     index = 1;
     break;
 #endif
@@ -422,6 +419,7 @@ uint8_t get_dac_index(uint32_t instance)
     index = 0;
     break;
   }
+
   return index;
 }
 
@@ -515,6 +513,10 @@ uint32_t get_adc_channel(PinName pinname)
     channel = 0xFF;
     break;
   }
+  if (channel == 0xFF) {
+    Error_Handler();
+  }
+
   return channel;
 }
 
@@ -523,21 +525,23 @@ void adc_clock_enable(ADCName instance)
 {
   rcu_periph_enum temp;
   switch (instance) {
-#if defined(GD32F30x) || defined(GD32F10x) || defined(GD32E50X) //todo: other series
+#if defined(ADC)
+  case ADC_0:
+    temp = RCU_ADC;
+    break;
+#elif defined(ADC0)
   case ADC_0:
     temp = RCU_ADC0;
     break;
+#endif
+#if defined(ADC1)
   case ADC_1:
     temp = RCU_ADC1;
     break;
-#if defined(GD32F30X_HD) || defined(GD32F30X_XD) || defined(GD32F10X_HD)
+#endif
+#if defined(ADC2)
   case ADC_2:
     temp = RCU_ADC2;
-    break;
-#endif
-#elif defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32E23x)
-  case ADC:
-    temp = RCU_ADC;
     break;
 #endif
   default:

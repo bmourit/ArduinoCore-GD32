@@ -5,13 +5,17 @@
 
 #define EXTI_NUMS   (16)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
   IRQn_Type irqNum;
   void (*callback)(void);
 } extiConf_t;
 
 static extiConf_t gpio_exti_info[EXTI_NUMS] = {
-#if defined(GD32F30x) || defined(GD32E50X) /* TODO: handle other series!! (E23x etc) */
+#if defined(GD32F30x) || defined(GD32E50X)
   {.irqNum = EXTI0_IRQn, .callback = NULL },
   {.irqNum = EXTI1_IRQn, .callback = NULL },
   {.irqNum = EXTI2_IRQn, .callback = NULL },
@@ -302,5 +306,9 @@ void EXTI4_15_IRQHandler(void)
   for (i = 4; i < 16; i++) {
     exti_callbackHandler(i);
   }
+}
+#endif
+
+#ifdef __cplusplus
 }
 #endif

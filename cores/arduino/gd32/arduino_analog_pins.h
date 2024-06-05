@@ -22,6 +22,10 @@
 #include "variant.h"
 #include "PinNames.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Analog base pin number
  * easyily check if a pin number is an analog pin:
@@ -192,5 +196,9 @@
 #else
 #define ANALOG_PINS_MAX   0
 #endif /* ANALOG_PINS_NUM > 0 */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _ARDUINO_DIGITAL_PINS_H_ */

@@ -146,4 +146,3 @@ const uint32_t gpio_pin[] = {
 #ifdef __cplusplus
 }
 #endif
-

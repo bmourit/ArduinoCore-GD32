@@ -113,7 +113,7 @@ extern const uint32_t gpio_port[];
 extern const uint32_t gpio_pin[];
 /*------------------------------------------------------------------------------*/
 
-#define NOT_INTERRUPT   NC
+#define NOT_INTERRUPT   (uint32_t)NC
 
 /* Convert a digital pin to a PinName */
 #if ANALOG_PINS_NUM > 0
@@ -225,7 +225,7 @@ uint32_t digital_pin_to_analog(uint32_t pin);
   #define DAC_RESOLUTION        12
 #endif
 #ifndef PWM_FREQUENCY
-  #define PWM_FREQUENCY         1000  // 1000µS = 1ms = 1kHz
+  #define PWM_FREQUENCY         1000
 #endif
 #ifndef PWM_MAX_DUTY_CYCLE
   #define PWM_MAX_DUTY_CYCLE    4095

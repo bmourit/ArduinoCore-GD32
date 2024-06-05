@@ -39,6 +39,10 @@ OF SUCH DAMAGE.
 #include "gd32f30x_enet.h"
 #include <stdlib.h>
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #ifdef GD32F30X_CL
 
 #if defined   (__CC_ARM)                                    /*!< ARM compiler */
@@ -3678,3 +3682,7 @@ static void enet_delay(uint32_t ncount)
 #endif /* USE_DELAY */
 
 #endif /* GD32F30X_CL */
+
+#ifdef __cplusplus
+}
+#endif

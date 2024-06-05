@@ -103,11 +103,8 @@ static serial_t serial_debug = { .uart = NP, .index = UART_NUM };
 
 serial_t *get_serial_object(SPL_UartHandle_t *uart_handle)
 {
-	struct serial_s *obj_s;
-	serial_t *obj;
-
-	obj_s = (struct serial_s *)((char *)uart_handle - offsetof(struct serial_s, handle));
-	obj = (serial_t *)((char *)obj_s - offsetof(serial_t, uart));
+	struct serial_s *obj_s = (struct serial_s *)((char *)uart_handle - offsetof(struct serial_s, handle));
+	serial_t *obj = (serial_t *)((char *)obj_s - offsetof(serial_t, uart));
 
 	return (obj);
 }
@@ -223,8 +220,8 @@ void serial_init(serial_t *obj, uint32_t baudrate, uint32_t databits, uint32_t p
 
 	SPL_UartHandle_t *uart_handle = &(obj->handle);
 
-	UARTName uart_tx = (UARTName)pinmap_peripheral(obj->pin_tx, PinMap_UART_TX);
-	UARTName uart_rx = (UARTName)pinmap_peripheral(obj->pin_rx, PinMap_UART_RX);
+	uint32_t uart_tx = pinmap_peripheral(obj->pin_tx, PinMap_UART_TX);
+	uint32_t uart_rx = pinmap_peripheral(obj->pin_rx, PinMap_UART_RX);
 
 	if (uart_tx == NP) {
 		gd_debug("ERROR: [U(S)ART] TX pin has no peripheral!\n");
@@ -277,7 +274,7 @@ void serial_init(serial_t *obj, uint32_t baudrate, uint32_t databits, uint32_t p
   }
 
   uart_handlers[obj->index] = uart_handle;
-  uart_handle->instance = (UARTName)(obj->uart);
+  uart_handle->instance = obj->uart;
 	uart_handle->params.baudrate = baudrate;
 	uart_handle->params.databits = databits;
 	uart_handle->params.stopbits = stopbits;
@@ -544,7 +541,8 @@ gd_status_enum serial_transmit(SPL_UartHandle_t *uart_handle, uint8_t *pData, ui
 					return GD_TIMEOUT;
 				}
 				tmp = (uint16_t *)pData;
-				USART_DATA(uart_handle->instance) = (*tmp & (uint16_t)0x01FF);
+				//usart_data_trasnmit(uart_handle->instance, *tmp);
+				USART_DATA(uart_handle->instance) = USART_DATA_DATA & (uint32_t)*tmp;
 				if (uart_handle->params.parity == USART_PM_NONE) {
 					pData += 2U;
 				} else {
@@ -554,7 +552,8 @@ gd_status_enum serial_transmit(SPL_UartHandle_t *uart_handle, uint8_t *pData, ui
 				if (serial_wait_flag_timeout(uart_handle, USART_FLAG_TBE, RESET, timeout) != GD_OK) {
 					return GD_TIMEOUT;
 				}
-				USART_DATA(uart_handle->instance) = (*pData++ & (uint8_t)0xFF);
+				//usart_data_transmit(uart_handle->instance, *pData++);
+				USART_DATA(uart_handle->instance) = USART_DATA_DATA & (uint32_t)*pData++;
 			}
 		}
 

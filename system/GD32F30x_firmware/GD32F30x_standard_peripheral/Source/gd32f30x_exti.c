@@ -37,6 +37,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_exti.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #define EXTI_REG_RESET_VALUE            ((uint32_t)0x00000000U)
 
 /*!
@@ -250,3 +254,7 @@ void exti_interrupt_flag_clear(exti_line_enum linex)
 {
     EXTI_PD = (uint32_t)linex;
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -37,6 +37,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_ctc.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #define CTC_FLAG_MASK            ((uint32_t)0x00000700U)
 
 /* CTC register bit offset */
@@ -389,3 +393,6 @@ void ctc_interrupt_flag_clear(uint32_t int_flag)
     }
 }
 
+#ifdef __cplusplus
+}
+#endif

@@ -3,6 +3,10 @@
 #include "gd32xxyy_gpio.h"
 #include "gpio_pull_helper.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 uint32_t gd_gpio_get_mode(uint32_t gpio, uint32_t pin)
 {
   uint16_t i;
@@ -12,13 +16,13 @@ uint32_t gd_gpio_get_mode(uint32_t gpio, uint32_t pin)
   for (i = 0U; i < 8; i++) {
     if ((1U << i) & pin) {
       reg = GPIO_CTL0(gpio);
-      mode = reg & GPIO_MODE_MASK(i);
+      mode = ((i) * 4) >> (reg & GPIO_MODE_MASK(i));
     }
   }
   for (i = 8U; i < 16; i++) {
     if ((1U << i) & pin) {
       reg = GPIO_CTL1(gpio);
-      mode = reg & GPIO_MODE_MASK(i - 8U);
+      mode = ((i - 8U) * 4) >> (reg & GPIO_MODE_MASK(i - 8U));
     }
   }
   return mode;
@@ -63,3 +67,7 @@ void gd_gpio_set_pull(uint32_t gpio, uint32_t pin, uint32_t pull)
     }
   }
 }
+
+#ifdef __cplusplus
+}
+#endif

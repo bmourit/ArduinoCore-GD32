@@ -37,6 +37,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_adc.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /*!
     \brief      reset ADC 
     \param[in]  adc_periph: ADCx,x=0,1,2
@@ -939,3 +943,7 @@ void adc_oversample_mode_disable(uint32_t adc_periph)
 {
     ADC_OVSAMPCTL(adc_periph) &= ~((uint32_t)ADC_OVSAMPCTL_OVSEN);
 }
+
+#ifdef __cplusplus
+}
+#endif

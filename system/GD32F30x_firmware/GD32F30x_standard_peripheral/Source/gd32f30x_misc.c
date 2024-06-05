@@ -37,6 +37,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_misc.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /*!
     \brief      set the priority group
     \param[in]  nvic_prigroup: the NVIC priority group
@@ -174,3 +178,7 @@ void systick_clksource_set(uint32_t systick_clksource)
         SysTick->CTRL &= SYSTICK_CLKSOURCE_HCLK_DIV8;
     }
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -37,6 +37,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_sdio.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #define DEFAULT_RESET_VALUE 0x00000000U
 
 /*!
@@ -807,3 +811,7 @@ void sdio_ceata_command_completion_disable(void)
 {
     SDIO_CMDCTL &= ~SDIO_CMDCTL_ENCMDC;
 }
+
+#ifdef __cplusplus
+}
+#endif

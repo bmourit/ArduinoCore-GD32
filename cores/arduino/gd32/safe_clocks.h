@@ -66,14 +66,14 @@ extern "C" {
 #define RCU_HXTAL_PREDIV2	1U
 
 typedef struct sc_pll_params_struct {
-	uint32_t pll_status;				/* pll_status: no_config, on, or off */
-	uint32_t pll_source_clock;			/* either IRC8M / 2, or HXTAL */
-	uint32_t pll_multiplier;			/* the multiplier of the pll clock */
+	uint32_t pll_status;		/* pll_status: no_config, on, or off */
+	uint32_t pll_source_clock;	/* either IRC8M / 2, or HXTAL */
+	uint32_t pll_multiplier;	/* the multiplier of the pll clock */
 } SC_pll_params_t;
 
 typedef struct sc_clock_params_struct {
-	uint32_t clock;						/* sysclk, ahbclk, apb1clk, or apb2clk */
-	uint32_t system_source;				/* one of the RCU_CKSYSSRC Source values */
+	uint32_t clock;			/* sysclk, ahbclk, apb1clk, or apb2clk */
+	uint32_t system_source;		/* one of the RCU_CKSYSSRC Source values */
 	uint32_t ahbclk_div;
 	uint32_t apb1clk_div;
 	uint32_t apb2clk_div;
@@ -81,13 +81,13 @@ typedef struct sc_clock_params_struct {
 
 typedef struct sc_oscillator_params_struct {
 	uint32_t osc;
-	uint32_t HXTAL_state;
 	uint32_t HXTAL_prediv;
+	uint32_t HXTAL_state;
 	uint32_t LXTAL_state;
 	uint32_t IRC8M_state;
-	uint32_t IRC8M_calibration;
 	uint32_t IRC40K_state;
-	SC_pll_params_t pll_params;
+	uint32_t IRC8M_calibration;
+	SC_pll_params_t pll_params;	
 } SC_oscillator_params_t;
 
 typedef struct sc_peripheral_params_struct {

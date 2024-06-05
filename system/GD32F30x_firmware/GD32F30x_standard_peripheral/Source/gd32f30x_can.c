@@ -41,6 +41,10 @@ OF SUCH DAMAGE.
 #include "gd32f30x_can.h"
 #include <stdlib.h>
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #define CAN_ERROR_HANDLE(s)     do{}while(1)
 
 /*!
@@ -1041,3 +1045,7 @@ void can_interrupt_flag_clear(uint32_t can_periph, can_interrupt_flag_enum flag)
 {
     CAN_REG_VALS(can_periph, flag) = BIT(CAN_BIT_POS0(flag));
 }
+
+#ifdef __cplusplus
+}
+#endif

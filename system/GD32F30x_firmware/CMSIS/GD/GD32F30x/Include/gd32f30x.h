@@ -38,10 +38,6 @@ OF SUCH DAMAGE.
 #ifndef GD32F30X_H
 #define GD32F30X_H
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 /* define GD32F30x */
 #if !defined (GD32F30X_HD) && !defined (GD32F30X_XD) && !defined (GD32F30X_CL)
   #define GD32F30X_HD
@@ -53,8 +49,12 @@ OF SUCH DAMAGE.
  #error "Please select the target GD32F30x device in gd32f30x.h file"
 #endif /* undefine GD32F30x tip */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* define value of high speed crystal oscillator (HXTAL) in Hz */
-#if !defined  HXTAL_VALUE
+#if !defined(HXTAL_VALUE)
 #ifdef GD32F30X_CL
 #define HXTAL_VALUE	((uint32_t)25000000) /*!< value of the external oscillator in Hz */
 #else
@@ -282,10 +282,18 @@ typedef enum IRQn
 #endif /* GD32F30X_CL */
 } IRQn_Type;
 
+#ifdef __cplusplus
+}
+#endif
+
 /* includes */
 #include "core_cm4.h"
 #include "system_gd32f30x.h"
 #include <stdint.h>
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /* enum definitions */
 typedef enum { DISABLE = 0, ENABLE = !DISABLE } EventStatus, ControlStatus;
@@ -356,4 +364,5 @@ typedef enum { ERROR = 0, SUCCESS = !ERROR } ErrStatus;
 #ifdef __cplusplus
 }
 #endif
+
 #endif

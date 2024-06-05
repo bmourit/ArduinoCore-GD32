@@ -26,7 +26,7 @@
  * ATTENTION:
  * This function relies on micros() so cannot be used in noInterrupt() context
  */
-uint32_t pulseIn(pin_size_t pin, uint32_t state, uint32_t timeout)
+unsigned long pulseIn(pin_size_t pin, uint32_t state, unsigned long timeout)
 {
     // Cache the port and bit of the pin in order to speed up the
     // pulse width measuring loop and achieve finer resolution.
@@ -68,7 +68,7 @@ uint32_t pulseIn(pin_size_t pin, uint32_t state, uint32_t timeout)
  * ATTENTION:
  * This function relies on micros() so cannot be used in noInterrupt() context
  */
-uint32_t pulseInLong(pin_size_t pin, uint32_t state, uint32_t timeout)
+unsigned long pulseInLong(pin_size_t pin, uint32_t state, unsigned long timeout)
 {
     return pulseIn(pin, state, timeout);
 }

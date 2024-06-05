@@ -19,12 +19,11 @@
 #define _PINNAMES_H
 
 #include "PortNames.h"
+#include "cmsis.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "cmsis.h"
 
 #define ALT1    0x100
 #define ALT2    0x200
@@ -42,7 +41,7 @@ extern "C" {
 #define PINNAME_MASK        0xff
 
 typedef enum {
-#if defined GPIOA
+#if defined(GPIOA)
   PORTA_0  = (PORTA << 4) + 0x00,
   PORTA_1  = (PORTA << 4) + 0x01,
   PORTA_2  = (PORTA << 4) + 0x02,
@@ -60,7 +59,7 @@ typedef enum {
   PORTA_14 = (PORTA << 4) + 0x0E,
   PORTA_15 = (PORTA << 4) + 0x0F,
 #endif
-#if defined GPIOB
+#if defined(GPIOB)
   PORTB_0  = (PORTB << 4) + 0x00,
   PORTB_1  = (PORTB << 4) + 0x01,
   PORTB_2  = (PORTB << 4) + 0x02,
@@ -78,7 +77,7 @@ typedef enum {
   PORTB_14 = (PORTB << 4) + 0x0E,
   PORTB_15 = (PORTB << 4) + 0x0F,
 #endif
-#if defined GPIOC
+#if defined(GPIOC)
   PORTC_0  = (PORTC << 4) + 0x00,
   PORTC_1  = (PORTC << 4) + 0x01,
   PORTC_2  = (PORTC << 4) + 0x02,
@@ -96,7 +95,7 @@ typedef enum {
   PORTC_14 = (PORTC << 4) + 0x0E,
   PORTC_15 = (PORTC << 4) + 0x0F,
 #endif
-#if defined GPIOD
+#if defined(GPIOD)
   PORTD_0  = (PORTD << 4) + 0x00,
   PORTD_1  = (PORTD << 4) + 0x01,
   PORTD_2  = (PORTD << 4) + 0x02,
@@ -114,7 +113,7 @@ typedef enum {
   PORTD_14 = (PORTD << 4) + 0x0E,
   PORTD_15 = (PORTD << 4) + 0x0F,
 #endif
-#if defined GPIOE
+#if defined(GPIOE)
   PORTE_0  = (PORTE << 4) + 0x00,
   PORTE_1  = (PORTE << 4) + 0x01,
   PORTE_2  = (PORTE << 4) + 0x02,
@@ -132,7 +131,7 @@ typedef enum {
   PORTE_14 = (PORTE << 4) + 0x0E,
   PORTE_15 = (PORTE << 4) + 0x0F,
 #endif
-#if defined GPIOF
+#if defined(GPIOF)
   PORTF_0  = (PORTF << 4) + 0x00,
   PORTF_1  = (PORTF << 4) + 0x01,
   PORTF_2  = (PORTF << 4) + 0x02,
@@ -150,7 +149,7 @@ typedef enum {
   PORTF_14 = (PORTF << 4) + 0x0E,
   PORTF_15 = (PORTF << 4) + 0x0F,
 #endif
-#if defined GPIOG
+#if defined(GPIOG)
   PORTG_0  = (PORTG << 4) + 0x00,
   PORTG_1  = (PORTG << 4) + 0x01,
   PORTG_2  = (PORTG << 4) + 0x02,
@@ -168,7 +167,7 @@ typedef enum {
   PORTG_14 = (PORTG << 4) + 0x0E,
   PORTG_15 = (PORTG << 4) + 0x0F,
 #endif
-#if defined GPIOH
+#if defined(GPIOH)
   PORTH_0  = (PORTH << 4) + 0x00,
   PORTH_1  = (PORTH << 4) + 0x01,
   PORTH_2  = (PORTH << 4) + 0x02,
@@ -186,7 +185,7 @@ typedef enum {
   PORTH_14 = (PORTH << 4) + 0x0E,
   PORTH_15 = (PORTH << 4) + 0x0F,
 #endif
-#if defined GPIOI
+#if defined(GPIOI)
   PORTI_0  = (PORTI << 4) + 0x00,
   PORTI_1  = (PORTI << 4) + 0x01,
   PORTI_2  = (PORTI << 4) + 0x02,
@@ -203,7 +202,7 @@ typedef enum {
   PORTI_13 = (PORTI << 4) + 0x0D,
   PORTI_14 = (PORTI << 4) + 0x0E,
   PORTI_15 = (PORTI << 4) + 0x0F,
-#endif
+#endiff
   /* ADC internal channels */
   ADC_PINS_BASE = PINNAME_ANALOG_INT,
 #if defined(ADC_CHANNEL_TEMPSENSOR) || defined(ADC_CHANNEL_TEMPSENSOR_ADC1)

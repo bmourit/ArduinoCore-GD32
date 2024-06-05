@@ -36,9 +36,7 @@ board_config = env.BoardConfig()
 
 # check framework is installed
 FRAMEWORK_DIR = platform.get_package_dir("framework-arduinogd32")
-#CMSIS_DIR = join(platform.get_package_dir("framework-arduinogd32"), "CMSIS", "CMSIS")
 assert isdir(FRAMEWORK_DIR)
-#assert isdir(CMSIS_DIR)
 
 #VARIANT_REMAP = {
 #    "CREALITY_422_GD32F303RE": "CREALITY_422_GD32F303RE"
@@ -79,6 +77,59 @@ def process_usart_configuration(cpp_defines):
 	elif "PIO_FRAMEWORK_ARDUINO_SERIAL_WITHOUT_GENERIC" in cpp_defines:
 		env.Append(CPPDEFINES=["HWSERIAL_NONE"])
 
+# include the USB stack for boards that support it
+if not board_config.get("build.series").lower().startswith("gd32e23"):
+	if isdir(join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library")):
+		env.Append(
+			CPPPATH=[
+				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "device", "Include"),
+				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "device", "Source"),
+				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "usbd", "Include"),
+				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "usbd", "Source"),
+			]
+		)
+	# never activate USB FS driver since we have no core support for it yet
+	if isdir(join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver")) and False:
+		env.Append(
+			CPPPATH=[
+				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "driver", "Include"),
+				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "driver", "Source"),
+				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "core", "Include"),
+				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "core", "Source"),
+			]
+		)
+
+def process_usb_configuration(cpp_defines):
+	# support standard way of enabling CDC
+	if "PIO_FRAMEWORK_ARDUINO_ENABLE_CDC" in cpp_defines:
+		env.Append(CPPDEFINES=["USBD_USE_CDC"])
+	# any USB flags enabled? more might be to come 
+	if any(
+		d in cpp_defines
+		for d in (
+			"PIO_FRAMEWORK_ARDUINO_ENABLE_CDC",
+		)
+	):
+		# then add usb flags
+		usb_vid = int(board_config.get("build.hwids", [["0xdead", "0xbeef"]])[0][0], 16)
+		usb_pid = int(board_config.get("build.hwids", [["0xdead", "0xbeef"]])[0][1], 16)
+		# prevent usage of Leaflabs VID/PID, otherwise if people have the DFU
+		# driver installed, it will recognize it as "Maple DFU" and not the 
+		# actual USB device it is :(
+		if usb_vid == 0x1EAF and usb_pid == 0x0003:
+			(usb_vid, usb_pid) = (0xdead, 0xbeef)
+		env.Append(
+			CPPDEFINES=[
+				"USBCON",
+				("USB_VID", hex(usb_vid)),
+				("USB_PID", hex(usb_pid)),
+				("USB_PRODUCT", '\\"%s\\"' %
+					board_config.get("build.usb_product", board_config.get("name", "Undefined USB Product")).replace('"', "")),
+				("USB_MANUFACTURER", '\\"%s\\"' %
+					board_config.get("build.usb_manufacturer",  board_config.get("vendor", "Undefined Manufacturer")).replace('"', ""))
+			]
+		)
+
 #def add_upload_protocol_defines(upload_protocol):
 #    if upload_protocol == "serial":
 #        env.Append(CPPDEFINES=[("CONFIG_MAPLE_MINI_NO_DISABLE_DEBUG", 1)])
@@ -95,16 +146,18 @@ def process_usart_configuration(cpp_defines):
 #    if upload_protocol in ("stlink", "dfu", "jlink") and is_generic:
 #        env.Append(CPPDEFINES=["GENERIC_BOOTLOADER"])
 
-def get_arm_math_lib(cpu):
-	core = board_config.get("build.cpu")
-	#if "m4" in core:
-	 #   return "arm_cortexM4lf_math"
-	if "m7" in core:
+def get_arm_math_lib(cpu_core):
+	cpu_core = board_config.get("build.cpu")
+	if "m3" in cpu_core:
+		return "arm_corexM3l_math"
+	if "m4" in cpu_core:
+		return "arm_cortexM4l_math"
+	if "m7" in cpu_core:
 		return "arm_cortexM7lfsp_math"
-	elif "m33" in core:
+	elif "m33" in cpu_core:
 		return "arm_ARMv8MMLlfsp_math"
 
-	return "arm_cortex%sl_math" % core[7:9].upper()
+	return "arm_cortex%sl_math" % cpu_core[7:9].upper()
 
 def configure_application_offset(mcu, upload_protocol):
 	offset = 0
@@ -165,10 +218,10 @@ env.Append(
 		"-fno-use-cxa-atexit",
 	],
 	CCFLAGS=[
-		"-Os",  # optimize for size
+		"-Os",
 		"-mcpu=%s" % env.BoardConfig().get("build.cpu"),
 		"-mthumb",
-		"-ffunction-sections",  # place each function in its own section
+		"-ffunction-sections",
 		"-fdata-sections",
 		"-Wall",
 		"-nostdlib",
@@ -179,10 +232,10 @@ env.Append(
 		series,
 		spl_series,
 		("ARDUINO", 10808),
-		#("F_CPU", "$BOARD_F_CPU"), # for compatiblity
 		"ARDUINO_ARCH_GD32",
 		"ARDUINO_%s" % board_name.upper(),
 		("BOARD_NAME", '\\"%s\\"' % board_name.upper()),
+		("F_CPU", "$BOARD_F_CPU"),
 		("ARDUINO_UPLOAD_MAXIMUM_SIZE", board_config.get("upload.maximum_size")),
 	],
 	CPPPATH=[
@@ -215,6 +268,7 @@ env.Append(
 		"-Wl,--defsym=LD_MAX_DATA_SIZE=%d" % board_config.get("upload.maximum_ram_size"),
 	],
 	LIBS=[
+		get_arm_math_lib(env.BoardConfig().get("build.cpu")),
 		"c",
 		"m",
 		"gcc",
@@ -224,59 +278,6 @@ env.Append(
 		variant_dir, join(FRAMEWORK_DIR, "system", "CMSIS", "DSP", "Lib", "GCC")
 	],
 )
-
-# include the USB stack for boards that support it
-if not board_config.get("build.spl_series").lower().startswith("gd32e23"):
-	if isdir(join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library")):
-		env.Append(
-			CPPPATH=[
-				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "device", "Include"),
-				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "device", "Source"),
-				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "usbd", "Include"),
-				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbd_library", "usbd", "Source"),
-			]
-		)
-	# never activate USB FS driver since we have no core support for it yet
-	if isdir(join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver")) and False:
-		env.Append(
-			CPPPATH=[
-				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "driver", "Include"),
-				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "driver", "Source"),
-				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "core", "Include"),
-				join(FRAMEWORK_DIR, "system", spl_series + "_firmware", spl_series + "_usbfs_driver", "core", "Source"),
-			]
-		)
-
-def process_usb_configuration(cpp_defines):
-	# support standard way of enabling CDC
-	if "PIO_FRAMEWORK_ARDUINO_ENABLE_CDC" in cpp_defines:
-		env.Append(CPPDEFINES=["USBD_USE_CDC"])
-	# any USB flags enabled? more might be to come 
-	if any(
-		d in cpp_defines
-		for d in (
-			"PIO_FRAMEWORK_ARDUINO_ENABLE_CDC",
-		)
-	):
-		# then add usb flags
-		usb_vid = int(board_config.get("build.hwids", [["0xdead", "0xbeef"]])[0][0], 16)
-		usb_pid = int(board_config.get("build.hwids", [["0xdead", "0xbeef"]])[0][1], 16)
-		# prevent usage of Leaflabs VID/PID, otherwise if people have the DFU
-		# driver installed, it will recognize it as "Maple DFU" and not the 
-		# actual USB device it is :(
-		if usb_vid == 0x1EAF and usb_pid == 0x0003:
-			(usb_vid, usb_pid) = (0xdead, 0xbeef)
-		env.Append(
-			CPPDEFINES=[
-				"USBCON",
-				("USB_VID", hex(usb_vid)),
-				("USB_PID", hex(usb_pid)),
-				("USB_PRODUCT", '\\"%s\\"' %
-					board_config.get("build.usb_product", board_config.get("name", "Undefined USB Product")).replace('"', "")),
-				("USB_MANUFACTURER", '\\"%s\\"' %
-					board_config.get("build.usb_manufacturer",  board_config.get("vendor", "Undefined Manufacturer")).replace('"', ""))
-			]
-		)
 
 env.ProcessFlags(board_config.get("build.framework_extra_flags.arduino", ""))
 
@@ -306,7 +307,7 @@ env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
 
 env.Append(
 	LIBSOURCE_DIRS=[
-		join(FRAMEWORK_DIR, "libraries", "__cores__" "arduino"),
+		join(FRAMEWORK_DIR, "libraries", "__cores__", "arduino"),
 		join(FRAMEWORK_DIR, "libraries"),
 	]
 )

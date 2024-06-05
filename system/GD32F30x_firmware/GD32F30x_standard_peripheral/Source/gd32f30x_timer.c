@@ -37,6 +37,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_timer.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /*!
     \brief      deinit a TIMER
     \param[in]  timer_periph: TIMERx(x=0..13)
@@ -2040,3 +2044,7 @@ void timer_output_value_selection_config(uint32_t timer_periph, uint16_t outsel)
         /* illegal parameters */
     }
 }
+
+#ifdef __cplusplus
+}
+#endif

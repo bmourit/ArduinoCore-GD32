@@ -38,6 +38,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_i2c.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #define I2C_ERROR_HANDLE(s)           do{}while(1)
 
 #define I2CCLK_MAX                    ((uint32_t)0x0000003CU)             /*!< i2cclk maximum value */
@@ -736,3 +740,7 @@ void i2c_interrupt_flag_clear(uint32_t i2c_periph, i2c_interrupt_flag_enum int_f
         I2C_REG_VAL2(i2c_periph, int_flag) = ~BIT(I2C_BIT_POS2(int_flag));
     }
 }
+
+#ifdef __cplusplus
+}
+#endif

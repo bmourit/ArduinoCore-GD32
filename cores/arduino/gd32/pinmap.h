@@ -31,12 +31,12 @@ extern const uint32_t bare_pin_map[16];
 #define GD_BARE_GPIO_PIN(X) (bare_pin_map[GD_PIN_GET(X)])
 
 /* provide a way to distiguish between No Peripheral and No Pin */
-#define NP      0U
+#define NP		0U
 
 typedef struct {
-  PinName pin;
-  uint32_t peripheral;
-  int function;
+	PinName pin;
+	uint32_t peripheral;
+	int function;
 } PinMap;
 
 void pin_function(PinName pin, int function);

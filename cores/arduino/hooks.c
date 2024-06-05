@@ -22,9 +22,17 @@
  * Its defined as a weak symbol and it can be redefined to implement a
  * real cooperative scheduler.
  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static void __empty()
 {
   // Empty
 }
 void yield(void) __attribute__((weak, alias("__empty")));
 
+#ifdef __cplusplus
+}
+#endif

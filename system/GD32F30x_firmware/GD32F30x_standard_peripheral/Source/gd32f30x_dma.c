@@ -38,6 +38,10 @@ OF SUCH DAMAGE.
 #include "gd32f30x_dma.h"
 #include <stdlib.h>
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #define DMA_WRONG_HANDLE        while(1){}
 
 /* check whether peripheral matches channels or not */
@@ -733,3 +737,7 @@ static ErrStatus dma_periph_and_channel_check(uint32_t dma_periph, dma_channel_e
 
     return val;
 }
+
+#ifdef __cplusplus
+}
+#endif

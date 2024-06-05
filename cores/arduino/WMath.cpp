@@ -20,8 +20,9 @@ extern "C" {
 #include "stdlib.h"
 #include "stdint.h"
 }
+#include "Arduino.h"
 
-extern void randomSeed(uint32_t dwSeed)
+extern void randomSeed(unsigned long dwSeed)
 {
   if (dwSeed != 0) {
     srand(dwSeed);

@@ -25,6 +25,10 @@
 #include "gd32f30x_remap.h"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern const int GD_GPIO_REMAP[];
 extern const int GD_GPIO_MODE[];
 extern const int GD_GPIO_SPEED[];
@@ -73,4 +77,8 @@ extern const PinMap PinMap_SD_DATA5[];
 extern const PinMap PinMap_SD_DATA6[];
 extern const PinMap PinMap_SD_DATA7[];
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

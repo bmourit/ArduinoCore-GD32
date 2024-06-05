@@ -31,7 +31,19 @@
 #include "Arduino.h"
 #include "safe_clocks.h"
 
-const uint8_t AHBPrescaleTable[16U] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
+//const uint8_t AHBPrescaleTable[16U] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define SC_DELAY(sc_delay)  do {\
+                                volatile uint32_t i;\
+                                if (sc_delay != 0) {\
+                                  for (i = 0; i < sc_delay; i++) {\
+                                  }\
+                                }\
+                              } while (0)
 
 /**
  * Firmware code provided by GigaDevices has several issues.
@@ -239,6 +251,7 @@ SC_error_t SC_Osc_Params(SC_oscillator_params_t *osc_params)
 					reg &= ~RCU_CTL_HXTALEN;
 					reg |= RCU_CTL_HXTALEN;
 					RCU_CTL = reg;
+					SC_DELAY(10000);
 				} else if ((osc_params->HXTAL_state) == RCU_HXTAL_OFF) {
 					reg = RCU_CTL;
 					reg &= ~RCU_CTL_HXTALBPS;
@@ -571,3 +584,7 @@ SC_error_t SC_Periph_Params(SC_peripheral_params_t *periph_params)
 
 	return SC_OK;
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -1,7 +1,9 @@
 
 #include "Arduino.h"
 #include "HardwareTimer.h"
+extern "C" {
 #include "gpio_extra.h"
+}
 
 #define MAX_FREQ  65535
 

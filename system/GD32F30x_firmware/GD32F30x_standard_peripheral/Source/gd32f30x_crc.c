@@ -37,6 +37,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_crc.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #define CRC_DATA_RESET_VALUE      ((uint32_t)0xFFFFFFFFU)
 #define CRC_FDATA_RESET_VALUE     ((uint32_t)0x00000000U)
 
@@ -128,3 +132,7 @@ uint32_t crc_block_data_calculate(const uint32_t *array, uint32_t size)
     }
     return (CRC_DATA);
 }
+
+#ifdef __cplusplus
+}
+#endif

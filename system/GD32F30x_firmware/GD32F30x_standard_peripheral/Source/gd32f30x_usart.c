@@ -37,6 +37,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_usart.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /* USART register bit offset */
 #define GP_GUAT_OFFSET            ((uint32_t)8U)       /* bit offset of GUAT in USART_GP */
 #define CTL3_SCRTNUM_OFFSET       ((uint32_t)1U)       /* bit offset of SCRTNUM in USART_CTL3 */
@@ -870,3 +874,7 @@ void usart_interrupt_flag_clear(uint32_t usart_periph, usart_interrupt_flag_enum
 {
     USART_REG_VAL2(usart_periph, int_flag) = ~BIT(USART_BIT_POS2(int_flag));
 }
+
+#ifdef __cplusplus
+}
+#endif

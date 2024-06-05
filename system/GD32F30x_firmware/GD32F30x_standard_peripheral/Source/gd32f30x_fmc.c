@@ -38,6 +38,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_fmc.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /*!
     \brief      set the wait state counter value
     \param[in]  wscnt:wait state counter value
@@ -1007,3 +1011,7 @@ fmc_state_enum fmc_bank1_ready_wait(uint32_t timeout)
     /* return the FMC state */
     return fmc_state;
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -38,6 +38,10 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_rtc.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /*!
     \brief      enable RTC interrupt
     \param[in]  interrupt: specify which interrupt to enbale
@@ -228,3 +232,6 @@ void rtc_flag_clear(uint32_t flag)
     RTC_CTL &= ~flag;
 }
 
+#ifdef __cplusplus
+}
+#endif

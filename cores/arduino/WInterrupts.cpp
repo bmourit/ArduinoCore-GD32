@@ -18,8 +18,10 @@
 
 #include "Arduino.h"
 #include <api/Interrupts.h>
+extern "C" {
 #include "gpio_interrupt.h"
 #include "gd32f30x_remap.h"
+}
 
 void attachInterrupt(pin_size_t pin, voidFuncPtr callback, PinStatus mode)
 {

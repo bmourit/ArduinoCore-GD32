@@ -139,69 +139,40 @@ void gpio_afio_deinit(void)
 */
 void gpio_init(uint32_t gpio_periph, uint32_t mode, uint32_t speed, uint32_t pin)
 {
-    uint16_t i;
-    uint32_t temp_mode = 0U;
-    uint32_t reg = 0U;
+    uint32_t temp_mode = mode & 0x0F;
+    uint32_t reg0 = GPIO_CTL0(gpio_periph);
+    uint32_t reg1 = GPIO_CTL1(gpio_periph);
 
-    /* GPIO mode configuration */
-    temp_mode = (uint32_t)(mode & ((uint32_t)0x0FU));
-
-    /* GPIO speed configuration */
-    /* only for output modes */
-    if (((uint32_t)0x00U) != ((uint32_t)mode & ((uint32_t)0x10U))) {
-        /* output mode max speed */
-        if (GPIO_OSPEED_MAX == (uint32_t)speed) {
-            temp_mode |= (uint32_t)0x03U;
-            /* set the corresponding SPD bit */
-            GPIOx_SPD(gpio_periph) |= (uint32_t)pin;
+    if (mode & 0x10) {
+        // Output mode
+        if (speed == GPIO_OSPEED_MAX) {
+            temp_mode |= 0x03;
+            GPIO_SPD(gpio_periph) |= pin;
         } else {
-            /* output mode max speed: 10MHz, 2MHz, 50MHz */
-            temp_mode |= (uint32_t)speed;
+            temp_mode |= speed;
         }
     }
 
-    /* configure the eight low port (mode bits) for all pins with GPIO_CTL0 */
-    for (i = 0U; i < 8U; i++) {
-        if ((1U << i) & pin) {
-            reg = GPIO_CTL0(gpio_periph);
-            /* clear the specified pin mode bits */
-            reg &= ~GPIO_MODE_MASK(i);
-            /* set the specified pin mode bits */
-            reg |= GPIO_MODE_SET(i, temp_mode);
-            /* set IPD or IPU */
-            if (GPIO_MODE_IPD == mode) {
-                /* reset the corresponding OCTL bit */
-                GPIO_BC(gpio_periph) = (uint32_t)((1U << i) & pin);
-            } else {
-                /* set the corresponding OCTL bit */
-                if (GPIO_MODE_IPU == mode) {
-                    GPIO_BOP(gpio_periph) = (uint32_t)((1U << i) & pin);
-                }
+    for (uint16_t i = 0; i < 16; i++) {
+        if (pin & (1U << i)) {
+            uint32_t reg = (i < 8) ? reg0 : reg1;
+            uint32_t mask = GPIO_MODE_MASK(i % 8);
+            uint32_t set_value = GPIO_MODE_SET(i % 8, temp_mode);
+
+            reg &= ~mask;
+            reg |= set_value;
+
+            if (mode == GPIO_MODE_IPD) {
+                GPIO_BC(gpio_periph) = (1U << i);
+            } else if (mode == GPIO_MODE_IPU) {
+                GPIO_BOP(gpio_periph) = (1U << i);
             }
-            /* set GPIO_CTL0 register */
-            GPIO_CTL0(gpio_periph) = reg;
-        }
-    }
-    /* configure the eight high port pins with GPIO_CTL1 */
-    for (i = 8U; i < 16U; i++) {
-        if ((1U << i) & pin) {
-            reg = GPIO_CTL1(gpio_periph);
-            /* clear the specified pin mode bits */
-            reg &= ~GPIO_MODE_MASK(i - 8U);
-            /* set the specified pin mode bits */
-            reg |= GPIO_MODE_SET(i - 8U, temp_mode);
-            /* set IPD or IPU */
-            if (GPIO_MODE_IPD == mode) {
-                /* reset the corresponding OCTL bit */
-                GPIO_BC(gpio_periph) = (uint32_t)((1U << i) & pin);
+
+            if (i < 8) {
+                GPIO_CTL0(gpio_periph) = reg;
             } else {
-                /* set the corresponding OCTL bit */
-                if (GPIO_MODE_IPU == mode) {
-                    GPIO_BOP(gpio_periph) = (uint32_t)((1U << i) & pin);
-                }
+                GPIO_CTL1(gpio_periph) = reg;
             }
-            /* set GPIO_CTL1 register */
-            GPIO_CTL1(gpio_periph) = reg;
         }
     }
 }
@@ -217,7 +188,7 @@ void gpio_init(uint32_t gpio_periph, uint32_t mode, uint32_t speed, uint32_t pin
 */
 void gpio_bit_set(uint32_t gpio_periph, uint32_t pin)
 {
-    GPIO_BOP(gpio_periph) = (uint32_t)pin;
+    GPIO_BOP(gpio_periph) = pin;
 }
 
 /*!
@@ -231,7 +202,7 @@ void gpio_bit_set(uint32_t gpio_periph, uint32_t pin)
 */
 void gpio_bit_reset(uint32_t gpio_periph, uint32_t pin)
 {
-    GPIO_BC(gpio_periph) = (uint32_t)pin;
+    GPIO_BC(gpio_periph) = pin;
 }
 
 /*!
@@ -249,9 +220,9 @@ void gpio_bit_reset(uint32_t gpio_periph, uint32_t pin)
 void gpio_bit_write(uint32_t gpio_periph, uint32_t pin, bit_status bit_value)
 {
     if (RESET != bit_value) {
-        GPIO_BOP(gpio_periph) = (uint32_t)pin;
+        GPIO_BOP(gpio_periph) = pin;
     } else {
-        GPIO_BC(gpio_periph) = (uint32_t)pin;
+        GPIO_BC(gpio_periph) = pin;
     }
 }
 
@@ -375,42 +346,35 @@ uint16_t gpio_output_port_get(uint32_t gpio_periph)
 */
 void gpio_pin_remap_config(uint32_t remap, ControlStatus newvalue)
 {
-    uint32_t remap1 = 0U, remap2 = 0U, temp_reg = 0U, temp_mask = 0U;
-
-    if (((uint32_t)0x80000000U) == (remap & 0x80000000U)) {
-        /* get AFIO_PCF1 regiter value */
+    uint32_t temp_reg;
+    
+    if (remap & AFIO_PCF1_FIELDS) {
         temp_reg = AFIO_PCF1;
     } else {
-        /* get AFIO_PCF0 regiter value */
         temp_reg = AFIO_PCF0;
     }
-
-    temp_mask = (remap & PCF_POSITION_MASK) >> 0x10U;
-    remap1 = remap & LSB_16BIT_MASK;
-
-    /* judge pin remap type */
-    if ((PCF_LOCATION1_MASK | PCF_LOCATION2_MASK) == (remap & (PCF_LOCATION1_MASK | PCF_LOCATION2_MASK))) {
+    
+    uint32_t remap1 = remap & LSB_16BIT_MASK;
+    uint32_t temp_mask = (remap & PCF_POSITION_MASK) >> 16U;
+    
+    if (remap & (PCF_LOCATION1_MASK | PCF_LOCATION2_MASK)) {
         temp_reg &= PCF_SWJCFG_MASK;
         AFIO_PCF0 &= PCF_SWJCFG_MASK;
-    } else if (PCF_LOCATION2_MASK == (remap & PCF_LOCATION2_MASK)) {
-        remap2 = ((uint32_t)0x03U) << temp_mask;
-        temp_reg &= ~remap2;
-        temp_reg |= ~PCF_SWJCFG_MASK;
+    } else if (remap & PCF_LOCATION2_MASK) {
+        temp_reg &= ~(0x03U << temp_mask);
+        temp_reg |= PCF_SWJCFG_MASK;
     } else {
-        temp_reg &= ~(remap1 << ((remap >> 0x15U) * 0x10U));
-        temp_reg |= ~PCF_SWJCFG_MASK;
+        temp_reg &= ~(remap1 << (temp_mask * 16U));
+        temp_reg |= PCF_SWJCFG_MASK;
     }
-
-    /* set pin remap value */
-    if (DISABLE != newvalue) {
-        temp_reg |= (remap1 << ((remap >> 0x15U) * 0x10U));
+    
+    if (newvalue != DISABLE) {
+        temp_reg |= (remap1 << (temp_mask * 16U));
     }
-
-    if (AFIO_PCF1_FIELDS == (remap & AFIO_PCF1_FIELDS)) {
-        /* set AFIO_PCF1 regiter value */
+    
+    if (remap & AFIO_PCF1_FIELDS) {
         AFIO_PCF1 = temp_reg;
     } else {
-        /* set AFIO_PCF0 regiter value */
         AFIO_PCF0 = temp_reg;
     }
 }

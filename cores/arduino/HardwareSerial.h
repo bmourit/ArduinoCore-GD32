@@ -27,7 +27,9 @@
 #include <inttypes.h>
 
 #include "api/Stream.h"
+extern "C" {
 #include "uart.h"
+}
 
 
 // Define constants and variables for buffering incoming serial data.  We're
