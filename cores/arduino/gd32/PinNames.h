@@ -202,7 +202,7 @@ typedef enum {
   PORTI_13 = (PORTI << 4) + 0x0D,
   PORTI_14 = (PORTI << 4) + 0x0E,
   PORTI_15 = (PORTI << 4) + 0x0F,
-#endiff
+#endif
   /* ADC internal channels */
   ADC_PINS_BASE = PINNAME_ANALOG_INT,
 #if defined(ADC_CHANNEL_TEMPSENSOR) || defined(ADC_CHANNEL_TEMPSENSOR_ADC1)

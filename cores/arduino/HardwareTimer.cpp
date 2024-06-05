@@ -55,7 +55,7 @@ HardwareTimer::HardwareTimer(TIMERName instance)
   _timerObj.handle.init_params.clockdivision = TIMER_CKDIV_DIV1;
   _timerObj.handle.init_params.alignedmode = TIMER_COUNTER_EDGE;
   _timerObj.handle.init_params.repetitioncounter = 0;
-    
+
     uint32_t index = get_timer_index(instance);
     if (index == UNKNOWN_TIMER) {
         Error_Handler();
