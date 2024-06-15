@@ -28,9 +28,14 @@ OF SUCH DAMAGE.
 */
 
 #include "gd_debug.h"
+#include "gd32_def.h"
 #include "utility/drv_spi.h"
 #include "gd32f30x_remap.h"
+//#include "gd32xxyy_spl_spi.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define SPI_PINS_FREE_MODE   0x00000001
 
@@ -217,7 +222,7 @@ void spi_begin(spi_t *obj, uint32_t speed, uint8_t mode, uint8_t endian)
       pull = GPIO_NOPULL;
       break;
   }
-  f3_pin_pull_config(gpio_port[GD_PORT_GET(obj->pin_sclk)], gpio_pin[GD_PIN_GET(obj->pin_sclk)], pull);
+  f3_pin_pull_config(APORT_TO_GPORT(GD_PORT_GET(obj->pin_sclk)), APIN_TO_GPIN(GD_PIN_GET(obj->pin_sclk)), pull);
   pinmap_pinout(obj->pin_ssel, PinMap_SPI_SSEL);
 
   /* enable SPI clock */

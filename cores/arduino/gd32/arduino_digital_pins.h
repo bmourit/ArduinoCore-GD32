@@ -19,7 +19,7 @@
 #ifndef _ARDUINO_DIGITAL_PINS_H_
 #define _ARDUINO_DIGITAL_PINS_H_
 
-#include "variant.h"
+//#include "variant.h"
 
 #ifdef __cplusplus
 extern "C" {

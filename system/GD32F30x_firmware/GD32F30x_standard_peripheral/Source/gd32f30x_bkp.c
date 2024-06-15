@@ -37,10 +37,6 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_bkp.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 #define TAMPER_FLAG_SHIFT          ((uint8_t)8U)
 
 /*!
@@ -329,7 +325,3 @@ void bkp_interrupt_flag_clear(uint16_t flag)
 {
     BKP_TPCS |= (uint16_t)(flag >> TAMPER_FLAG_SHIFT);
 }
-
-#ifdef __cplusplus
-}
-#endif

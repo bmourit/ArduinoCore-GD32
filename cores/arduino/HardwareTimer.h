@@ -28,9 +28,7 @@ OF SUCH DAMAGE.
 #ifndef HARDWARETIMER_H
 #define HARDWARETIMER_H
 
-extern "C" {
 #include "timer.h"
-}
 
 // Copied from 1.0.x firmware library for compatibility, but this is
 // unspecified in the data sheet. Being able to use both edges is not

@@ -34,6 +34,38 @@ OF SUCH DAMAGE.
 extern "C" {
 #endif
 
+//extern const uint32_t gpio_port[];
+//extern const uint32_t gpio_pin[];
+
+static inline uint32_t APORT_TO_GPORT(uint32_t port_num)
+{
+  uint32_t gpio_port = 0U;
+
+  switch (port_num) {
+    case 0:
+      gpio_port = GPIOA;
+      break;
+    case 1:
+      gpio_port = GPIOB;
+      break;
+    case 2:
+      gpio_port = GPIOC;
+      break;
+    case 3:
+      gpio_port = GPIOD;
+      break;
+    case 4:
+      gpio_port = GPIOE;
+      break;
+    default:
+      break;
+  }
+
+  return gpio_port;
+}
+
+#define APIN_TO_GPIN(pin)   (uint16_t)(1 << (pin))
+
 typedef enum {
   FirstPort = 0x00,
   PORTA = FirstPort,
@@ -45,25 +77,15 @@ typedef enum {
 #if defined(GPIOE)
   PORTE,
 #endif
-#if defined(GPIOF)
-  PORTF,
-#endif
-#if defined(GPIOG)
-  PORTG,
-#endif
-#if defined(GPIOH)
-  PORTH,
-#endif
-#if defined(GPIOI)
-  PORTI,
-#endif
   PORTEND,
   LastPort = PORTEND - 1
 } PortName;
 
 #define GPIO_PORT_NUM (LastPort - FirstPort + 1)
 
-#define GET_GPIO_PORT(p)  ((p < GPIO_PORT_NUM) ? gpio_port[p] : (uint32_t)NULL)
+#define GET_GPIO_PORT(p)  ((p < GPIO_PORT_NUM) ? APORT_TO_GPORT(p) : (uint32_t)NULL)
+
+uint32_t set_gpio_port_clock(uint32_t port);
 
 #ifdef __cplusplus
 }

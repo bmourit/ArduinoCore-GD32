@@ -1,7 +1,7 @@
 #ifndef _GD32F30X_REMAP_H
 #define _GD32F30X_REMAP_H
 
-#ifdef GD32F30x
+#ifdef GD32F30X_HD
 
 #include "gpio_pull_helper.h"
 
@@ -362,6 +362,6 @@ static inline void f3_afpin_set(uint32_t afn)
 }
 #endif
 
-#endif  /* GD32F30x */
+#endif  /* GD32F30X_HD */
 
 #endif /* _GD32F30X_REMAP_H */

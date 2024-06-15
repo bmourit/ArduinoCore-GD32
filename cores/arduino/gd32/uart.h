@@ -30,12 +30,9 @@ OF SUCH DAMAGE.
 #ifndef UART_H
 #define UART_H
 
+#include "gd32_def.h"
 #include "PinNames.h"
 #include "PeripheralNames.h"
-
-#include "gd32xxyy.h"
-#include "PeripheralPins.h"
-#include "pinmap.h"
 
 #ifdef __cplusplus
 extern "C" {

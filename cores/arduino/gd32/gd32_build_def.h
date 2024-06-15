@@ -2,12 +2,12 @@
 #define _GD32_BUILD_DEF_
 
 #if !defined(CMSIS_STARTUP_FILE) && !defined(CUSTOM_STARTUP_FILE)
-#if defined(GD32F30X_CL)
-#define CMSIS_STARTUP_FILE "startup_gd32f30x_cl.S"
-#elif defined(GD32F30X_HD)
-#define CMSIS_STARTUP_FILE "startup_gd32f30x_hd.s"
+#if defined(GD32F30X_HD)
+#define CMSIS_STARTUP_FILE "startup_gd32f30x_hd.S"
 #elif defined(GD32F30X_XD)
 #define CMSIS_STARTUP_FILE "startup_gd32f30x_xd.S"
+#elif defined(GD32F30X_CL)
+#define CMSIS_STARTUP_FILE "startup_gd32f30x_cl.S"
 #elif defined(GD32F3x0)
 #define CMSIS_STARTUP_FILE "startup_gd32f3x0.S"
 #elif defined(GD32F1x0)

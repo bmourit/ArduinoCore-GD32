@@ -97,6 +97,16 @@ const uint32_t analog_pins[] = {
   37  // A15, PC5
 };
 
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if defined(SAFE_CLOCKS_ENABLE)
+
 WEAK void SystemClock_Config(void)
 {
   SC_oscillator_params_t osc_params = {};
@@ -115,11 +125,13 @@ WEAK void SystemClock_Config(void)
 
   osc_params.osc = RCU_OSC_HXTAL;
   osc_params.HXTAL_state = RCU_HXTAL_ON;
-  osc_params.HXTAL_prediv = RCU_HXTAL_PREDIV2;
+  //osc_params.HXTAL_prediv = RCU_HXTAL_PREDIV2;
+  osc_params.HXTAL_prediv = RCU_HXTAL_PREDIV1;
   osc_params.IRC8M_state = RCU_IRC8M_ON;
   osc_params.pll_params.pll_status = RCU_PLL_ON;
   osc_params.pll_params.pll_source_clock = RCU_PLLSRC_HXTAL_IRC48M;
-  osc_params.pll_params.pll_multiplier = RCU_PLL_MUL30;
+  //osc_params.pll_params.pll_multiplier = RCU_PLL_MUL30;
+  osc_params.pll_params.pll_multiplier = RCU_PLL_MUL9;
   if (SC_Osc_Params(&osc_params) != SC_OK) {
     Error_Handler();
   }
@@ -138,7 +150,8 @@ WEAK void SystemClock_Config(void)
   reg &= ~PMU_CTL_HDEN;
   reg |= PMU_CTL_HDEN;
   PMU_CTL = reg;
-  while (((PMU_CS & PMU_CS_HDRF) >> 16) != 1U) {
+  volatile uint32_t stable = ((PMU_CS & PMU_CS_HDRF) >> 16);
+  while (stable == 0U) {
   }
 
   /* select the high-drive mode */
@@ -146,15 +159,19 @@ WEAK void SystemClock_Config(void)
   reg &= ~PMU_CTL_HDS;
   reg |= PMU_CTL_HDS;
   PMU_CTL = reg;
-  while (((PMU_CS & PMU_CS_HDSRF) >> 17) != 1U) {
+  volatile uint32_t stable = ((PMU_CS & PMU_CS_HDSRF) >> 17);
+  while (stable == 0U) {
   }
 
   pclk_params.pclock = RCU_PERIPHCLK_ADC;
-  pclk_params.adc_clk = RCU_CKADC_CKAPB2_DIV8;
+  //pclk_params.adc_clk = RCU_CKADC_CKAPB2_DIV8;
+  pclk_params.adc_clk = RCU_CKADC_CKAPB2_DIV4;
   if (SC_Periph_Params(&pclk_params) != SC_OK) {
     Error_Handler();
   }
 }
+
+#endif /* SAFE_CLOCKS_ENABLE */
 
 #ifdef __cplusplus
 }

@@ -39,26 +39,17 @@ OF SUCH DAMAGE.
 #ifndef SYSTICK_H
 #define SYSTICK_H
 
-#include <stdint.h>
-#include "safe_clocks.h"
-#include "gd32xxyy.h"
+#include "gd32_def.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef enum {
-  SOURCE_PLL_CK,
-#ifdef GD32F30X_CL
-  SOURCE_PLL1_CK,
-  SOURCE_PLL2_CK,
-#endif
-  SOURCE_IRC40K,
-  SOURCE_IRC48M,
-  SOURCE_IRC8M,
-  SOURCE_LXTAL,
-  SOURCE_HXTAL,
-} clock_source_t;
+  TICK_OK,
+  TICK_ERROR,
+  TICK_TIMEOUT
+} TICK_error_t;
 
 typedef enum {
   SYSTICK_FREQ_10HZ = 100U,
@@ -73,16 +64,14 @@ extern uint32_t msTickPrio;
 extern systick_freq_t msTickFreq;
 
 /* configure systick */
-SC_error_t tickInit(uint32_t systick_priority);
+TICK_error_t tickInit(uint32_t systick_priority);
 void tickInc(void);
-uint32_t getSysTickPrio(void);
-SC_error_t setTickFreq(systick_freq_t freq);
+uint32_t getTickPrio(void);
+TICK_error_t setTickFreq(systick_freq_t freq);
 systick_freq_t getTickFreq(void);
 void tickDelay(uint32_t delay);
-uint32_t getCurrentMillis(void);
-uint32_t getCurrentMicros(void);
-
-void clockEnable(clock_source_t clock_source);
+uint32_t getTickMs(void);
+uint32_t getTickUs(void);
 
 /**
   * @brief  This function checks if the Systick counter flag is active

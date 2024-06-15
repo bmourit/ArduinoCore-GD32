@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-#include "gd32f30x.h"
+#include "gd32_def"
 
 typedef enum {
     ADC_0 = (int)ADC0,

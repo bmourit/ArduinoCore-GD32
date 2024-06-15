@@ -25,7 +25,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
-#include "safe_clocks.h"
 #include "rtc.h"
 #include <time.h>
 
@@ -347,10 +346,12 @@ void rtc_attachInterrupt(INT_MODE mode)
       interrupt = RTC_INT_SECOND;
       break;
 #endif
+#if defined(SPL_EXTI_ENABLE)
     case INT_ALARM_MODE:
       interrupt = RTC_INT_ALARM;
       exti_init(EXTI_17, EXTI_INTERRUPT, EXTI_TRIG_RISING);
       break;
+#endif
 #if defined(GD32F30x) || defined(GD32E50X)
     case INT_OVERFLOW_MODE:
       interrupt = RTC_INT_OVERFLOW;
@@ -375,9 +376,11 @@ void rtc_detachInterrupt(INT_MODE mode)
       interrupt = RTC_INT_SECOND;
       break;
 #endif
+#if defined(SPL_EXTI_ENABLE)
     case INT_ALARM_MODE:
       interrupt = RTC_INT_ALARM;
       break;
+#endif
 #if defined(GD32F30x) || defined(GD32E50X)
     case INT_OVERFLOW_MODE:
       interrupt = RTC_INT_OVERFLOW;
@@ -405,11 +408,13 @@ void RTC_IRQHandler(void)
     RTC_Handler(INT_OVERFLOW_MODE);
   }
 #elif defined(GD32F3x0) || defined(GD32F1x0)
+#if defined(SPL_EXTI_ENABLE)
   if (rtc_flag_get(RTC_FLAG_ALARM0) != RESET) {
     rtc_flag_clear(RTC_FLAG_ALARM0);
     exti_flag_clear(EXTI_17);
     RTC_Handler(INT_ALARM_MODE);
   }
+#endif
 #endif
 }
 
@@ -419,6 +424,7 @@ void RTC_IRQHandler(void)
   \param[out] none
   \retval     none
 */
+#if defined(SPL_EXTI_ENABLE)
 #if defined(GD32F30x) || defined(GD32E50X)
 void RTC_Alarm_IRQHandler(void)
 {
@@ -428,6 +434,7 @@ void RTC_Alarm_IRQHandler(void)
     RTC_Handler(INT_ALARM_MODE);
   }
 }
+#endif
 #endif
 
 /*!

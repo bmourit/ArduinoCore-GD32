@@ -20,7 +20,6 @@
 #define _PERIPHERALPINS_H
 
 #include "pinmap.h"
-
 #ifdef GD32F30x
 #include "gd32f30x_remap.h"
 #endif
@@ -77,8 +76,8 @@ extern const PinMap PinMap_SD_DATA5[];
 extern const PinMap PinMap_SD_DATA6[];
 extern const PinMap PinMap_SD_DATA7[];
 
-#endif
-
 #ifdef __cplusplus
 }
+#endif
+
 #endif

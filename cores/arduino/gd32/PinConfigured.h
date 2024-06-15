@@ -36,7 +36,7 @@ extern "C" {
 
 #define PIN_MASK    0x1
 
-#define PIN_PORT_INDEX(X)           (gpio_port[GD_PORT_GET(X)])
+#define PIN_PORT_INDEX(X)           (APORT_TO_GPORT(GD_PORT_GET(X)))
 #define PIN_OFFSET(X)               (GD_PIN_GET(X))
 #define PIN_BIT(X)                  (PIN_MASK << PIN_OFFSET(X))
 

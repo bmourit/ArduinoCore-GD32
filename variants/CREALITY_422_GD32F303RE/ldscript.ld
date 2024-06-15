@@ -1,25 +1,25 @@
-
 ENTRY(Reset_Handler)
 
-_estack = 0x20000000 + LD_MAX_DATA_SIZE;
-_Min_Heap_Size = 0x400;      /* required amount of heap  */
+_estack = ORIGIN(RAM) + LENGTH(RAM);
+
+_Min_Heap_Size = 0x200;      /* required amount of heap  */
 _Min_Stack_Size = 0x400;     /* required amount of stack */
 
 /* memory map */
 MEMORY
 {
-  RAM (rwx) : ORIGIN = 0x20000000, LENGTH = LD_MAX_DATA_SIZE
-  FLASH (rx) : ORIGIN = 0x08000000 + LD_FLASH_OFFSET, LENGTH = 512K - LD_FLASH_OFFSET
+  RAM (rwx) : ORIGIN = 0x20000000, LENGTH = LD_MAX_DATA_SIZE - 40
+  FLASH (rx) : ORIGIN = 0x8000000 + LD_FLASH_OFFSET, LENGTH = LD_MAX_SIZE - LD_FLASH_OFFSET
 }
 
 SECTIONS
 {
   /* ISR vectors */
   /* The startup code into "FLASH" Rom type memory */
-  .vectors :
+  .isr_vector :
   {
     . = ALIGN(4);
-    KEEP(*(.vectors)) /* Startup code */
+    KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
   } >FLASH
 
@@ -50,16 +50,13 @@ SECTIONS
   } >FLASH
 
   .ARM.extab : {
-    . = ALIGN(4);
     *(.ARM.extab* .gnu.linkonce.armextab.*)
-    . = ALIGN(4);
   } >FLASH
+
   .ARM : {
-    . = ALIGN(4);
     __exidx_start = .;
     *(.ARM.exidx*)
     __exidx_end = .;
-    . = ALIGN(4);
   } >FLASH
 
   .preinit_array :
@@ -140,5 +137,8 @@ SECTIONS
     libgcc.a ( * )
   }
 
-  .ARM.attributes 0 : { *(.ARM.attributes) }
+  .ARM.attributes 0 :
+  {
+    *(.ARM.attributes)
+  }
 }

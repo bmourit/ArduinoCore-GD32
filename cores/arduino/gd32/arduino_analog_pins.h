@@ -19,8 +19,8 @@
 #ifndef _ARDUINO_ANALOG_PINS_H_
 #define _ARDUINO_ANALOG_PINS_H_
 
-#include "variant.h"
-#include "PinNames.h"
+//#include "variant.h"
+//#include "PinNames.h"
 
 #ifdef __cplusplus
 extern "C" {

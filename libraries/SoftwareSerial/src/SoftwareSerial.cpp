@@ -32,7 +32,7 @@
  */
 
 #include "SoftwareSerial.h"
-
+#include "PeripheralNames.h"
 
 #define OVERSAMPLE 3      // in RX, Timer will generate interruption OVERSAMPLE time during a bit. Thus OVERSAMPLE ticks in a bit. (interrupt not synchonized with edge).
 
@@ -89,10 +89,10 @@ SoftwareSerial::SoftwareSerial(uint16_t receivePin, uint16_t transmitPin, bool i
 {
   _receivePin = receivePin;
   _transmitPin = transmitPin;
-  _transmitPinPort = gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(transmitPin))];
-  _receivePinPort = gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(receivePin))];
-  _receivePinNumber = gpio_pin[GD_PIN_GET(DIGITAL_TO_PINNAME(receivePin))];
-  _transmitPinNumber = gpio_pin[GD_PIN_GET(DIGITAL_TO_PINNAME(transmitPin))];
+  _transmitPinPort = APORT_TO_GPORT(GD_PORT_GET(DIGITAL_TO_PINNAME(transmitPin)));
+  _receivePinPort = APORT_TO_GPORT(GD_PORT_GET(DIGITAL_TO_PINNAME(receivePin)));
+  _receivePinNumber = APORT_TO_GPORT(GD_PIN_GET(DIGITAL_TO_PINNAME(receivePin)));
+  _transmitPinNumber = APORT_TO_GPORT(GD_PIN_GET(DIGITAL_TO_PINNAME(transmitPin)));
   _speed = 0;
   _buffer_overflow = false;
   _inverse_logic = inverse_logic;
@@ -209,8 +209,8 @@ void SoftwareSerial::begin(long speed)
 {
   _speed = speed;
   if ((_receivePin < DIGITAL_PINS_NUM) || (_transmitPin < DIGITAL_PINS_NUM)) {
-    gpio_clock_enable(gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(_transmitPin))]);
-    gpio_clock_enable(gpio_port[GD_PORT_GET(DIGITAL_TO_PINNAME(_receivePin))]);
+    gpio_clock_enable(APORT_TO_GPORT(GD_PORT_GET(DIGITAL_TO_PINNAME(_transmitPin))));
+    gpio_clock_enable(APORT_TO_GPORT(GD_PORT_GET(DIGITAL_TO_PINNAME(_receivePin))));
   }
   if (_inverse_logic) {
     gpio_bit_reset(_transmitPinPort, _transmitPinNumber);

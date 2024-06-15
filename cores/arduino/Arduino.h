@@ -29,58 +29,13 @@
 
 #include "api/ArduinoAPI.h"
 
-#if defined(__cplusplus)
-using namespace arduino;
-#endif
-
-#include "gd32xxyy.h"
-#include "gd32/pins_arduino.h"
-#include "gd32/PeripheralPins.h"
+#include "wiring.h"
 
 #define interrupts()      __enable_irq()
 #define noInterrupts()    __disable_irq()
 
-#define digitalPinToInterrupt(pin)  (pin)
+//#define digitalPinToInterrupt(pin)  (pin)
 
-#ifdef __cplusplus
-#include "HardwareTimer.h"
-#include "WSerial.h"
+#include "pins_arduino.h"
 
-extern "C" {
-#endif /* __cplusplus */
-
-//#define EXTENDED_PIN_MODE
-
-#include "gd32/systick.h"
-#include "analog.h"
-#include "wiring_analog_extra.h"
-#include "wiring_digital_extra.h"
-#include "gd32/gpio_interrupt.h"
-#include "gd32/timer.h"
-#include "gd32/rtc.h"
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-//extern void init(void);
-extern void setup(void);
-extern void loop(void);
-#ifdef __cplusplus
-}
-#endif
-
-#ifdef __cplusplus
-
-#include "variant.h"
-#include "HardwareSerial.h"
-#ifdef USBD_USE_CDC
-#include "CDCACM.h"
-#endif
-
-#endif	/* __cplusplus */
-
-#endif
+#endif  /* Arduino_h */

@@ -1,13 +1,10 @@
+#include "Arduino.h"
 #include "gpio_interrupt.h"
-#include "pinmap.h"
-#include "pins_arduino.h"
-#include "gd32xxyy_gpio.h"
+#include <cstddef>
+
+#if defined(SPL_EXTI_ENABLE)
 
 #define EXTI_NUMS   (16)
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef struct {
   IRQn_Type irqNum;
@@ -69,20 +66,63 @@ static extiConf_t gpio_exti_info[EXTI_NUMS] = {
 #endif
 };
 
-void gpio_interrupt_enable(uint32_t portNum, uint32_t pinNum, void (*callback)(void), uint32_t mode)
+static uint8_t get_exti_pin_id(uint16_t pin)
 {
-  exti_line_enum exti_line = BIT(pinNum);
-  exti_mode_enum exti_mode = EXTI_INTERRUPT;
-  exti_trig_type_enum trig_type = mode;
-  gpio_exti_info[pinNum].callback = callback;
+  uint8_t id = 0;
 
-  gpio_clock_enable(portNum);
+  while (pin != 0x0001) {
+    pin = pin >> 1;
+    id++;
+  }
+
+  return id;
+}
+
+void gpio_interrupt_enable(uint32_t gpioPort, uint16_t pin, void (*callback)(void), uint32_t mode)
+{
+  uint8_t id = get_exti_pin_id(pin);
+  exti_line_enum exti_line = (exti_line_enum)BIT(id);
+  exti_mode_enum exti_mode = (exti_mode_enum)EXTI_INTERRUPT;
+  exti_trig_type_enum trig_type = (exti_trig_type_enum)mode;
+  gpio_exti_info[id].callback = callback;
 #if defined(GD32F30x) || defined(GD32E50X)
+  uint8_t pos;
+  uint32_t ctlReg;
+  uint32_t ctlRegOffset = 0;
+  uint32_t octlRegOffset = 0;
+  const uint32_t configMask = 0x00000008;
+#endif
+  uint32_t pupd;
+
+/**
+ * get the currently configured mode and use it
+ * in the gpio_init function to avoid misconfiguration
+ */
+#if defined(GD32F30x) || defined(GD32E50X)
+  ctlReg = (pin < GPIO_PIN_8) ? GPIO_CTL0(gpioPort) : GPIO_CTL1(gpioPort);
+
+  for (pos = 0; pos < 16; pos++) {
+    if (pin == (0x0001 << pos)) {
+      ctlRegOffset = (pin < GPIO_PIN_8) ? (pos << 2) : ((pos - 8) << 2);
+      octlRegOffset = pos;
+    }
+  }
+
+  if ((ctlReg & ((GPIO_CTL0_MD0 | GPIO_CTL0_CTL0) << ctlRegOffset)) == (configMask << ctlRegOffset)) {
+    if ((GPIO_OCTL(gpioPort) & (GPIO_OCTL_OCTL0 << octlRegOffset)) == (GPIO_OCTL_OCTL0 << octlRegOffset)) {
+      pupd = GPIO_MODE_IPU;
+    } else {
+      pupd = GPIO_MODE_IPD;
+    }
+  } else {
+    pupd = GPIO_MODE_IN_FLOATING;
+  }
   rcu_periph_clock_enable(RCU_AF);
-  // do not re-init to IN_FLOATING, this might destroy previously set INPUT_PULLUP or INPUT_PULLDOWN modes!
-  // only messes up things if pin was in OUTPUT / OUTPUT_OPENDRAIN mode previously, but, I don't think
-  // anyone expects interrupt to work when they explicitly initialize a pin in OUTPUT mode...
-  //gpio_init(portNum, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, pinNum);
+  /**
+   * use the currently set mode and configure the port
+   * NOTE: only pins set as input will be attaching interrupts.
+   */
+  gpio_init(gpioPort, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, pin);
 #elif defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32E23x)
   rcu_periph_clock_enable(RCU_CFGCMP);
   //gpio_mode_set(portNum, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pinNum);
@@ -90,44 +130,29 @@ void gpio_interrupt_enable(uint32_t portNum, uint32_t pinNum, void (*callback)(v
 
   /* some NVIC controllers do not have subprio? */
 #if defined(GD32E23x)
-  nvic_irq_enable(gpio_exti_info[pinNum].irqNum, EXTI_IRQ_PRIO);
+  nvic_irq_enable(gpio_exti_info[id].irqNum, EXTI_IRQ_PRIO);
 #else
-  nvic_irq_enable(gpio_exti_info[pinNum].irqNum, EXTI_IRQ_PRIO, EXTI_IRQ_SUBPRIO);
+  nvic_irq_enable(gpio_exti_info[id].irqNum, EXTI_IRQ_PRIO, EXTI_IRQ_SUBPRIO);
 #endif
 #if defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32E23x)
-  syscfg_exti_line_config((uint8_t)portNum, (uint8_t)pinNum);
+  syscfg_exti_line_config((uint8_t)gpioPort, (uint8_t)id);
 #elif defined(GD32F30x) || defined(GD32E50X)
   uint8_t port_source = (uint8_t)NC;
-  switch (portNum) {
-    case PORTA:
+  switch (gpioPort) {
+    case GPIOA:
       port_source = GPIO_PORT_SOURCE_GPIOA;
       break;
-    case PORTB:
+    case GPIOB:
       port_source = GPIO_PORT_SOURCE_GPIOB;
       break;
 #ifdef GPIOC
-    case PORTC:
+    case GPIOC:
       port_source = GPIO_PORT_SOURCE_GPIOC;
       break;
 #endif
 #ifdef GPIOD
-    case PORTD:
+    case GPIOD:
       port_source = GPIO_PORT_SOURCE_GPIOD;
-      break;
-#endif
-#ifdef GPIOE
-    case PORTE:
-      port_source = GPIO_PORT_SOURCE_GPIOE;
-      break;
-#endif
-#ifdef GPIOF
-    case PORTF:
-      port_source = GPIO_PORT_SOURCE_GPIOF;
-      break;
-#endif
-#ifdef GPIOG
-    case PORTG:
-      port_source = GPIO_PORT_SOURCE_GPIOG;
       break;
 #endif
     default:
@@ -135,7 +160,7 @@ void gpio_interrupt_enable(uint32_t portNum, uint32_t pinNum, void (*callback)(v
   }
 
   uint8_t pin_source = (uint8_t)NC;
-  switch (gpio_pin[pinNum]) {
+  switch (pin) {
     case GPIO_PIN_0:
       pin_source = GPIO_PIN_SOURCE_0;
       break;
@@ -195,61 +220,68 @@ void gpio_interrupt_enable(uint32_t portNum, uint32_t pinNum, void (*callback)(v
   exti_interrupt_flag_clear(exti_line);
 }
 
-void gpio_interrupt_disable(uint32_t pinNum)
+void gpio_interrupt_disable(uint32_t gpioPort, uint16_t pin)
 {
-  gpio_exti_info[pinNum].callback = NULL;
+  UNUSED(gpioPort);
+  uint8_t id = get_exti_pin_id(pin);
+  gpio_exti_info[id].callback = NULL;
 
-  int i = 0;
-  for (i = 0; i < EXTI_NUMS; i++) {
-    if (gpio_exti_info[pinNum].irqNum == gpio_exti_info[i].irqNum  && \
-        NULL != gpio_exti_info[i].callback) {
+  for (int i = 0; i < EXTI_NUMS; i++) {
+    if (gpio_exti_info[id].irqNum == gpio_exti_info[i].irqNum
+        && gpio_exti_info[i].callback != NULL) {
       return;
     }
   }
-  nvic_irq_disable(gpio_exti_info[pinNum].irqNum);
+  nvic_irq_disable(gpio_exti_info[id].irqNum);
 }
 
-void exti_callbackHandler(uint32_t pinNum)
+void exti_callbackHandler(uint16_t pin)
 {
-  exti_line_enum linex = (exti_line_enum)BIT(pinNum);
-  if (RESET != exti_interrupt_flag_get(linex)) {
+  uint8_t irq_id = get_exti_pin_id(pin);
+
+  exti_line_enum linex = (exti_line_enum)BIT(irq_id);
+  if (exti_interrupt_flag_get(linex) != RESET) {
     exti_interrupt_flag_clear(linex);
-    if (NULL != gpio_exti_info[pinNum].callback) {
-      gpio_exti_info[pinNum].callback();
+    if (gpio_exti_info[irq_id].callback != NULL) {
+      gpio_exti_info[irq_id].callback();
     }
   }
 }
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #if defined(GD32F30x) || defined(GD32E50X)
 void EXTI0_IRQHandler(void)
 {
-  exti_callbackHandler(0);
+  exti_callbackHandler(GPIO_PIN_0);
 }
 
 void EXTI1_IRQHandler(void)
 {
-  exti_callbackHandler(1);
+  exti_callbackHandler(GPIO_PIN_1);
 }
 
 void EXTI2_IRQHandler(void)
 {
-  exti_callbackHandler(2);
+  exti_callbackHandler(GPIO_PIN_2);
 }
 
 void EXTI3_IRQHandler(void)
 {
-  exti_callbackHandler(3);
+  exti_callbackHandler(GPIO_PIN_3);
 }
 
 void EXTI4_IRQHandler(void)
 {
-  exti_callbackHandler(4);
+  exti_callbackHandler(GPIO_PIN_4);
 }
 
 void EXTI5_9_IRQHandler(void)
 {
   uint32_t i;
-  for (i = 5; i < 10; i++) {
+  for (i = GPIO_PIN_5; i <= GPIO_PIN_9; i = i << 1) {
     exti_callbackHandler(i);
   }
 }
@@ -257,7 +289,7 @@ void EXTI5_9_IRQHandler(void)
 void EXTI10_15_IRQHandler(void)
 {
   uint32_t i;
-  for (i = 10; i < 16; i++) {
+  for (i = GPIO_PIN_10; i <= GPIO_PIN_15; i = i << 1) {
     exti_callbackHandler(i);
   }
 }
@@ -265,7 +297,7 @@ void EXTI10_15_IRQHandler(void)
 void EXTI0_1_IRQHandler(void)
 {
   uint32_t i;
-  for (i = 0; i <= 1; i++) {
+  for (i = GPIO_PIN_0; i <= GPIO_PIN_1; i = i << 1) {
     exti_callbackHandler(i);
   }
 }
@@ -273,7 +305,7 @@ void EXTI0_1_IRQHandler(void)
 void EXTI2_3_IRQHandler(void)
 {
   uint32_t i;
-  for (i = 2; i <= 3; i++) {
+  for (i = GPIO_PIN_2; i <= GPIO_PIN_3; i = i << 1) {
     exti_callbackHandler(i);
   }
 }
@@ -281,7 +313,7 @@ void EXTI2_3_IRQHandler(void)
 void EXTI4_15_IRQHandler(void)
 {
   uint32_t i;
-  for (i = 4; i <= 15; i++) {
+  for (i = GPIO_PIN_4; i <= GPIO_PIN_15; i = i << 1) {
     exti_callbackHandler(i);
   }
 }
@@ -289,21 +321,21 @@ void EXTI4_15_IRQHandler(void)
 void EXTI0_1_IRQHandler(void)
 {
   uint32_t i;
-  for ( i = 0; i < 2; i++) {
+  for (i = GPIO_PIN_0; i <= GPIO_PIN_1; i = i << 1) {
     exti_callbackHandler(i);
   }
 }
 void EXTI2_3_IRQHandler(void)
 {
   uint32_t i;
-  for (i = 2; i < 4; i++) {
+  for (i = GPIO_PIN_2; i <= GPIO_PIN_3; i = i << 1) {
     exti_callbackHandler(i);
   }
 }
 void EXTI4_15_IRQHandler(void)
 {
   uint32_t i;
-  for (i = 4; i < 16; i++) {
+  for (i = GPIO_PIN_4; i <= GPIO_PIN_15; i = i << 1) {
     exti_callbackHandler(i);
   }
 }
@@ -312,3 +344,5 @@ void EXTI4_15_IRQHandler(void)
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* SPL_EXTI_ENABLE */

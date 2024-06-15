@@ -17,8 +17,7 @@
 */
 
 #include "Arduino.h"
-#include "gd32/PinConfigured.h"
-#include "gd32/PinNames.h"
+#include "PinConfigured.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,24 +69,24 @@ void pinMode(pin_size_t pin, PinMode ulMode)
 void digitalWrite(pin_size_t pin, PinStatus status)
 {
   PinName pinname = DIGITAL_TO_PINNAME(pin);
-  uint32_t gpiopin =  gpio_pin[GD_PIN_GET(pinname)];
-  uint32_t port = gpio_port[GD_PORT_GET(pinname)];
+  uint32_t gpiopin =  APIN_TO_GPIN(GD_PIN_GET(pinname));
+  uint32_t port = APORT_TO_GPORT(GD_PORT_GET(pinname));
   gpio_bit_write(port, gpiopin, (bit_status)status);
 }
 
 PinStatus digitalRead(pin_size_t pin)
 {
   PinName pinname = DIGITAL_TO_PINNAME(pin);
-  uint32_t gpiopin =  gpio_pin[GD_PIN_GET(pinname)];
-  uint32_t port = gpio_port[GD_PORT_GET(pinname)];
+  uint32_t gpiopin =  APIN_TO_GPIN(GD_PIN_GET(pinname));
+  uint32_t port = APORT_TO_GPORT(GD_PORT_GET(pinname));
   return (FlagStatus)gpio_input_bit_get(port, gpiopin);
 }
 
 void digitalToggle(pin_size_t pin)
 {
   PinName pinname = DIGITAL_TO_PINNAME(pin);
-  uint32_t gpiopin =  gpio_pin[GD_PIN_GET(pinname)];
-  uint32_t port = gpio_port[GD_PORT_GET(pinname)];
+  uint32_t gpiopin =  APIN_TO_GPIN(GD_PIN_GET(pinname));
+  uint32_t port = APORT_TO_GPORT(GD_PORT_GET(pinname));
   gpio_bit_write(port, gpiopin, (bit_status)(1 - (FlagStatus)gpio_input_bit_get(port, gpiopin)));
 }
 
@@ -99,32 +98,32 @@ void digitalToggle(pin_size_t pin)
  * 
  * TODO: consider adding a file for undefining these beforehand on a per-chip basis.
  */
-const uint32_t gpio_port[] = {
-  GPIOA,
-  GPIOB,
-  GPIOC,
-#ifdef GPIOD
-  GPIOD,
-#endif
-#ifdef GPIOE
-  GPIOE,
-#endif
-#ifdef GPIOF
-  GPIOF,
-#endif
-#ifdef GPIOG
-  GPIOG,
-#endif
-#ifdef GPIOH
-  GPIOH,
-#endif
-#ifdef GPIOI
-  GPIOI
-#endif
-};
+//const uint32_t gpio_port[] = {
+//  GPIOA,
+//  GPIOB,
+//  GPIOC,
+//#ifdef GPIOD
+//  GPIOD,
+//#endif
+//#ifdef GPIOE
+//  GPIOE,
+//#endif
+//#ifdef GPIOF
+//  GPIOF,
+//#endif
+//#ifdef GPIOG
+//  GPIOG,
+//#endif
+//#ifdef GPIOH
+//  GPIOH,
+//#endif
+//#ifdef GPIOI
+//  GPIOI
+//#endif
+//};
 
 /* converts pinname to gpio pin bit location in register */
-const uint32_t gpio_pin[] = {
+/*const uint32_t gpio_pin[] = {
   GPIO_PIN_0,
   GPIO_PIN_1,
   GPIO_PIN_2,
@@ -141,7 +140,7 @@ const uint32_t gpio_pin[] = {
   GPIO_PIN_13,
   GPIO_PIN_14,
   GPIO_PIN_15
-};
+};*/
 
 #ifdef __cplusplus
 }

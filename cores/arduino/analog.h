@@ -31,8 +31,10 @@ OF SUCH DAMAGE.
 #ifndef __ANALOG_H
 #define __ANALOG_H
 
+#include "gd32_def.h"
 #include "PeripheralNames.h"
-#include "timer.h"
+#include "HardwareTimer.h"
+#include "PeripheralPins.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,12 +46,12 @@ typedef struct {
 
 /* adc */
 uint32_t get_adc_channel(PinName pn);
-uint8_t get_adc_index(uint32_t instance);
+uint8_t get_adc_index(ADCName instance);
 uint16_t get_adc_value(PinName pn, uint32_t resolution);
 void adc_clock_enable(ADCName instance);
 /* dac */
 void set_dac_value(PinName pn, uint16_t value, uint8_t needs_init);
-uint8_t get_dac_index(uint32_t instance);
+uint8_t get_dac_index(DACName instance);
 void dac_stop(PinName pn);
 /* pwm */
 void pwm_start(PinName pin, uint32_t PWM_freq, uint32_t value, enum captureCompareFormat resolution);

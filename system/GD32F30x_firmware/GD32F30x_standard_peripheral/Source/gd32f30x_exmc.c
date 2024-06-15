@@ -37,10 +37,6 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_exmc.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 /* EXMC bank0 register reset value */
 #define BANK0_SNCTL_REGION0_RESET         ((uint32_t)0x000030DBU)
 #define BANK0_SNCTL_REGION1_2_3_RESET     ((uint32_t)0x000030D2U)
@@ -679,7 +675,3 @@ void exmc_interrupt_flag_clear(uint32_t exmc_bank,uint32_t interrupt)
     /* NAND bank1,bank2 or PC card bank3 */
     EXMC_NPINTEN(exmc_bank) &= ~(interrupt >> INTEN_INTS_OFFSET);
 }
-
-#ifdef __cplusplus
-}
-#endif

@@ -21,11 +21,7 @@
  *
  */
 
-#include <Arduino.h>
-#include <assert.h>
-
 #include "SPI.h"
-#include "pins_arduino.h"
 
 SPIClass SPI;
 

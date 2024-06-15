@@ -37,10 +37,6 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_gpio.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 #define AFIO_EXTI_SOURCE_MASK              ((uint8_t)0x03U)         /*!< AFIO exti source selection mask*/     
 #define AFIO_EXTI_SOURCE_FIELDS            ((uint8_t)0x04U)         /*!< select AFIO exti source registers */
 #define LSB_16BIT_MASK                     ((uint16_t)0xFFFFU)      /*!< LSB 16-bit mask */
@@ -59,45 +55,9 @@ OF SUCH DAMAGE.
 */
 void gpio_deinit(uint32_t gpio_periph)
 {
-    switch (gpio_periph) {
-    case GPIOA:
-        /* reset GPIOA */
-        rcu_periph_reset_enable(RCU_GPIOARST);
-        rcu_periph_reset_disable(RCU_GPIOARST);
-        break;
-    case GPIOB:
-        /* reset GPIOB */
-        rcu_periph_reset_enable(RCU_GPIOBRST);
-        rcu_periph_reset_disable(RCU_GPIOBRST);
-        break;
-    case GPIOC:
-        /* reset GPIOC */
-        rcu_periph_reset_enable(RCU_GPIOCRST);
-        rcu_periph_reset_disable(RCU_GPIOCRST);
-        break;
-    case GPIOD:
-        /* reset GPIOD */
-        rcu_periph_reset_enable(RCU_GPIODRST);
-        rcu_periph_reset_disable(RCU_GPIODRST);
-        break;
-    case GPIOE:
-        /* reset GPIOE */
-        rcu_periph_reset_enable(RCU_GPIOERST);
-        rcu_periph_reset_disable(RCU_GPIOERST);
-        break;
-    case GPIOF:
-        /* reset GPIOF */
-        rcu_periph_reset_enable(RCU_GPIOFRST);
-        rcu_periph_reset_disable(RCU_GPIOFRST);
-        break;
-    case GPIOG:
-        /* reset GPIOG */
-        rcu_periph_reset_enable(RCU_GPIOGRST);
-        rcu_periph_reset_disable(RCU_GPIOGRST);
-        break;
-    default:
-        break;
-    }
+    uint32_t gpio_rst_mask = (uint32_t)(RCU_GPIOARST << (gpio_periph >> 12));
+    rcu_periph_reset_enable(gpio_rst_mask);
+    rcu_periph_reset_disable(gpio_rst_mask);
 }
 
 /*!
@@ -453,27 +413,15 @@ void gpio_ethernet_phy_select(uint32_t enet_sel)
 */
 void gpio_exti_source_select(uint8_t output_port, uint8_t output_pin)
 {
-    uint32_t source = 0U;
-    source = ((uint32_t)0x0FU) << (AFIO_EXTI_SOURCE_FIELDS * (output_pin & AFIO_EXTI_SOURCE_MASK));
+    output_port &= 0x0FU;
+    output_pin &= AFIO_EXTI_SOURCE_MASK;
 
-    /* select EXTI sources */
-    if (GPIO_PIN_SOURCE_4 > output_pin) {
-        /* select EXTI0/EXTI1/EXTI2/EXTI3 */
-        AFIO_EXTISS0 &= ~source;
-        AFIO_EXTISS0 |= (((uint32_t)output_port) << (AFIO_EXTI_SOURCE_FIELDS * (output_pin & AFIO_EXTI_SOURCE_MASK)));
-    } else if (GPIO_PIN_SOURCE_8 > output_pin) {
-        /* select EXTI4/EXTI5/EXTI6/EXTI7 */
-        AFIO_EXTISS1 &= ~source;
-        AFIO_EXTISS1 |= (((uint32_t)output_port) << (AFIO_EXTI_SOURCE_FIELDS * (output_pin & AFIO_EXTI_SOURCE_MASK)));
-    } else if (GPIO_PIN_SOURCE_12 > output_pin) {
-        /* select EXTI8/EXTI9/EXTI10/EXTI11 */
-        AFIO_EXTISS2 &= ~source;
-        AFIO_EXTISS2 |= (((uint32_t)output_port) << (AFIO_EXTI_SOURCE_FIELDS * (output_pin & AFIO_EXTI_SOURCE_MASK)));
-    } else {
-        /* select EXTI12/EXTI13/EXTI14/EXTI15 */
-        AFIO_EXTISS3 &= ~source;
-        AFIO_EXTISS3 |= (((uint32_t)output_port) << (AFIO_EXTI_SOURCE_FIELDS * (output_pin & AFIO_EXTI_SOURCE_MASK)));
-    }
+    volatile uint32_t* EXTISS_reg = (output_pin < 4U) ? &AFIO_EXTISS0 : (output_pin < 8U) ? &AFIO_EXTISS1 :
+                           (output_pin < 12U) ? &AFIO_EXTISS2 : &AFIO_EXTISS3;
+    uint32_t shift = (output_pin % 4U) * AFIO_EXTI_SOURCE_FIELDS;
+
+    *EXTISS_reg &= ~(0x0FU << shift);
+    *EXTISS_reg |= (output_port << shift);
 }
 
 /*!
@@ -493,15 +441,8 @@ void gpio_exti_source_select(uint8_t output_port, uint8_t output_pin)
 */
 void gpio_event_output_config(uint8_t output_port, uint8_t output_pin)
 {
-    uint32_t reg = 0U;
-    reg = AFIO_EC;
-
-    /* clear AFIO_EC_PORT and AFIO_EC_PIN bits */
-    reg &= (uint32_t)(~(AFIO_EC_PORT | AFIO_EC_PIN));
-    reg |= (uint32_t)((uint32_t)output_port << GPIO_OUTPUT_PORT_OFFSET);
-    reg |= (uint32_t)output_pin;
-
-    AFIO_EC = reg;
+    AFIO_EC = (AFIO_EC & ~(AFIO_EC_PORT | AFIO_EC_PIN)) |
+              ((uint32_t)output_port << GPIO_OUTPUT_PORT_OFFSET) | output_pin;
 }
 
 /*!
@@ -559,12 +500,7 @@ void gpio_pin_lock(uint32_t gpio_periph,uint32_t pin)
 */
 void gpio_compensation_config(uint32_t compensation)
 {
-    uint32_t reg;
-    reg = AFIO_CPSCTL;
-
-    /* reset the AFIO_CPSCTL_CPS_EN bit and set according to gpio_compensation */
-    reg &= ~AFIO_CPSCTL_CPS_EN;
-    AFIO_CPSCTL = (reg | compensation);
+    AFIO_CPSCTL = (AFIO_CPSCTL & ~AFIO_CPSCTL_CPS_EN) | (compensation & AFIO_CPSCTL_CPS_EN);
 }
 
 /*!
@@ -575,13 +511,5 @@ void gpio_compensation_config(uint32_t compensation)
   */
 FlagStatus gpio_compensation_flag_get(void)
 {
-    if (((uint32_t)RESET) != (AFIO_CPSCTL & AFIO_CPSCTL_CPS_RDY)) {
-        return SET;
-    } else {
-        return RESET;
-    }
+    return ((AFIO_CPSCTL & AFIO_CPSCTL_CPS_RDY) ? RESET : SET);
 }
-
-#ifdef __cplusplus
-}
-#endif

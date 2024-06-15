@@ -28,9 +28,10 @@ OF SUCH DAMAGE.
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
-#include "gd32xxyy.h"
-#include "PeripheralPins.h"
+#include "gd32_def.h"
+#include "PinNames.h"
 #include "PeripheralNames.h"
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {

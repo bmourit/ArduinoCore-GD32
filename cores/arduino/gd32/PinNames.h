@@ -19,7 +19,6 @@
 #define _PINNAMES_H
 
 #include "PortNames.h"
-#include "cmsis.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -113,104 +112,14 @@ typedef enum {
   PORTD_14 = (PORTD << 4) + 0x0E,
   PORTD_15 = (PORTD << 4) + 0x0F,
 #endif
-#if defined(GPIOE)
-  PORTE_0  = (PORTE << 4) + 0x00,
-  PORTE_1  = (PORTE << 4) + 0x01,
-  PORTE_2  = (PORTE << 4) + 0x02,
-  PORTE_3  = (PORTE << 4) + 0x03,
-  PORTE_4  = (PORTE << 4) + 0x04,
-  PORTE_5  = (PORTE << 4) + 0x05,
-  PORTE_6  = (PORTE << 4) + 0x06,
-  PORTE_7  = (PORTE << 4) + 0x07,
-  PORTE_8  = (PORTE << 4) + 0x08,
-  PORTE_9  = (PORTE << 4) + 0x09,
-  PORTE_10 = (PORTE << 4) + 0x0A,
-  PORTE_11 = (PORTE << 4) + 0x0B,
-  PORTE_12 = (PORTE << 4) + 0x0C,
-  PORTE_13 = (PORTE << 4) + 0x0D,
-  PORTE_14 = (PORTE << 4) + 0x0E,
-  PORTE_15 = (PORTE << 4) + 0x0F,
-#endif
-#if defined(GPIOF)
-  PORTF_0  = (PORTF << 4) + 0x00,
-  PORTF_1  = (PORTF << 4) + 0x01,
-  PORTF_2  = (PORTF << 4) + 0x02,
-  PORTF_3  = (PORTF << 4) + 0x03,
-  PORTF_4  = (PORTF << 4) + 0x04,
-  PORTF_5  = (PORTF << 4) + 0x05,
-  PORTF_6  = (PORTF << 4) + 0x06,
-  PORTF_7  = (PORTF << 4) + 0x07,
-  PORTF_8  = (PORTF << 4) + 0x08,
-  PORTF_9  = (PORTF << 4) + 0x09,
-  PORTF_10 = (PORTF << 4) + 0x0A,
-  PORTF_11 = (PORTF << 4) + 0x0B,
-  PORTF_12 = (PORTF << 4) + 0x0C,
-  PORTF_13 = (PORTF << 4) + 0x0D,
-  PORTF_14 = (PORTF << 4) + 0x0E,
-  PORTF_15 = (PORTF << 4) + 0x0F,
-#endif
-#if defined(GPIOG)
-  PORTG_0  = (PORTG << 4) + 0x00,
-  PORTG_1  = (PORTG << 4) + 0x01,
-  PORTG_2  = (PORTG << 4) + 0x02,
-  PORTG_3  = (PORTG << 4) + 0x03,
-  PORTG_4  = (PORTG << 4) + 0x04,
-  PORTG_5  = (PORTG << 4) + 0x05,
-  PORTG_6  = (PORTG << 4) + 0x06,
-  PORTG_7  = (PORTG << 4) + 0x07,
-  PORTG_8  = (PORTG << 4) + 0x08,
-  PORTG_9  = (PORTG << 4) + 0x09,
-  PORTG_10 = (PORTG << 4) + 0x0A,
-  PORTG_11 = (PORTG << 4) + 0x0B,
-  PORTG_12 = (PORTG << 4) + 0x0C,
-  PORTG_13 = (PORTG << 4) + 0x0D,
-  PORTG_14 = (PORTG << 4) + 0x0E,
-  PORTG_15 = (PORTG << 4) + 0x0F,
-#endif
-#if defined(GPIOH)
-  PORTH_0  = (PORTH << 4) + 0x00,
-  PORTH_1  = (PORTH << 4) + 0x01,
-  PORTH_2  = (PORTH << 4) + 0x02,
-  PORTH_3  = (PORTH << 4) + 0x03,
-  PORTH_4  = (PORTH << 4) + 0x04,
-  PORTH_5  = (PORTH << 4) + 0x05,
-  PORTH_6  = (PORTH << 4) + 0x06,
-  PORTH_7  = (PORTH << 4) + 0x07,
-  PORTH_8  = (PORTH << 4) + 0x08,
-  PORTH_9  = (PORTH << 4) + 0x09,
-  PORTH_10 = (PORTH << 4) + 0x0A,
-  PORTH_11 = (PORTH << 4) + 0x0B,
-  PORTH_12 = (PORTH << 4) + 0x0C,
-  PORTH_13 = (PORTH << 4) + 0x0D,
-  PORTH_14 = (PORTH << 4) + 0x0E,
-  PORTH_15 = (PORTH << 4) + 0x0F,
-#endif
-#if defined(GPIOI)
-  PORTI_0  = (PORTI << 4) + 0x00,
-  PORTI_1  = (PORTI << 4) + 0x01,
-  PORTI_2  = (PORTI << 4) + 0x02,
-  PORTI_3  = (PORTI << 4) + 0x03,
-  PORTI_4  = (PORTI << 4) + 0x04,
-  PORTI_5  = (PORTI << 4) + 0x05,
-  PORTI_6  = (PORTI << 4) + 0x06,
-  PORTI_7  = (PORTI << 4) + 0x07,
-  PORTI_8  = (PORTI << 4) + 0x08,
-  PORTI_9  = (PORTI << 4) + 0x09,
-  PORTI_10 = (PORTI << 4) + 0x0A,
-  PORTI_11 = (PORTI << 4) + 0x0B,
-  PORTI_12 = (PORTI << 4) + 0x0C,
-  PORTI_13 = (PORTI << 4) + 0x0D,
-  PORTI_14 = (PORTI << 4) + 0x0E,
-  PORTI_15 = (PORTI << 4) + 0x0F,
-#endif
   /* ADC internal channels */
   ADC_PINS_BASE = PINNAME_ANALOG_INT,
-#if defined(ADC_CHANNEL_TEMPSENSOR) || defined(ADC_CHANNEL_TEMPSENSOR_ADC1)
+//#if defined(ADC_CHANNEL_TEMPSENSOR) || defined(ADC_CHANNEL_TEMPSENSOR_ADC1)
   ADC_TEMP,
-#endif
-#if defined(ADC_CHANNEL_VREFINT)
+//#endif
+//#if defined(ADC_CHANNEL_VREFINT)
   ADC_VREF,
-#endif
+//#endif
   ADC_START_ANALOG,
 /* pin names specific to the variant */
 #if __has_include("PinNamesVar.h")
@@ -331,7 +240,7 @@ typedef enum {
 #define GD_VALID_PINNAME(X)   (GD_PORT_GET(X) <= LastPort)
 #define GD_GPIO_PIN(X)        ((uint16_t)(1 << GD_PIN_GET(X)))
 
-#define GD_PIN_FUNC_ANALOG_CH(CHAN)       ((int)(GD_PIN_ANALOG & PIN_MODE_MASK) | ((CHAN & PIN_CHANNEL_MASK) << PIN_CHANNEL_SHIFT) | (((int)PIN_PUPD_NONE & PIN_PULL_UD_MASK) << PIN_PULL_UD_SHIFT))
+#define GD_PIN_FUNC_ANALOG_CH(CHAN)   ((int)(GD_PIN_ANALOG & PIN_MODE_MASK) | ((CHAN & PIN_CHANNEL_MASK) << PIN_CHANNEL_SHIFT) | (((int)PIN_PUPD_NONE & PIN_PULL_UD_MASK) << PIN_PULL_UD_SHIFT))
 
 #ifdef __cplusplus
 }

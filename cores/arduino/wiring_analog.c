@@ -16,9 +16,8 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "PinConfigured.h"
-#include "gd32/PinNames.h"
 #include "Arduino.h"
+#include "PinConfigured.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -4,9 +4,10 @@
 /*
  * Core and peripherals registers definitions
  */
-#include "api/Interrupts.h"
+#include "gpio_interrupt.h"
 #include "analog.h"
 #include "backup_domain.h"
+#include "dwt.h"
 #include "systick.h"
 #include "hw_config.h"
 #include "rtc.h"
@@ -15,12 +16,12 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif /* __cplusplus */
+#endif
 
 void init(void);
 
 #ifdef __cplusplus
 }
-#endif /* __cplusplus */
+#endif
 
 #endif /* _BOARD_H_ */

@@ -21,8 +21,6 @@
 #define _BACKUP_H_
 
 #include "gd32_def.h"
-#include "gd32xxyy.h"
-#include "gd32f30x_bkp.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,7 +41,7 @@ extern "C" {
 
 #if defined(BL_HID)
 #if !defined(HID_MAGIC_BACKUP_INDEX)
-#define HID_MAGIC_BACKUP_INDEX		BKP_DATA_3
+#define HID_MAGIC_BACKUP_INDEX		  BKP_DATA_3
 #endif
 #if !defined(HID_MAGIC_BACKUP_INDEX) && defined(BKP_DATA_9)
 #define HID_OLD_MAGIC_BACKUP_INDEX	BKP_DATA_9
@@ -119,5 +117,6 @@ static inline uint16_t backup_rergister_get(bkp_data_register_enum index)
 #ifdef __cplusplus
 }
 #endif	/* __cplusplus */
+
 
 #endif /* _BACKUP_H_ */

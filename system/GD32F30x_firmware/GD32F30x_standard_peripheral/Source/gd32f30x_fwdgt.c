@@ -37,10 +37,6 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_fwdgt.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 /* write value to FWDGT_CTL_CMD bit field */
 #define CTL_CMD(regval)             (BITS(0,15) & ((uint32_t)(regval) << 0))
 /* write value to FWDGT_RLD_RLD bit field */
@@ -225,7 +221,3 @@ FlagStatus fwdgt_flag_get(uint16_t flag)
 
     return RESET;
 }
-
-#ifdef __cplusplus
-}
-#endif

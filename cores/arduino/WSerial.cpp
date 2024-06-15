@@ -27,5 +27,4 @@ WEAK void serialEventRun(void)
     serialEvent5();
   }
 #endif
-
 }

@@ -25,19 +25,17 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 OF SUCH DAMAGE.
 */
 
+#include "gd_debug.h"
 #include "timer.h"
-#ifdef GD32E50x
-#include <gd32e50x_rcu.h>
-#include <gd32e50x_timer.h>
-#endif
-#ifdef GD32F30x
-#include <gd32f30x_timer.h>
-#include <gd32f30x_rcu.h>
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "board.h"
+//#ifdef GD32E50x
+//#include <gd32e50x_rcu.h>
+//#include <gd32e50x_timer.h>
+//#endif
+//#ifdef GD32F30x
+//#include <gd32f30x_timer.h>
+//#include <gd32f30x_rcu.h>
+//#endif
 
 #if defined(GD32F1x0) || defined(GD32F3x0) || defined(GD32E50X) || defined(GD32EPRT)
 #define TIMER5_IRQ_Name TIMER5_DAC_IRQn
@@ -157,9 +155,7 @@ static uint32_t getTimerRCUClockName(TIMERName instance);
 
 timerDevice_t *get_timer_object(SPL_TimerHandle_t *timer_handle)
 {
-  timerDevice_t *timerObj;
-  timerObj = (timerDevice_t *)((char *)timer_handle - offsetof(timerDevice_t, handle));
-  return (timerObj);
+    return (timerDevice_t *)((char *)timer_handle - offsetof(timerDevice_t, handle));
 }
 
 /*!
@@ -192,99 +188,61 @@ void Timer_clock_disable(SPL_TimerHandle_t *timer_handle)
 */
 static uint32_t getTimerRCUClockName(TIMERName instance)
 {
-  uint32_t rcuclk = 0U;
-
-  switch (instance) {
+  static const uint32_t rcuclk[] = {
 #if defined(TIMER0)
-    case TIMER_0:
-      rcuclk = RCU_TIMER0;
-      break;
+    RCU_TIMER0,
 #endif
 #if defined(TIMER1)
-    case TIMER_1:
-      rcuclk = RCU_TIMER1;
-      break;
+    RCU_TIMER1,
 #endif
 #if defined(TIMER2)
-    case TIMER_2:
-      rcuclk = RCU_TIMER2;
-      break;
+    RCU_TIMER2,
 #endif
 #if defined(TIMER3)
-    case TIMER_3:
-      rcuclk = RCU_TIMER3;
-      break;
+    RCU_TIMER3,
 #endif
 #if defined(TIMER4)
-    case TIMER_4:
-      rcuclk = RCU_TIMER4;
-      break;
+    RCU_TIMER4,
 #endif
 #if defined(TIMER5) && !defined(NO_TIMER_5)
-    case TIMER_5:
-      rcuclk = RCU_TIMER5;
-      break;
+    RCU_TIMER5,
 #endif
 #if defined(TIMER6)
-    case TIMER_6:
-      rcuclk = RCU_TIMER6;
-      break;
+    RCU_TIMER6,
 #endif
 #if defined(TIMER7)
-    case TIMER_7:
-      rcuclk = RCU_TIMER7;
-      break;
+    RCU_TIMER7,
 #endif
-#if defined(TIMER8)&& defined(HAS_TIMER_8) /* ToDO: Fix this so for non-F30x series that also have TIMER8 *and* RCU_TIMER8 */
-    case TIMER_8:
-      rcuclk = RCU_TIMER8;
-      break;
+#if defined(TIMER8) && defined(HAS_TIMER_8)
+    RCU_TIMER8,
 #endif
-#if defined(TIMER9)&& defined(HAS_TIMER_9)
-    case TIMER_9:
-      rcuclk = RCU_TIMER9;
-      break;
+#if defined(TIMER9) && defined(HAS_TIMER_9)
+    RCU_TIMER9,
 #endif
-#if defined(TIMER10)&& defined(HAS_TIMER_10) 
-    case TIMER_10:
-      rcuclk = RCU_TIMER10;
-      break;
+#if defined(TIMER10) && defined(HAS_TIMER_10)
+    RCU_TIMER10,
 #endif
-#if defined(TIMER11)&& defined(HAS_TIMER_11)
-    case TIMER_11:
-      rcuclk = RCU_TIMER11;
-      break;
+#if defined(TIMER11) && defined(HAS_TIMER_11)
+    RCU_TIMER11,
 #endif
-#if defined(TIMER12)&& defined(HAS_TIMER_12)
-    case TIMER_12:
-      rcuclk = RCU_TIMER12;
-      break;
+#if defined(TIMER12) && defined(HAS_TIMER_12)
+    RCU_TIMER12,
 #endif
-#if defined(TIMER13)&& defined(HAS_TIMER_13)
-    case TIMER_13:
-      rcuclk = RCU_TIMER13;
-      break;
+#if defined(TIMER13) && defined(HAS_TIMER_13)
+    RCU_TIMER13,
 #endif
 #if defined(TIMER14)
-    case TIMER_14:
-      rcuclk = RCU_TIMER14;
-      break;
+    RCU_TIMER14,
 #endif
 #if defined(TIMER15)
-    case TIMER_15:
-      rcuclk = RCU_TIMER15;
-      break;
+    RCU_TIMER15,
 #endif
 #if defined(TIMER16)
-    case TIMER_16:
-      rcuclk = RCU_TIMER16;
-      break;
+    RCU_TIMER16,
 #endif
-    default:
-      break;
-  }
+  };
 
-  return rcuclk;
+  return rcuclk[(int)instance];
 }
 
 /*!
@@ -304,7 +262,6 @@ void Timer_init(SPL_TimerHandle_t *timer_handle)
   timer_deinit(timer_handle->timer_instance);
 
 #if defined(GD32E23x)
-  /* no subpriority */
   nvic_irq_enable(getTimerUpIrq(timer_handle->timer_instance), timerObj->timerPreemptPriority);
   nvic_irq_enable(getTimerCCIrq(timer_handle->timer_instance), timerObj->timerPreemptPriority);
 #else
@@ -735,7 +692,3 @@ __attribute__((weak)) void timer_captureHandle(SPL_TimerHandle_t *timer_handle)
 {
 
 }
-
-#ifdef __cplusplus
-}
-#endif

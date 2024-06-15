@@ -39,37 +39,29 @@ OF SUCH DAMAGE.
 #include "backup_domain.h"
 #include "systick.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 __IO uint32_t msTicks;
 uint32_t msTickPrio = (1UL << __NVIC_PRIO_BITS);
 systick_freq_t msTickFreq = SYSTICK_FREQ_DEFAULT;
 
 /*!
   \brief      configure systick
-  \param[in]  none
+  \param[in]  priority
   \param[out] none
   \retval     none
 */
-SC_error_t tickInit(uint32_t systick_priority)
+TICK_error_t tickInit(uint32_t priority)
 {
-  /* setup systick timer for 1000Hz interrupts */
   if (SysTick_Config(SystemCoreClock / (1000U / msTickFreq)) > 0U) {
-    return SC_ERROR;
+    return TICK_ERROR;
   }
 
-  if (systick_priority < (1UL << __NVIC_PRIO_BITS)) {
-    uint32_t priority_group = NVIC_GetPriorityGrouping();
-    /* configure the systick handler priority */
-    NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(priority_group, systick_priority, 0U));
-    msTickPrio = systick_priority;
+  if (priority < (1UL << __NVIC_PRIO_BITS)) {
+    NVIC_SetPriority(SysTick_IRQn, priority);
+    msTickPrio = priority;
   } else {
-    return SC_ERROR;
+    return TICK_ERROR;
   }
-
-  return SC_OK;
+  return TICK_OK;
 }
 
 void tickInc(void)
@@ -98,22 +90,21 @@ void SysTick_Handler(void)
   \param[out] none
   \retval     tick priority
 */
-uint32_t getSysTickPrio(void)
+uint32_t getTickPrio(void)
 {
   return msTickPrio;
 }
 
-SC_error_t setTickFreq(systick_freq_t freq)
+TICK_error_t setTickFreq(systick_freq_t freq)
 {
-  SC_error_t status = SC_OK;
-
+  TICK_error_t state = TICK_OK;
   if (freq != msTickFreq) {
-    status = tickInit(msTickPrio);
-    if (status == SC_OK) {
+    state = tickInit(msTickPrio);
+    if (state == TICK_OK) {
       msTickFreq = freq;
     }
   }
-  return status;
+  return state;
 }
 
 systick_freq_t getTickFreq(void)
@@ -123,25 +114,24 @@ systick_freq_t getTickFreq(void)
 
 void tickDelay(uint32_t delay)
 {
-  uint32_t tstart = getCurrentMillis();
+  uint32_t tstart = getTickMs();
   uint32_t tdelay = delay;
 
   if (tdelay < MAX_TICK_DELAY) {
     tdelay += (uint32_t)(msTickFreq);
   }
 
-  while ((getCurrentMillis() - tstart) < tdelay)
-  {
+  while ((getTickMs() - tstart) < tdelay) {
   }
 }
 
 /*!
-  \brief      get current milliseconds
+  \brief      get tick value in milliseconds
   \param[in]  none
   \param[out] none
   \retval     current milliseconds
 */
-uint32_t getCurrentMillis(void)
+uint32_t getTickMs(void)
 {
   return msTicks;
 }
@@ -152,66 +142,15 @@ uint32_t getCurrentMillis(void)
   \param[out] none
   \retval     current microseconds
 */
-uint32_t getCurrentMicros(void)
+uint32_t getTickUs(void)
 {
-  systick_active_counter_flag();
   uint32_t ms = msTicks;
-  const uint32_t systick_load = SysTick->LOAD + 1;
-  __IO uint32_t us = systick_load - SysTick->VAL;
-  if (systick_active_counter_flag()) {
+  uint32_t us = SysTick->LOAD - SysTick->VAL;
+
+  if (SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) {
     ms = msTicks;
-    us = systick_load - SysTick->VAL;
-  }
-  return (ms * 1000 + (us * 1000) / systick_load);
-}
-
-void clockEnable(clock_source_t clock_source)
-{
-  SC_oscillator_params_t osc_params = {0};
-  osc_params.pll_params.pll_status = RCU_PLL_NONE;
-
-  backup_domain_enable();
-
-  switch(clock_source) {
-    case SOURCE_IRC40K:
-      if (rcu_flag_get(RCU_FLAG_IRC40KSTB) == RESET) {
-        osc_params.osc = RCU_OSC_IRC40K;
-        osc_params.IRC40K_state = RCU_IRC40K_ON;
-      }
-      break;
-    case SOURCE_IRC8M:
-      if (rcu_flag_get(RCU_FLAG_IRC8MSTB) == RESET) {
-        osc_params.osc = RCU_OSC_IRC8M;
-        osc_params.IRC8M_state = RCU_IRC8M_ON;
-        osc_params.IRC8M_calibration = 16U;
-      }
-      break;
-  case SOURCE_LXTAL:
-      if (rcu_flag_get(RCU_FLAG_LXTALSTB) == RESET) {
-#ifdef USE_LXTAL_DRIVE_CAP
-        rcu_lxtal_drive_capability_config(RCU_LXTAL_LOWDRI);
-#endif
-        osc_params.osc = RCU_OSC_LXTAL;
-        osc_params.LXTAL_state = RCU_LXTAL_ON;
-      }
-      break;
-  case SOURCE_HXTAL:
-      if (rcu_flag_get(RCU_FLAG_HXTALSTB) == RESET) {
-        osc_params.osc = RCU_OSC_HXTAL;
-        osc_params.HXTAL_state = RCU_HXTAL_ON;
-      }
-      break;
-  default:
-      break;
+    us = SysTick->LOAD - SysTick->VAL;
   }
 
-  if (osc_params.osc != RCU_OSC_NONE) {
-    if (SC_Osc_Params(&osc_params) != SC_OK) {
-      Error_Handler();
-    }
-  }
+  return (ms * 1000 + (us * 1000) / SysTick->LOAD);
 }
-
-#ifdef __cplusplus
-}
-#endif

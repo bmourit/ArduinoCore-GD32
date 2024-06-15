@@ -30,7 +30,7 @@ OF SUCH DAMAGE.
 #ifndef __DRV_SPI_H
 #define __DRV_SPI_H
 
-#include "PinNames.h"
+#include "gd32_def.h"
 #include "PeripheralPins.h"
 #include "PeripheralNames.h"
 

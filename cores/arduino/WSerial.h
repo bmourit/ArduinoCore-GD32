@@ -2,7 +2,7 @@
 #define WIRING_SERIAL_H
 
 #include "variant.h"
-#include "HardwareSerial.h"
+#include "UartSerial.h"
 
 #if defined(USBCON) && defined(USBD_USE_CDC)
   #ifndef DISABLE_GENERIC_SERIALUSB
@@ -83,21 +83,11 @@
   #endif
 #endif
 
-#if defined(HAVE_HWSERIAL1)
-  extern void serialEvent1(void) __attribute__((weak));
-#endif
-#if defined(HAVE_HWSERIAL2)
-  extern void serialEvent2(void) __attribute__((weak));
-#endif
-#if defined(HAVE_HWSERIAL3)
-  extern void serialEvent3(void) __attribute__((weak));
-#endif
-#if defined(HAVE_HWSERIAL4)
-  extern void serialEvent4(void) __attribute__((weak));
-#endif
-#if defined(HAVE_HWSERIAL5)
-  extern void serialEvent5(void) __attribute__((weak));
-#endif
+extern void serialEvent1(void) __attribute__((weak));
+extern void serialEvent2(void) __attribute__((weak));
+extern void serialEvent3(void) __attribute__((weak));
+extern void serialEvent4(void) __attribute__((weak));
+extern void serialEvent5(void) __attribute__((weak));
 
 extern void serialEventRun(void);
 

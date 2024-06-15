@@ -27,9 +27,13 @@ OF SUCH DAMAGE.
     Based on mbed-os\targets\TARGET_GigaDevice\TARGET_GD32F30X\i2c_api.c
 */
 
+#include "gd_debug.h"
 #include "utility/twi.h"
-#include "pinmap.h"
-#include "twi.h"
+#include "gd32f30x_remap.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum {
 #if defined(I2C0)
@@ -713,5 +717,8 @@ extern "C" void I2C2_ER_IRQHandler(void)
 {
     i2c_err_handler(I2C2);
 }
+#endif
 
+#ifdef __cplusplus
+}
 #endif

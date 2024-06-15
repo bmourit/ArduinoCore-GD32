@@ -30,14 +30,8 @@ OF SUCH DAMAGE.
 
 #include "Arduino.h"
 #include "analog.h"
-#include "PinNames.h"
-#include "PeripheralPins.h"
-#include "HardwareTimer.h"
-extern "C" {
-#include "gd32xxyy.h"
 #include "gd_debug.h"
 #include "gd32f30x_remap.h"
-}
 
 #ifdef __cplusplus
 extern "C" {
@@ -122,10 +116,10 @@ analog_t ADC_[ADC_NUMS] = { 0 };
   * @param  needs_init : if set to 1 the initialization of the dac is done
   * @retval None
  */
-void set_dac_value(PinName pn, uint16_t value, uint8_t needs_init)
+void set_dac_value(PinName pin, uint16_t value, uint8_t needs_init)
 {
 #if DAC_NUMS != 0
-  uint32_t dac_periph = pinmap_peripheral(pn, PinMap_DAC);
+  uint32_t dac_periph = pinmap_peripheral(pin, PinMap_DAC);
 
   if (needs_init == 1) {
     dac_deinit();
@@ -152,7 +146,7 @@ void set_dac_value(PinName pn, uint16_t value, uint8_t needs_init)
 #endif
     /* DAC0 and DAC1 use same clock */
     rcu_periph_clock_enable(RCU_DAC);
-    pinmap_pinout(pn, PinMap_DAC);
+    pinmap_pinout(pin, PinMap_DAC);
   } else {
     /* set dac value */
 #if defined(GD32F30x) || (defined(GD32F1x0) && defined(GD32F170_190)) || defined(GD32E50X) || defined(GD32F10x)
@@ -166,9 +160,9 @@ void set_dac_value(PinName pn, uint16_t value, uint8_t needs_init)
 #endif
 }
 
-void dac_stop(PinName pn)
+void dac_stop(PinName pin)
 {
-  uint32_t dac_periph = pinmap_peripheral(pn, PinMap_DAC);
+  uint32_t dac_periph = pinmap_peripheral(pin, PinMap_DAC);
   if (dac_periph == NP) {
     return;
   }
@@ -213,7 +207,7 @@ void pwm_start(PinName pin, uint32_t PWM_freq, uint32_t value, enum captureCompa
   captureMode previous;
   uint32_t index = get_timer_index(instance);
   if (HWTimer_Handle[index] == NULL) {
-    HWTimer_Handle[index]->_timer_instance = new HardwareTimer(pinmap_peripheral(pin, PinMap_PWM));
+    HWTimer_Handle[index]->_timer_instance = new HardwareTimer((TIMERName)pinmap_peripheral(pin, PinMap_PWM));
   }
   HWT = (HardwareTimer *)(HWTimer_Handle[index]->_timer_instance);
   uint32_t channel = GD_PIN_CHANNEL_GET(pinmap_function(pin, PinMap_PWM));
@@ -236,7 +230,7 @@ void pwm_stop(PinName pin)
   HardwareTimer *HWT;
   uint32_t index = get_timer_index(instance);
   if (HWTimer_Handle[index] == NULL) {
-    HWTimer_Handle[index]->_timer_instance = new HardwareTimer(pinmap_peripheral(pin, PinMap_PWM));
+    HWTimer_Handle[index]->_timer_instance = new HardwareTimer((TIMERName)pinmap_peripheral(pin, PinMap_PWM));
   }
   HWT = (HardwareTimer *)(HWTimer_Handle[index]->_timer_instance);
   if (HWT != NULL) {
@@ -246,35 +240,35 @@ void pwm_stop(PinName pin)
 }
 
 /* get adc value */
-uint16_t get_adc_value(PinName pn, uint32_t resolution)
+uint16_t get_adc_value(PinName pin, uint32_t resolution)
 {
   uint16_t value;
-  uint32_t adc_periph = NP;
+  ADCName adc_periph = (ADCName)NP;
   uint8_t index = 0;
   uint32_t sampling_time = ADC_SAMPLETIME;
   uint32_t channel = 0;
 
-  if ((pn & ADC_PINS_BASE) && (pn < ADC_START_ANALOG)) {
-    adc_periph = ADC0;
-    switch (pn) {
-#if defined(ADC_CHANNEL_TEMPSENSOR)
+  if ((pin & ADC_PINS_BASE) && (pin < ADC_START_ANALOG)) {
+    adc_periph = ADC_0;
+    switch (pin) {
+//#if defined(ADC_CHANNEL_TEMPSENSOR)
     case ADC_TEMP:
       channel = ADC_CHANNEL_TEMPSENSOR;
       break;
-#endif
-#if defined(ADC_CHANNEL_VREFINT)
+//#endif
+//#if defined(ADC_CHANNEL_VREFINT)
     case ADC_VREF:
       channel = ADC_CHANNEL_VREFINT;
       break;
-#endif
+//#endif
     default:
       channel = 0;
       break;
     }
     sampling_time = ADC_SAMPLETIME_INTERNAL;
   } else {
-    adc_periph = pinmap_peripheral(pn, PinMap_ADC);
-    channel = get_adc_channel(pn);
+    adc_periph = (ADCName)pinmap_peripheral(pin, PinMap_ADC);
+    channel = get_adc_channel(pin);
   }
   if (adc_periph == NP) {
     return 0;
@@ -310,7 +304,7 @@ uint16_t get_adc_value(PinName pn, uint32_t resolution)
 
   index = get_adc_index(adc_periph);
   if (!(ADC_[index].isactive & ADC_PINS_BASE)) {
-    pinmap_pinout(pn, PinMap_ADC);
+    pinmap_pinout(pin, PinMap_ADC);
 
 #if defined(GD32F30x)|| defined(GD32E50X)
     //rcu_adc_clock_config(ADC_PRESCALE_DIV);
@@ -348,7 +342,7 @@ uint16_t get_adc_value(PinName pn, uint32_t resolution)
   }
 
 #if defined(GD32F30x) || defined(GD32E50X)
-  if ((pn == ADC_TEMP) | (pn == ADC_VREF)) {
+  if ((pin == ADC_TEMP) | (pin == ADC_VREF)) {
       adc_tempsensor_vrefint_enable();
       delay(1U);
   }
@@ -359,7 +353,7 @@ uint16_t get_adc_value(PinName pn, uint32_t resolution)
 
 #elif defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32E23x)
   adc_regular_channel_config(0U, channel, sampling_time);
-  if (pn == ADC_TEMP || pn == ADC_VREF) {
+  if (pin == ADC_TEMP || pin == ADC_VREF) {
     adc_tempsensor_vrefint_enable();
     delay(1U);
   }

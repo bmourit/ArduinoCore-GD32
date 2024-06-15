@@ -1,6 +1,6 @@
 #ifdef USBD_USE_CDC
-#include "CDCACM.h"
 
+#include "CDCACM.h"
 #include "USBCore.h"
 
 const uint8_t ACM_EP_MAXLEN = 0x10;
@@ -169,4 +169,5 @@ CDCACM_& CDCACM()
   static CDCACM_ obj(0, 1);
   return obj;
 }
-#endif
+
+#endif /* USBD_USE_CDC */

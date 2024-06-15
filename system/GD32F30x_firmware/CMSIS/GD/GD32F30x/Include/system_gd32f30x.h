@@ -44,7 +44,7 @@ extern "C" {
 /* system clock frequency (core clock) */
 extern uint32_t SystemCoreClock;
 
-extern const uint8_t AHBPrescTable[16U];
+extern const uint8_t AHBPrescaler[16U];
 extern const uint8_t APBPrescTable[8U];
 
 /* function declarations */

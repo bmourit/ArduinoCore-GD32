@@ -20,10 +20,11 @@
  * this file is adapted from https://github.com/stm32duino/Arduino_Core_STM32/blob/master/libraries/Servo/src/stm32/Servo.cpp
  * for GigaDevice GD32 devices.
  */
+#if defined(ARDUINO_ARCH_GD32)
 
 #include <Arduino.h>
 #include <Servo.h>
-#include "HardwareTimer.h"
+#include <HardwareTimer.h>
 
 static servo_t servos[MAX_SERVOS];                          // static array of servo structures
 static volatile int8_t timerChannel[_Nbr_16timers] = {-1};  // counter for the servo being pulsed for each timer (or -1 if refresh interval)
@@ -197,3 +198,5 @@ bool Servo::attached()
 {
   return servos[this->servoIndex].Pin.isActive;
 }
+
+#endif /* ARDUINO_ARCH_GD32 */

@@ -1,9 +1,7 @@
 #ifndef _GD_HARDWARERTC_H_
 #define _GD_HARDWARERTC_H_
 
-extern "C" {
 #include "rtc.h"
-}
 
 extern class HWRTC rtc;
 

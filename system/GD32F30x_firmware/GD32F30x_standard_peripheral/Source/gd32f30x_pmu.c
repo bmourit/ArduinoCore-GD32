@@ -38,10 +38,6 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_pmu.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 /*!
     \brief      reset PMU register
     \param[in]  none
@@ -402,7 +398,3 @@ void pmu_flag_clear(uint32_t flag)
         break;
     }
 }
-
-#ifdef __cplusplus
-}
-#endif

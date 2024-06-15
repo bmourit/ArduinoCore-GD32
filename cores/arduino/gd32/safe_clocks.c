@@ -28,22 +28,18 @@
  *  OF SUCH DAMAGE.
  */
 
-#include "Arduino.h"
+#include <stddef.h>
+
+#include "backup_domain.h"
 #include "safe_clocks.h"
+//#include "gd32_def.h"
 
-//const uint8_t AHBPrescaleTable[16U] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define SC_DELAY(sc_delay)  do {\
-                                volatile uint32_t i;\
-                                if (sc_delay != 0) {\
-                                  for (i = 0; i < sc_delay; i++) {\
-                                  }\
-                                }\
-                              } while (0)
+static inline void CLOCKS_DELAY(uint32_t delay) {
+	uint32_t cycles_per_ms = (SystemCoreClock / 1000U);
+	volatile uint32_t i;
+	for (i = 0; i < delay * cycles_per_ms; i++) {
+	}
+}
 
 /**
  * Firmware code provided by GigaDevices has several issues.
@@ -94,7 +90,7 @@ SC_error_t SC_set_flash_wait_state(uint32_t wait_state_value)
 SC_error_t SC_Clock_Params(SC_clock_params_t *clock_params, uint32_t wait_state_value)
 {
 	uint32_t reg = 0U;
-	uint32_t timeout = 0U;
+	volatile uint32_t timeout = 0U;
 
 	if (clock_params == NULL) {
 		return SC_ERROR;
@@ -187,7 +183,7 @@ SC_error_t SC_Clock_Params(SC_clock_params_t *clock_params, uint32_t wait_state_
 	}
 
 	/* update the SystemCoreClock CMSIS global variable */
-	SystemCoreClock = SC_get_system_clock_frequency() >> AHBPrescaleTable[((RCU_CFG0 & RCU_CFG0_AHBPSC) >> 4)];
+	SystemCoreClock = SC_get_system_clock_frequency() >> AHBPrescaler[((RCU_CFG0 & RCU_CFG0_AHBPSC) >> 4)];
 
 	return SC_OK;
 }
@@ -251,11 +247,12 @@ SC_error_t SC_Osc_Params(SC_oscillator_params_t *osc_params)
 					reg &= ~RCU_CTL_HXTALEN;
 					reg |= RCU_CTL_HXTALEN;
 					RCU_CTL = reg;
-					SC_DELAY(10000);
+					CLOCKS_DELAY(10000);
 				} else if ((osc_params->HXTAL_state) == RCU_HXTAL_OFF) {
 					reg = RCU_CTL;
 					reg &= ~RCU_CTL_HXTALBPS;
 					RCU_CTL = reg;
+					CLOCKS_DELAY(5000);
 					reg = RCU_CTL;
 					reg &= ~RCU_CTL_HXTALEN;
 					RCU_CTL = reg;
@@ -264,14 +261,17 @@ SC_error_t SC_Osc_Params(SC_oscillator_params_t *osc_params)
 					reg &= ~RCU_CTL_HXTALBPS;
 					reg |= RCU_CTL_HXTALBPS;
 					RCU_CTL = reg;
+					CLOCKS_DELAY(5000);
 					reg = RCU_CTL;
 					reg &= ~RCU_CTL_HXTALEN;
 					reg |= RCU_CTL_HXTALEN;
 					RCU_CTL = reg;
+					CLOCKS_DELAY(10000);
 				} else {
 					reg = RCU_CTL;
 					reg &= ~RCU_CTL_HXTALBPS;
 					RCU_CTL = reg;
+					CLOCKS_DELAY(5000);
 					reg = RCU_CTL;
 					reg &= ~RCU_CTL_HXTALEN;
 					reg |= RCU_CTL_HXTALEN;
@@ -303,12 +303,14 @@ SC_error_t SC_Osc_Params(SC_oscillator_params_t *osc_params)
 				reg = RCU_CTL;
 				reg &= ~RCU_CTL_IRC8MADJ;
 				RCU_CTL = (reg | ((uint32_t)(osc_params->IRC8M_calibration) << 3U));
+				CLOCKS_DELAY(5000);
 			}
 		} else {
 			if (osc_params->IRC8M_state != RCU_IRC8M_OFF) {
 				reg = RCU_CTL;
 				reg &= ~RCU_CTL_IRC8MEN;
 				RCU_CTL = (reg | RCU_CTL_IRC8MEN);
+				CLOCKS_DELAY(2000);
 				do {
 					timeout++;
 				} while ((rcu_flag_get(RCU_FLAG_IRC8MSTB) == RESET) && (timeout != HXTAL_STARTUP_TIMEOUT));
@@ -318,10 +320,12 @@ SC_error_t SC_Osc_Params(SC_oscillator_params_t *osc_params)
 				reg = RCU_CTL;
 				reg &= ~RCU_CTL_IRC8MADJ;
 				RCU_CTL = (reg | ((uint32_t)(osc_params->IRC8M_calibration) << 3U));
+				CLOCKS_DELAY(2000);
 			} else {
 				reg = RCU_CTL;
 				reg &= ~RCU_CTL_IRC8MEN;
 				RCU_CTL = reg;
+				CLOCKS_DELAY(2000);
 				do {
 					timeout++;
 				} while ((rcu_flag_get(RCU_FLAG_IRC8MSTB) != RESET) && (timeout != HXTAL_STARTUP_TIMEOUT));
@@ -337,6 +341,7 @@ SC_error_t SC_Osc_Params(SC_oscillator_params_t *osc_params)
 			reg &= ~RCU_RSTSCK_IRC40KEN;
 			reg |= RCU_RSTSCK_IRC40KEN;
 			RCU_RSTSCK = reg;
+			CLOCKS_DELAY(2000);
 			do {
 				timeout++;
 			} while ((rcu_flag_get(RCU_FLAG_IRC40KSTB) == RESET) && (timeout != HXTAL_STARTUP_TIMEOUT + 1));
@@ -347,6 +352,7 @@ SC_error_t SC_Osc_Params(SC_oscillator_params_t *osc_params)
 			reg = RCU_RSTSCK;
 			reg &= ~RCU_RSTSCK_IRC40KEN;
 			RCU_RSTSCK = reg;
+			CLOCKS_DELAY(2000);
 			do {
 				timeout++;
 			} while ((rcu_flag_get(RCU_FLAG_IRC40KSTB) != RESET) && (timeout != HXTAL_STARTUP_TIMEOUT));
@@ -450,6 +456,7 @@ SC_error_t SC_Osc_Params(SC_oscillator_params_t *osc_params)
 				reg = RCU_CTL;
 				reg &= ~RCU_CTL_PLLEN;
 				RCU_CTL = reg;
+				CLOCKS_DELAY(4000);
 				do {
 					timeout++;
 				} while ((rcu_flag_get(RCU_FLAG_PLLSTB) != RESET) && (timeout != HXTAL_STARTUP_TIMEOUT));
@@ -463,6 +470,7 @@ SC_error_t SC_Osc_Params(SC_oscillator_params_t *osc_params)
 						reg |= RCU_CFG0_PREDV0;
 					}
 					RCU_CFG0 = reg;
+					CLOCKS_DELAY(4000);
 				}
 
 				/* set pll source and pllmf */
@@ -470,12 +478,13 @@ SC_error_t SC_Osc_Params(SC_oscillator_params_t *osc_params)
 				reg &= ~(RCU_CFG0_PLLSEL | RCU_CFG0_PLLMF | RCU_CFG0_PLLMF_4 | RCU_CFG0_PLLMF_5);
 				reg |= (osc_params->pll_params.pll_source_clock | osc_params->pll_params.pll_multiplier);
 				RCU_CFG0 = reg;
+				CLOCKS_DELAY(5000);
 
 				/* enable pll */
 				reg = RCU_CTL;
 				reg &= ~RCU_CTL_PLLEN;
 				RCU_CTL = (reg | RCU_CTL_PLLEN);
-
+				CLOCKS_DELAY(2000);
 				do {
 					timeout++;
 				} while ((rcu_flag_get(RCU_FLAG_PLLSTB) == RESET) && (timeout != HXTAL_STARTUP_TIMEOUT));
@@ -486,6 +495,7 @@ SC_error_t SC_Osc_Params(SC_oscillator_params_t *osc_params)
 				reg = RCU_CTL;
 				reg &= ~RCU_CTL_PLLEN;
 				RCU_CTL = reg;
+				CLOCKS_DELAY(4000);
 				do {
 					timeout++;
 				} while ((rcu_flag_get(RCU_FLAG_PLLSTB) != RESET) && (timeout != HXTAL_STARTUP_TIMEOUT));
@@ -585,6 +595,50 @@ SC_error_t SC_Periph_Params(SC_peripheral_params_t *periph_params)
 	return SC_OK;
 }
 
-#ifdef __cplusplus
-}
+
+void clockEnable(clock_source_t clock_source)
+{
+  SC_oscillator_params_t osc_params = {0};
+  osc_params.pll_params.pll_status = RCU_PLL_NONE;
+
+  backup_domain_enable();
+
+  switch(clock_source) {
+    case SOURCE_IRC40K:
+      if (rcu_flag_get(RCU_FLAG_IRC40KSTB) == RESET) {
+        osc_params.osc = RCU_OSC_IRC40K;
+        osc_params.IRC40K_state = RCU_IRC40K_ON;
+      }
+      break;
+    case SOURCE_IRC8M:
+      if (rcu_flag_get(RCU_FLAG_IRC8MSTB) == RESET) {
+        osc_params.osc = RCU_OSC_IRC8M;
+        osc_params.IRC8M_state = RCU_IRC8M_ON;
+        osc_params.IRC8M_calibration = 16U;
+      }
+      break;
+  case SOURCE_LXTAL:
+      if (rcu_flag_get(RCU_FLAG_LXTALSTB) == RESET) {
+#ifdef USE_LXTAL_DRIVE_CAP
+        rcu_lxtal_drive_capability_config(RCU_LXTAL_LOWDRI);
 #endif
+        osc_params.osc = RCU_OSC_LXTAL;
+        osc_params.LXTAL_state = RCU_LXTAL_ON;
+      }
+      break;
+  case SOURCE_HXTAL:
+      if (rcu_flag_get(RCU_FLAG_HXTALSTB) == RESET) {
+        osc_params.osc = RCU_OSC_HXTAL;
+        osc_params.HXTAL_state = RCU_HXTAL_ON;
+      }
+      break;
+  default:
+      break;
+  }
+
+  if (osc_params.osc != RCU_OSC_NONE) {
+    if (SC_Osc_Params(&osc_params) != SC_OK) {
+      Error_Handler();
+    }
+  }
+}

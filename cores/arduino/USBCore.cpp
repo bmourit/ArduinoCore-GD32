@@ -257,11 +257,11 @@ uint8_t *EPBuffer<L>::ptr()
 template<size_t L>
 bool EPBuffer<L>::waitForReadComplete()
 {
-  // auto start = getCurrentMillis();
+  // auto start = getTickMs();
   auto ok = true;
   while (ok && this->rxWaiting) {
     ok = EPBuffers().pollEPStatus();
-    // if (getCurrentMillis() - start > 5) {
+    // if (getTickMs() - start > 5) {
     //     EPBuffers().buf(ep).transcIn();
     //     return false;
     // }
@@ -274,11 +274,11 @@ bool EPBuffer<L>::waitForReadComplete()
 template<size_t L>
 bool EPBuffer<L>::waitForWriteComplete()
 {
-  // auto start = getCurrentMillis();
+  // auto start = getTickMs();
   auto ok = true;
   while (ok && this->txWaiting) {
     ok = EPBuffers().pollEPStatus();
-    // if (getCurrentMillis() - start > 5) {
+    // if (getTickMs() - start > 5) {
     //     EPBuffers().buf(ep).transcIn();
     //     ok = false;
     // }

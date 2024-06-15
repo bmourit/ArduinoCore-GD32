@@ -31,25 +31,25 @@
 #include "USBCore.h"
 #endif
 
-extern "C" {
-#include "gd32xxyy.h"
-}
-
 // Force init to be called *first*, i.e. before static object allocation.
-// Otherwise, statically allocated objects that need libmaple may fail.
+// Otherwise, statically allocated objects that need SPL may fail.
 __attribute__((constructor(101))) void premain()
 {
 #ifdef NVIC_PRIGROUP_PRE4_SUB0
   nvic_priority_group_set(NVIC_PRIGROUP_PRE4_SUB0);
 #endif
+
   init();
 }
 
+/*!
+  \brief Main entry point of Arduino application
+*/
 int main(void)
 {
 #if defined(USBCON)
-  // TODO: remove this and only call it when the USB is attempted to
-  // be used.
+  // TODO:  remove this and only call it when
+  // we are attempting to use the USB.
   USBCore().connect();
 #endif
 

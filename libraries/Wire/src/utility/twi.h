@@ -32,7 +32,6 @@ OF SUCH DAMAGE.
 
 #include "gd32_def.h"
 #include "PeripheralPins.h"
-#include "gd32xxyy.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,8 +91,6 @@ void i2c_attach_slave_tx_callback(i2c_t *obj, void (*function)(void*), void* pWi
 void i2c_set_clock(i2c_t *obj, uint32_t clock_hz);
 /* Check to see if the I2C bus is busy */
 i2c_status_enum _i2c_busy_wait(i2c_t *obj);
-
-
 
 #ifdef __cplusplus
 }

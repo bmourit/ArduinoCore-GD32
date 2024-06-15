@@ -1,9 +1,8 @@
 
 #include "Arduino.h"
-#include "HardwareTimer.h"
-extern "C" {
+//#include "HardwareTimer.h"
+
 #include "gpio_extra.h"
-}
 
 #define MAX_FREQ  65535
 
@@ -21,8 +20,8 @@ static HardwareTimer *TimerTone = NULL;
 // Tone Period elapsed callback in non-blocking mode
 static void tonePeriodElapsedCallback()
 {
-  uint32_t port = gpio_port[GD_PORT_GET(TimerTone_pinInfo.pin)];
-  uint32_t pin =  gpio_pin[GD_PIN_GET(TimerTone_pinInfo.pin)];
+  uint32_t port = APORT_TO_GPORT(GD_PORT_GET(TimerTone_pinInfo.pin));
+  uint32_t pin =  APORT_TO_GPORT(GD_PIN_GET(TimerTone_pinInfo.pin));
 
   if (port != NP) {
     if (TimerTone_pinInfo.count != 0) {

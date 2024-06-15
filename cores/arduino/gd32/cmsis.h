@@ -7,7 +7,9 @@
 #ifndef CMSIS_H
 #define CMSIS_H
 
-#include <gd32xxyy.h>
+#if defined(BUILD_CMSIS_MBED)
+#include <gd32_def.h>
 #include "cmsis_nvic.h"
-
 #endif
+
+#endif /* CMSIS_H */

@@ -37,10 +37,6 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_dbg.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 #define DBG_RESET_VAL       0x00000000U
 
 /*!
@@ -150,7 +146,3 @@ void dbg_trace_pin_disable(void)
 {
     DBG_CTL0 &= ~DBG_CTL0_TRACE_IOEN;
 }
-
-#ifdef __cplusplus
-}
-#endif

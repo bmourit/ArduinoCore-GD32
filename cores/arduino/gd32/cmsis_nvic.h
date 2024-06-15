@@ -32,9 +32,11 @@
 #ifndef MBED_CMSIS_NVIC_H
 #define MBED_CMSIS_NVIC_H
 
+#if defined(BUILD_CMSIS_MBED)
 // TODO: Inveestigate if this the same for all variants
 // or if we should move this to be defined by respective variants
 #define NVIC_NUM_VECTORS          (16 + 60)   // ARM CORE:16 Vectors; MCU Peripherals:60 Vectors
 #define NVIC_RAM_VECTOR_ADDRESS   0x20000000
-
 #endif
+
+#endif /* MBED_CMSIS_NVIC_H */

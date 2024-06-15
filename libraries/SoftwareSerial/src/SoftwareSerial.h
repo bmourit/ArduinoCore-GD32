@@ -33,12 +33,7 @@
 #ifndef SOFTWARESERIAL_H
 #define SOFTWARESERIAL_H
 
-#include "pins_arduino.h"
-#include "PinNames.h"
-#include "HardwareTimer.h"
-
 #include <Arduino.h>
-#include <Stream.h>
 
 #ifndef _SS_MAX_RX_BUFF
 #define _SS_MAX_RX_BUFF   64    // RX buffer size

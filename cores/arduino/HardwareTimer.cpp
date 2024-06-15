@@ -26,10 +26,9 @@ OF SUCH DAMAGE.
 */
 
 #include "Arduino.h"
-#include "HardwareTimer.h"
-#include "pins_arduino.h"
+//#include "HardwareTimer.h"
 
-//#define TIMERNUMS   13
+#if defined(SPL_TIMER_ENABLE)
 
 #define PERIOD_MAX  ((1 << 16) - 1)
 
@@ -49,6 +48,7 @@ HardwareTimer::HardwareTimer(TIMERName instance)
 
   _timerObj.timerPreemptPriority = TIMER_IRQ_PRIORITY;
   _timerObj.timerSubPriority = TIMER_IRQ_SUBPRIORITY;
+
   _timerObj.handle.init_params.prescaler = 0;
   _timerObj.handle.init_params.period = PERIOD_MAX;
   _timerObj.handle.init_params.counterdirection = TIMER_COUNTER_UP;
@@ -56,30 +56,30 @@ HardwareTimer::HardwareTimer(TIMERName instance)
   _timerObj.handle.init_params.alignedmode = TIMER_COUNTER_EDGE;
   _timerObj.handle.init_params.repetitioncounter = 0;
 
-    uint32_t index = get_timer_index(instance);
-    if (index == UNKNOWN_TIMER) {
-        Error_Handler();
-    }
+  uint32_t index = get_timer_index(instance);
+  if (index == UNKNOWN_TIMER) {
+      Error_Handler();
+  }
 
-    HWTimer_Handle[index] = &_timerObj;
-    Timer_clock_enable(&(_timerObj.handle));
+  HWTimer_Handle[index] = &_timerObj;
 
-    /* null callback initialization */
-    for (int i = 0; i < TIMER_NUM_CHANNELS + 1; i++) {
-        timerCallbacks[i] = NULL;
-    }
+  Timer_clock_enable(&(_timerObj.handle));
 
-    /* channel mode and complementary initialization */
-    for (int i = 0; i < TIMER_NUM_CHANNELS; i++) {
+  /* null callback initialisation */
+  for (int i = 0; i < TIMER_NUM_CHANNELS + 1; i++) {
+    timerCallbacks[i] = NULL;
+  }
+
+  /* channel mode and linked initialization */
+  for (int i = 0; i < TIMER_NUM_CHANNELS; i++) {
 #if defined(TIMER_CHCTL2_CH0NEN)
-        isLinkedChannel[i] = false;
+    isLinkedChannel[i] = false;
 #endif
-        _ChannelMode[i] = TIMER_DISABLED;
-    }
+    _ChannelMode[i] = TIMER_DISABLED;
+  }
 
-    Timer_init(&(_timerObj.handle));
+  Timer_init(&(_timerObj.handle));
 }
-
 
 /*!
   \brief  stop or pause a timer
@@ -87,6 +87,7 @@ HardwareTimer::HardwareTimer(TIMERName instance)
 */
 void HardwareTimer::timerStop(void)
 {
+  /* disable all interrupts */
   Timer_disableUpdateIT(_timerObj.handle.timer_instance);
   Timer_disableCaptureIT(_timerObj.handle.timer_instance, TIMER_INT_CH0);
   Timer_disableCaptureIT(_timerObj.handle.timer_instance, TIMER_INT_CH1);
@@ -105,7 +106,6 @@ void HardwareTimer::timerStop(void)
 */
 void HardwareTimer::stopChannel(uint8_t channel)
 {
-  int linkedChan;
   uint32_t CCChan;
 
   int chan = getChannel((uint32_t)channel);
@@ -113,12 +113,12 @@ void HardwareTimer::stopChannel(uint8_t channel)
     Error_Handler();
   }
 
-  int intChan = getInterruptChannel((uint32_t)channel);
-  if (intChan == -1) {
+  int itChan = getInterruptChannel((uint32_t)channel);
+  if (itChan == -1) {
     Error_Handler();
   }
 
-  Timer_disableCaptureIT(_timerObj.handle.timer_instance, intChan);
+  Timer_disableCaptureIT(_timerObj.handle.timer_instance, itChan);
   switch (channel) {
     case 1:
       CCChan = TIMER_CHCTL2_CH0EN;
@@ -138,14 +138,14 @@ void HardwareTimer::stopChannel(uint8_t channel)
   TIMER_CHCTL2(_timerObj.handle.timer_instance) &= (~(uint32_t)CCChan);
 
   if (_ChannelMode[channel - 1] == IC_MEASUREMENT) {
-    linkedChan = getLinkedChannel((uint32_t)channel);
+    int linkedChan = getLinkedChannel((uint32_t)channel);
     Timer_disableCaptureIT(_timerObj.handle.timer_instance, getInterruptChannel(linkedChan));
   }
 }
 
 /*!
-  \brief      start/resume timer
-  \retval     none
+  \brief  start/resume timer
+  \retval none
 */
 void HardwareTimer::timerStart(void)
 {
@@ -154,6 +154,8 @@ void HardwareTimer::timerStart(void)
     timer_enable(_timerObj.handle.timer_instance);
   }
   _timerObj.handle.isTimerActive = true;
+
+  /* start/resume all channels */
   startChannel(1);
   startChannel(2);
   startChannel(3);
@@ -255,8 +257,8 @@ int HardwareTimer::getLinkedChannel(uint32_t channel)
 */
 void HardwareTimer::startChannel(uint8_t channel)
 {
-  int timerChan = getChannel((uint32_t)channel);
   int timerLink;
+  int timerChan = getChannel((uint32_t)channel);
 
   if (timerChan == -1) {
     Error_Handler();
@@ -1316,3 +1318,5 @@ extern "C"
   }
 #endif
 }
+
+#endif /* SPL_TIMER_ENABLE */

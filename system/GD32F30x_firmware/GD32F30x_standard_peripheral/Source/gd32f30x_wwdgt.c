@@ -37,10 +37,6 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_wwdgt.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 /*!
     \brief      reset the window watchdog timer configuration
     \param[in]  none
@@ -130,7 +126,3 @@ void wwdgt_interrupt_enable(void)
 {
     WWDGT_CFG |= WWDGT_CFG_EWIE;
 }
-
-#ifdef __cplusplus
-}
-#endif

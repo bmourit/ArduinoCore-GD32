@@ -35,29 +35,79 @@ OF SUCH DAMAGE.
 #ifndef GD32F30X_LIBOPT_H
 #define GD32F30X_LIBOPT_H
 
+#include "gd32xxyy_spl_config.h"
+
+#if defined(SPL_RCU_ENABLE)
 #include "gd32f30x_rcu.h"
+#endif
+#if defined(SPL_ADC_ENABLE)
 #include "gd32f30x_adc.h"
+#endif
+#if defined(SPL_CAN_ENABLE)
 #include "gd32f30x_can.h"
+#endif
+#if defined(SPL_CRC_ENABLE)
 #include "gd32f30x_crc.h"
+#endif
+#if defined(SPL_CTC_ENABLE)
 #include "gd32f30x_ctc.h"
+#endif
+#if defined(SPL_DAC_ENABLE)
 #include "gd32f30x_dac.h"
+#endif
+#if defined(SPL_DBG_ENABLE)
 #include "gd32f30x_dbg.h"
+#endif
+#if defined(SPL_DMA_ENABLE)
 #include "gd32f30x_dma.h"
+#endif
+#if defined(SPL_EXTI_ENABLE)
 #include "gd32f30x_exti.h"
+#endif
+#if defined(SPL_FMC_ENABLE)
 #include "gd32f30x_fmc.h"
+#endif
+#if defined(SPL_FWDGT_ENABLE)
 #include "gd32f30x_fwdgt.h"
+#endif
+#if defined(SPL_GPIO_ENABLE)
 #include "gd32f30x_gpio.h"
+#endif
+#if defined(SPL_I2C_ENABLE)
 #include "gd32f30x_i2c.h"
+#endif
+#if defined(SPL_PMU_ENABLE)
 #include "gd32f30x_pmu.h"
+#endif
+#if defined(SPL_BKP_ENABLE)
 #include "gd32f30x_bkp.h"
+#endif
+#if defined(SPL_RTC_ENABLE)
 #include "gd32f30x_rtc.h"
+#endif
+#if defined(SPL_SDIO_ENABLE)
 #include "gd32f30x_sdio.h"
+#endif
+#if defined(SPL_SPI_ENABLE)
 #include "gd32f30x_spi.h"
+#endif
+#if defined(SPL_TIMER_ENABLE)
 #include "gd32f30x_timer.h"
+#endif
+#if defined(SPL_USART_ENABLE)
 #include "gd32f30x_usart.h"
+#endif
+#if defined(SPL_WWDGT_ENABLE)
 #include "gd32f30x_wwdgt.h"
+#endif
+#if defined(SPL_MISC_ENABLE)
 #include "gd32f30x_misc.h"
+#endif
+#if defined(SPL_ENET_ENABLE)
 #include "gd32f30x_enet.h"
+#endif
+#if defined(SPL_EXMC_ENABLE)
 #include "gd32f30x_exmc.h"
+#endif
 
 #endif /* GD32F30X_LIBOPT_H */

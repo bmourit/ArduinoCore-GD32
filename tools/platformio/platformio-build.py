@@ -137,27 +137,27 @@ def process_usb_configuration(cpp_defines):
 #        env.Append(CPPDEFINES=["SERIAL_USB"])
 #    else:
 #        env.Append(CPPDEFINES=[("CONFIG_MAPLE_MINI_NO_DISABLE_DEBUG", 1), "SERIAL_USB"])
-
+#
 #    is_generic = 0
-
+#
 #    if "generic" in board_name.lower():
 #        is_generic = 1
-
+#
 #    if upload_protocol in ("stlink", "dfu", "jlink") and is_generic:
 #        env.Append(CPPDEFINES=["GENERIC_BOOTLOADER"])
-
-def get_arm_math_lib(cpu_core):
-	cpu_core = board_config.get("build.cpu")
-	if "m3" in cpu_core:
-		return "arm_corexM3l_math"
-	if "m4" in cpu_core:
-		return "arm_cortexM4l_math"
-	if "m7" in cpu_core:
-		return "arm_cortexM7lfsp_math"
-	elif "m33" in cpu_core:
-		return "arm_ARMv8MMLlfsp_math"
-
-	return "arm_cortex%sl_math" % cpu_core[7:9].upper()
+#
+#def get_arm_math_lib(cpu_core):
+#	cpu_core = board_config.get("build.cpu")
+#	if "m3" in cpu_core:
+#		return "arm_corexM3l_math"
+#	if "m4" in cpu_core:
+#		return "arm_cortexM4l_math"
+#	if "m7" in cpu_core:
+#		return "arm_cortexM7lfsp_math"
+#	elif "m33" in cpu_core:
+#		return "arm_ARMv8MMLlfsp_math"
+#
+#	return "arm_cortex%sl_math" % cpu_core[7:9].upper()
 
 def configure_application_offset(mcu, upload_protocol):
 	offset = 0
@@ -175,18 +175,39 @@ def configure_application_offset(mcu, upload_protocol):
 	elif upload_protocol == "dfu":
 		# GD32F103/GD32F303 series don't have embedded DFU over USB
 		# stm32duino bootloader (v1, v2) is used instead
-		if mcu.startswith("gd32f303"):
+		if mcu.startswith("gd32f1"):
 			if board_config.get("upload.boot_version", 2) == 1:
 				offset = 0x5000
 			else:
 				offset = 0x2000
 			env.Append(CPPDEFINES=["BL_LEGACY_LEAF"])
 
-	if offset != 0:
-		env.Append(CPPDEFINES=[("VECT_TAB_OFFSET", "%s" % hex(offset))],)
+		if mcu.startswith("gd32f3"):
+			if board_config.get("upload.boot_version", 2) == 1:
+				offset = 0x5000
+			else:
+				offset = 0x2000
+			env.Append(CPPDEFINES=["BL_LEGACY_LEAF"])
+
+
+	env.Append(
+		CPPDEFINES=[
+			("VECT_TAB_OFFSET", board_config.get("build.offset", hex(offset)))
+		],
+	)
 
 	# LD_FLASH_OFFSET is mandatory even if there is no offset
-	env.Append(LINKFLAGS=["-Wl,--defsym=LD_FLASH_OFFSET=%s" % hex(offset)])
+	env.Append(
+		LINKFLAGS=[
+			"-Wl,--defsym=LD_FLASH_OFFSET=%s"
+			% board_config.get("build.offset", hex(offset))
+		]
+	)
+
+machine_flags = [
+	"-mcpu=%s" % board_config.get("build.cpu"),
+	"-mthumb",
+]
 
 # Some GD32F303RET6 chips shipped without an FPU and there doesn't
 # seem to be an easy way to check
@@ -202,8 +223,11 @@ if board_config.get("build.cpu") == "cortex-m7":
 if board_config.get("build.cpu") == "cortex-m33":
 	machine_flags.extend(["-mfpu=fp-armv8", "-mfloat-abi=softfp"])
 
+maximum_ram_size = board_config.get("upload.maximum_ram_size")
+
 env.Append(
-	ASFLAGS=[
+	ASFLAGS=machine_flags,
+	ASPPFLAGS=[
 		"-x",
 		"assembler-with-cpp",
 	],
@@ -217,13 +241,11 @@ env.Append(
 		"-fno-exceptions",
 		"-fno-use-cxa-atexit",
 	],
-	CCFLAGS=[
+	CCFLAGS=machine_flags
+	+ [
 		"-Os",
-		"-mcpu=%s" % env.BoardConfig().get("build.cpu"),
-		"-mthumb",
 		"-ffunction-sections",
 		"-fdata-sections",
-		"-Wall",
 		"-nostdlib",
 		"--param",
 		"max-inline-insns-single=500",
@@ -243,6 +265,7 @@ env.Append(
 		join(FRAMEWORK_DIR, "cores", "arduino", "api", "deprecated-avr-comp"),
 		join(FRAMEWORK_DIR, "cores", "arduino", "gd32"),
 		join(FRAMEWORK_DIR, "cores", "arduino", "gd32", "Source"),
+		join(FRAMEWORK_DIR, "cores", "arduino", "gd32", "SPL"),
 		join(FRAMEWORK_DIR, "system", "startup"),
 		join(FRAMEWORK_DIR, "system", "CMSIS", "Core", "Include"),
 		join(FRAMEWORK_DIR, "system", "CMSIS", "DSP", "Include"),
@@ -254,10 +277,9 @@ env.Append(
 		join(FRAMEWORK_DIR, "cores", "arduino"),
 		variant_dir,
 	],
-	LINKFLAGS=[
+	LINKFLAGS=machine_flags
+	+ [
 		"-Os",
-		"-mcpu=%s" % env.BoardConfig().get("build.cpu"),
-		"-mthumb",
 		"--specs=nano.specs",
 		"-Wl,--gc-sections,--relax",
 		"-Wl,--check-sections",
@@ -266,9 +288,9 @@ env.Append(
 		"-Wl,--warn-common",
 		"-Wl,--defsym=LD_MAX_SIZE=%d" % board_config.get("upload.maximum_size"),
 		"-Wl,--defsym=LD_MAX_DATA_SIZE=%d" % board_config.get("upload.maximum_ram_size"),
+		'-Wl,-Map="%s"' % join("${BUILD_DIR}", "${PROGNAME}.map"),
 	],
 	LIBS=[
-		get_arm_math_lib(env.BoardConfig().get("build.cpu")),
 		"c",
 		"m",
 		"gcc",
@@ -288,9 +310,20 @@ configure_application_offset(mcu, upload_protocol)
 #
 
 if not board_config.get("build.ldscript", ""):
+	env.Replace(LDSCRIPT_PATH=join(FRAMEWORK_DIR, "system", "ldscript.ld"))
 	if not isfile(join(env.subst(variant_dir), "ldscript.ld")):
 		print("Warning! Cannot find linker script for the current target!\n")
-	env.Replace(LDSCRIPT_PATH=join(variant_dir, "ldscript.ld"))
+	env.Append(
+		LINKFLAGS=[
+			(
+				"-Wl,--default-script",
+				join(variant_dir,
+					board_config.get("build.arduino.ldscript", "ldscript.ld"),
+				),
+			)
+		]
+	)
+	#env.Replace(LDSCRIPT_PATH=join(variant_dir, "ldscript.ld"))
 
 #
 # Process configuration flags
@@ -303,7 +336,7 @@ process_usb_configuration(cpp_defines)
 process_usart_configuration(cpp_defines)
 
 # copy CCFLAGS to ASFLAGS (-x assembler-with-cpp mode)
-env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
+#env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
 
 env.Append(
 	LIBSOURCE_DIRS=[
@@ -318,11 +351,13 @@ env.Append(
 libs = []
 
 if "build.variant" in env.BoardConfig():
-	env.Append(CPPPATH=[variant_dir])
+	env.Append(CPPPATH=[variant_dir], LIBPATH=[variant_dir])
 	env.BuildSources(join("$BUILD_DIR", "FrameworkArduinoVariant"), variant_dir)
 
-env.BuildSources(
-	join("$BUILD_DIR", "FrameworkArduino"), join(FRAMEWORK_DIR, "cores", "arduino")
+libs.append(
+	env.BuildLibrary(
+		join("$BUILD_DIR", "FrameworkArduino"), join(FRAMEWORK_DIR, "cores", "arduino")
+	)
 )
 
 env.Prepend(LIBS=libs)

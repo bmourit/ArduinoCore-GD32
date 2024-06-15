@@ -26,7 +26,6 @@
 
 #include "Arduino.h"
 #include <stdio.h>
-
 extern "C" {
 #include "utility/drv_spi.h"
 }

@@ -37,10 +37,6 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_rcu.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 /* define clock source */
 #define SEL_IRC8M                   ((uint16_t)0U)  /* IRC8M is selected as CK_SYS */
 #define SEL_HXTAL                   ((uint16_t)1U)  /* HXTAL is selected as CK_SYS */
@@ -302,12 +298,7 @@ void rcu_bkp_reset_disable(void)
 */
 void rcu_system_clock_source_config(uint32_t ck_sys)
 {
-    uint32_t reg;
-    
-    reg = RCU_CFG0;
-    /* reset the SCS bits and set according to ck_sys */
-    reg &= ~RCU_CFG0_SCS;
-    RCU_CFG0 = (reg | ck_sys);
+    RCU_CFG0 = (RCU_CFG0 & ~RCU_CFG0_SCS) | ck_sys;
 }
 
 /*!
@@ -334,13 +325,7 @@ uint32_t rcu_system_clock_source_get(void)
 */
 void rcu_ahb_clock_config(uint32_t ck_ahb)
 {
-    uint32_t reg;
-    
-    reg = RCU_CFG0;
-
-    /* reset the AHBPSC bits and set according to ck_ahb */
-    reg &= ~RCU_CFG0_AHBPSC;
-    RCU_CFG0 = (reg | ck_ahb);
+    RCU_CFG0 = (RCU_CFG0 & ~RCU_CFG0_AHBPSC) | ck_ahb;
 }
 
 /*!
@@ -357,13 +342,7 @@ void rcu_ahb_clock_config(uint32_t ck_ahb)
 */
 void rcu_apb1_clock_config(uint32_t ck_apb1)
 {
-    uint32_t reg;
-    
-    reg = RCU_CFG0;
-
-    /* reset the APB1PSC and set according to ck_apb1 */
-    reg &= ~RCU_CFG0_APB1PSC;
-    RCU_CFG0 = (reg | ck_apb1);
+    RCU_CFG0 = (RCU_CFG0 & ~RCU_CFG0_APB1PSC) | ck_apb1;
 }
 
 /*!
@@ -380,13 +359,7 @@ void rcu_apb1_clock_config(uint32_t ck_apb1)
 */
 void rcu_apb2_clock_config(uint32_t ck_apb2)
 {
-    uint32_t reg;
-    
-    reg = RCU_CFG0;
-
-    /* reset the APB2PSC and set according to ck_apb2 */
-    reg &= ~RCU_CFG0_APB2PSC;
-    RCU_CFG0 = (reg | ck_apb2);
+    RCU_CFG0 = (RCU_CFG0 & ~RCU_CFG0_APB2PSC) | ck_apb2;
 }
 
 /*!
@@ -407,13 +380,7 @@ void rcu_apb2_clock_config(uint32_t ck_apb2)
 */
 void rcu_ckout0_config(uint32_t ckout0_src)
 {
-    uint32_t reg;
-    
-    reg = RCU_CFG0;
-
-    /* reset the CKOUT0SRC, set according to ckout0_src */
-    reg &= ~RCU_CFG0_CKOUT0SEL;
-    RCU_CFG0 = (reg | ckout0_src);
+    RCU_CFG0 = (RCU_CFG0 & ~RCU_CFG0_CKOUT0SEL) | ckout0_src;
 }
 
 /*!
@@ -430,15 +397,8 @@ void rcu_ckout0_config(uint32_t ckout0_src)
 */
 void rcu_pll_config(uint32_t pll_src, uint32_t pll_mul)
 {
-    uint32_t reg = 0U;
-
-    reg = RCU_CFG0;
-
-    /* PLL clock source and multiplication factor configuration */
-    reg &= ~(RCU_CFG0_PLLSEL | RCU_CFG0_PLLMF | RCU_CFG0_PLLMF_4 | RCU_CFG0_PLLMF_5);
-    reg |= (pll_src | pll_mul);
-
-    RCU_CFG0 = reg;
+    RCU_CFG0 = (RCU_CFG0 & ~(RCU_CFG0_PLLSEL | RCU_CFG0_PLLMF | RCU_CFG0_PLLMF_4 | RCU_CFG0_PLLMF_5)) |
+               (pll_src | pll_mul);
 }
 
 /*!
@@ -452,15 +412,7 @@ void rcu_pll_config(uint32_t pll_src, uint32_t pll_mul)
 */
 void rcu_pllpresel_config(uint32_t pll_presel)
 {
-    uint32_t reg = 0U;
-
-    reg = RCU_CFG1;
-
-    /* PLL clock source preselection */
-    reg &= ~RCU_CFG1_PLLPRESEL;
-    reg |= pll_presel;
-
-    RCU_CFG1 = reg;
+    RCU_CFG1 = (RCU_CFG1 & ~RCU_CFG1_PLLPRESEL) | pll_presel;
 }
 
 #if (defined(GD32F30X_HD) || defined(GD32F30X_XD))
@@ -473,17 +425,7 @@ void rcu_pllpresel_config(uint32_t pll_presel)
 */
 void rcu_predv0_config(uint32_t predv0_div)
 {
-    uint32_t reg = 0U;
-
-    reg = RCU_CFG0;
-    /* reset PREDV0 bit */
-    reg &= ~RCU_CFG0_PREDV0;
-    if(RCU_PREDV0_DIV2 == predv0_div){
-        /* set the PREDV0 bit */
-        reg |= RCU_CFG0_PREDV0;
-    }
-
-    RCU_CFG0 = reg;
+    RCU_CFG0 = (RCU_CFG0 & ~RCU_CFG0_PREDV0) | (predv0_div & RCU_CFG0_PREDV0);
 }
 #elif defined(GD32F30X_CL)
 /*!
@@ -500,15 +442,8 @@ void rcu_predv0_config(uint32_t predv0_div)
 */
 void rcu_predv0_config(uint32_t predv0_source, uint32_t predv0_div)
 {
-    uint32_t reg = 0U;
-    
-    reg = RCU_CFG1;
-    /* reset PREDV0SEL and PREDV0 bits */
-    reg &= ~(RCU_CFG1_PREDV0SEL | RCU_CFG1_PREDV0);
-    /* set the PREDV0SEL and PREDV0 division factor */
-    reg |= (predv0_source | predv0_div);
-
-    RCU_CFG1 = reg;
+    RCU_CFG1 = (RCU_CFG1 & ~(RCU_CFG1_PREDV0SEL | RCU_CFG1_PREDV0)) |
+               (predv0_source | predv0_div);
 }
 
 /*!
@@ -521,15 +456,7 @@ void rcu_predv0_config(uint32_t predv0_source, uint32_t predv0_div)
 */
 void rcu_predv1_config(uint32_t predv1_div)
 {
-    uint32_t reg = 0U;
-    
-    reg = RCU_CFG1;
-    /* reset the PREDV1 bits */
-    reg &= ~RCU_CFG1_PREDV1;
-    /* set the PREDV1 division factor */
-    reg |= predv1_div;
-
-    RCU_CFG1 = reg;
+    RCU_CFG1 = (RCU_CFG1 & ~RCU_CFG1_PREDV1) | (predv1_div & RCU_CFG1_PREDV1);
 }
 
 /*!
@@ -542,8 +469,7 @@ void rcu_predv1_config(uint32_t predv1_div)
 */
 void rcu_pll1_config(uint32_t pll_mul)
 {
-    RCU_CFG1 &= ~RCU_CFG1_PLL1MF;
-    RCU_CFG1 |= pll_mul;
+    RCU_CFG1 = (RCU_CFG1 & ~RCU_CFG1_PLL1MF) | pll_mul;
 }
 
 /*!
@@ -556,8 +482,7 @@ void rcu_pll1_config(uint32_t pll_mul)
 */
 void rcu_pll2_config(uint32_t pll_mul)
 {
-    RCU_CFG1 &= ~RCU_CFG1_PLL2MF;
-    RCU_CFG1 |= pll_mul; 
+    RCU_CFG1 = (RCU_CFG1 & ~RCU_CFG1_PLL2MF) | pll_mul;
 }
 #endif /* GD32F30X_HD and GD32F30X_XD */
 
@@ -664,12 +589,7 @@ void rcu_usb_clock_config(uint32_t usb_psc)
 */
 void rcu_rtc_clock_config(uint32_t rtc_clock_source)
 {
-    uint32_t reg;
-    
-    reg = RCU_BDCTL; 
-    /* reset the RTCSRC bits and set according to rtc_clock_source */
-    reg &= ~RCU_BDCTL_RTCSRC;
-    RCU_BDCTL = (reg | rtc_clock_source);
+    RCU_BDCTL = (RCU_BDCTL & ~RCU_BDCTL_RTCSRC) | rtc_clock_source;
 }
 
 #ifdef GD32F30X_CL
@@ -684,12 +604,7 @@ void rcu_rtc_clock_config(uint32_t rtc_clock_source)
 */
 void rcu_i2s1_clock_config(uint32_t i2s_clock_source)
 {
-    uint32_t reg;
-    
-    reg = RCU_CFG1; 
-    /* reset the I2S1SEL bit and set according to i2s_clock_source */
-    reg &= ~RCU_CFG1_I2S1SEL;
-    RCU_CFG1 = (reg | i2s_clock_source);
+    RCU_CFG1 = (RCU_CFG1 & ~RCU_CFG1_I2S1SEL) | i2s_clock_source;
 }
 
 /*!
@@ -703,12 +618,7 @@ void rcu_i2s1_clock_config(uint32_t i2s_clock_source)
 */
 void rcu_i2s2_clock_config(uint32_t i2s_clock_source)
 {
-    uint32_t reg;
-    
-    reg = RCU_CFG1; 
-    /* reset the I2S2SEL bit and set according to i2s_clock_source */
-    reg &= ~RCU_CFG1_I2S2SEL;
-    RCU_CFG1 = (reg | i2s_clock_source);
+    RCU_CFG1 = (RCU_CFG1 & ~RCU_CFG1_I2S2SEL) | i2s_clock_source;
 }
 #endif /* GD32F30X_CL */
 
@@ -723,12 +633,7 @@ void rcu_i2s2_clock_config(uint32_t i2s_clock_source)
 */
 void rcu_ck48m_clock_config(uint32_t ck48m_clock_source)
 {
-    uint32_t reg;
-    
-    reg = RCU_ADDCTL;
-    /* reset the CK48MSEL bit and set according to ck48m_clock_source */
-    reg &= ~RCU_ADDCTL_CK48MSEL;
-    RCU_ADDCTL = (reg | ck48m_clock_source);
+    RCU_ADDCTL = (RCU_ADDCTL & ~RCU_ADDCTL_CK48MSEL) | ck48m_clock_source;
 }
 
 /*!
@@ -744,13 +649,7 @@ void rcu_ck48m_clock_config(uint32_t ck48m_clock_source)
 */
 void rcu_lxtal_drive_capability_config(uint32_t lxtal_dricap)
 {
-    uint32_t reg;
-    
-    reg = RCU_BDCTL;
-    
-    /* reset the LXTALDRI bits and set according to lxtal_dricap */
-    reg &= ~RCU_BDCTL_LXTALDRI;
-    RCU_BDCTL = (reg | lxtal_dricap);
+    RCU_BDCTL = (RCU_BDCTL & ~RCU_BDCTL_LXTALDRI) | lxtal_dricap;
 }
 
 /*!
@@ -1209,6 +1108,7 @@ uint32_t rcu_clock_freq_get(rcu_clock_freq_enum clock)
 /*!
     \brief      get the clock stabilization and periphral reset flags
     \param[in]  flag: the clock stabilization and periphral reset flags, refer to rcu_flag_enum
+                only one parameter can be selected
                 only one parameter can be selected which is shown as below:
       \arg        RCU_FLAG_IRC8MSTB: IRC8M stabilization flag
       \arg        RCU_FLAG_HXTALSTB: HXTAL stabilization flag
@@ -1225,16 +1125,11 @@ uint32_t rcu_clock_freq_get(rcu_clock_freq_enum clock)
       \arg        RCU_FLAG_WWDGTRST: window watchdog timer reset flag
       \arg        RCU_FLAG_LPRST: low-power reset flag
     \param[out] none
-    \retval     none
+    \retval     FlagStatus: SET or RESET
 */
 FlagStatus rcu_flag_get(rcu_flag_enum flag)
 {
-    /* get the rcu flag */
-    if(RESET != (RCU_REG_VAL(flag) & BIT(RCU_BIT_POS(flag)))){
-        return SET;
-    }else{
-        return RESET;
-    }
+    return ((RCU_REG_VAL(flag) & BIT(RCU_BIT_POS(flag))) ? SET : RESET);
 }
 
 /*!
@@ -1266,12 +1161,7 @@ void rcu_all_reset_flag_clear(void)
 */
 FlagStatus rcu_interrupt_flag_get(rcu_int_flag_enum int_flag)
 {
-    /* get the rcu interrupt flag */
-    if(RESET != (RCU_REG_VAL(int_flag) & BIT(RCU_BIT_POS(int_flag)))){
-        return SET;
-    }else{
-        return RESET;
-    }
+    return ((RCU_REG_VAL(int_flag) & BIT(RCU_BIT_POS(int_flag))) ? SET : RESET);
 }
 
 /*!
@@ -1334,7 +1224,3 @@ void rcu_interrupt_disable(rcu_int_enum interrupt)
 {
     RCU_REG_VAL(interrupt) &= ~BIT(RCU_BIT_POS(interrupt));
 }
-
-#ifdef __cplusplus
-}
-#endif

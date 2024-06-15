@@ -107,12 +107,6 @@ extern "C" {
 extern const PinName digital_pins[];
 extern const uint32_t analog_pins[];
 
-/* TODO: Move these GPIO defines to gpio related file */
-/*------------------------------------------------------------------------------*/
-extern const uint32_t gpio_port[];
-extern const uint32_t gpio_pin[];
-/*------------------------------------------------------------------------------*/
-
 #define NOT_INTERRUPT   (uint32_t)NC
 
 /* Convert a digital pin to a PinName */

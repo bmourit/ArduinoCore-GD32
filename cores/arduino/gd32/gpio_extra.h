@@ -38,7 +38,7 @@
 #ifndef GPIO_EXTRA_H
 #define GPIO_EXTRA_H
 
-#include "gd32xxyy_gpio.h"
+#include "gd32xxyy_spl_gpio.h"
 
 #ifdef __cplusplus
 extern "C" {

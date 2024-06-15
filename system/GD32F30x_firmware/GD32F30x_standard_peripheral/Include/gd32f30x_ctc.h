@@ -55,7 +55,7 @@ extern "C" {
 
 /* bits definitions */
 /* CTC_CTL0 */
-#define CTC_CTL0_CKOKIE              BIT(0)                    /*!< clock trim OK(CKOKIF) interrupt enable */ 
+#define CTC_CTL0_CKOKIE              BIT(0)                    /*!< clock trim OK(CKOKIF)interrupt enable */ 
 #define CTC_CTL0_CKWARNIE            BIT(1)                    /*!< clock trim warning(CKWARNIF) interrupt enable */
 #define CTC_CTL0_ERRIE               BIT(2)                    /*!< error(ERRIF) interrupt enable */
 #define CTC_CTL0_EREFIE              BIT(3)                    /*!< EREFIF interrupt enable */

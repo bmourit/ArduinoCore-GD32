@@ -1,8 +1,7 @@
 #ifndef _WIRING_DIGITAL_EXTRA_H
 #define _WIRING_DIGITAL_EXTRA_H
 
-#include "gd32/PinConfigured.h"
-#include "gd32/PinNames.h"
+#include "gd32_def.h"
 
 #ifdef __cplusplus
 extern "C" {

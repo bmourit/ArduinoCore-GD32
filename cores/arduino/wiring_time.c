@@ -17,57 +17,41 @@
 */
 
 #include "Arduino.h"
-#include "systick.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-uint32_t millis(void)
+unsigned long millis(void)
 {
   // TODO: ensure no interrupts
-  return getCurrentMillis();
+  return getTickMs();
 }
 
 // Interrupt-compatible version of micros
-uint32_t micros(void)
+unsigned long micros(void)
 {
-  return getCurrentMicros();
+  return getTickUs();
 }
 
-void delay(uint32_t ms)
+void delay(unsigned long ms)
 {
-  if (ms == 0) {
-    return;
+  if (ms != 0) {
+    uint32_t start = getTickMs();
+    do {
+      yield();
+    } while (getTickMs() - start < ms);
   }
-
-  uint32_t start = micros();
-
-  do {
-    __NOP();
-  } while (micros() - start < ms);
 }
 
 void delayMicroseconds(unsigned int us)
 {
-  if (us == 0) {
-    return;
+  if (us != 0) {
+    uint32_t start = getTickUs();
+    do {
+      yield();
+    } while (getTickUs() - start < us);
   }
-
-  __IO uint32_t currentTicks = SysTick->VAL;
-  /* Number of ticks per millisecond */
-  const uint32_t tickPerMs = SysTick->LOAD + 1;
-  /* Number of ticks to count */
-  const uint32_t nbTicks = ((us - ((us > 0) ? 1 : 0)) * tickPerMs) / 1000;
-  /* Number of elapsed ticks */
-  uint32_t elapsedTicks = 0;
-  __IO uint32_t oldTicks = currentTicks;
-  do {
-    currentTicks = SysTick->VAL;
-    elapsedTicks += (oldTicks < currentTicks) ? tickPerMs + oldTicks - currentTicks :
-            oldTicks - currentTicks;
-    oldTicks = currentTicks;
-  } while (nbTicks > elapsedTicks);
 }
 
 #ifdef __cplusplus

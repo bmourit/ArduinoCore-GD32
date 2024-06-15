@@ -34,15 +34,27 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
  *  OF SUCH DAMAGE.
  */
-
 #ifndef GD32F30X_SAFE_CLOCKS_H
 #define GD32F30X_SAFE_CLOCKS_H
 
-#include "gd32f30x_rcu.h"
+#include "gd32_def.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef enum {
+  SOURCE_PLL_CK,
+#if defined(GD32F30X_CL)
+  SOURCE_PLL1_CK,
+  SOURCE_PLL2_CK,
+#endif
+  SOURCE_IRC40K,
+  SOURCE_IRC48M,
+  SOURCE_IRC8M,
+  SOURCE_LXTAL,
+  SOURCE_HXTAL
+} clock_source_t;
 
 #define RCU_HXTAL_OFF			0x00000000U
 #define RCU_HXTAL_ON			RCU_CTL_HXTALEN
@@ -65,13 +77,13 @@ extern "C" {
 #define RCU_HXTAL_PREDIV1	0U
 #define RCU_HXTAL_PREDIV2	1U
 
-typedef struct sc_pll_params_struct {
+typedef struct {
 	uint32_t pll_status;		/* pll_status: no_config, on, or off */
 	uint32_t pll_source_clock;	/* either IRC8M / 2, or HXTAL */
 	uint32_t pll_multiplier;	/* the multiplier of the pll clock */
 } SC_pll_params_t;
 
-typedef struct sc_clock_params_struct {
+typedef struct {
 	uint32_t clock;			/* sysclk, ahbclk, apb1clk, or apb2clk */
 	uint32_t system_source;		/* one of the RCU_CKSYSSRC Source values */
 	uint32_t ahbclk_div;
@@ -79,7 +91,7 @@ typedef struct sc_clock_params_struct {
 	uint32_t apb2clk_div;
 } SC_clock_params_t;
 
-typedef struct sc_oscillator_params_struct {
+typedef struct {
 	uint32_t osc;
 	uint32_t HXTAL_prediv;
 	uint32_t HXTAL_state;
@@ -90,7 +102,7 @@ typedef struct sc_oscillator_params_struct {
 	SC_pll_params_t pll_params;	
 } SC_oscillator_params_t;
 
-typedef struct sc_peripheral_params_struct {
+typedef struct {
 	uint32_t pclock;
 	uint32_t rtc_clk;
 	uint32_t adc_clk;
@@ -100,10 +112,10 @@ typedef struct sc_peripheral_params_struct {
 } SC_peripheral_params_t;
 
 typedef enum {
-   RCU_CLK_SYS = 0x00000001U,			/* system clock */
-   RCU_CLK_AHB = 0x00000002U,			/* AHB clock */
-   RCU_CLK_APB1 = 0x00000004U,			/* APB1 clock */
-   RCU_CLK_APB2 = 0x00000008U			/* APB2 clock */
+	RCU_CLK_SYS = 0x00000001U,			/* system clock */
+	RCU_CLK_AHB = 0x00000002U,			/* AHB clock */
+	RCU_CLK_APB1 = 0x00000004U,			/* APB1 clock */
+	RCU_CLK_APB2 = 0x00000008U			/* APB2 clock */
 } SC_clock_t;
 
 typedef enum {
@@ -140,8 +152,10 @@ SC_error_t SC_Periph_Params(SC_peripheral_params_t *periph_params);
 /* get the clock frequency to update the SystemCoreClock global paramater */
 uint32_t SC_get_system_clock_frequency(void);
 
+void clockEnable(clock_source_t clock_source);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* GD32F30X_BITS_RCU_H */
+#endif /* GD32F30X_SAFE_CLOCKS_H */

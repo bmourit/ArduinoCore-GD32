@@ -12,12 +12,6 @@
 #endif
 
 #include <errno.h>
-#include <unistd.h>
-
-#ifdef __cplusplus
-extern "C"
-#endif
-
 #undef errno
 extern int errno;
 
@@ -34,21 +28,27 @@ extern int errno;
 
 __attribute__((weak))caddr_t _sbrk(int incr)
 {
-  extern char _estack;          /* Defined in the linker script */
-  extern char _Min_Stack_Size;  /* Defined in the linker script */
-  extern char _end;             /* Defined by the linker */
-  static char *heap_end = &_end;
-  char *prev_heap_end = heap_end;
+  static char *heap_end;
+  char *prev_heap_end;
 
+  if (!heap_end)
+  {
+    extern char _estack;          /* Defined in the linker script */
+    extern char _Min_Stack_Size;  /* Defined in the linker script */
+    extern char _end;             /* Defined by the linker */
+    heap_end = &_end;
+
+    /* Ensure to keep minimum stack size defined in the linker script */
+    if (heap_end + incr >= (char *)(&_estack - &_Min_Stack_Size)) {
+      errno = ENOMEM;
+      return (caddr_t)-1;
+    }
+  }
+
+  prev_heap_end = heap_end;
   if (heap_end + incr > (char *)__get_MSP())
   {
     /* Heap and stack collision */
-    errno = ENOMEM;
-    return (caddr_t)-1;
-  }
-
-  /* Ensure to keep minimum stack size defined in the linker script */
-  if (heap_end + incr >= (char *)(&_estack - &_Min_Stack_Size)) {
     errno = ENOMEM;
     return (caddr_t)-1;
   }
@@ -103,7 +103,3 @@ __attribute__((weak))int _getpid(void)
 {
   return 1;
 }
-
-#ifdef __cplusplus
-}
-#endif

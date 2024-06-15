@@ -37,10 +37,6 @@ OF SUCH DAMAGE.
 
 #include "gd32f30x_dac.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 /* DAC register bit offset */
 #define DAC1_REG_OFFSET             ((uint32_t)16U)
 #define DH_12BIT_OFFSET             ((uint32_t)16U)
@@ -544,7 +540,3 @@ void dac_concurrent_data_set(uint32_t dac_align, uint16_t data0, uint16_t data1)
         break;
     }
 }
-
-#ifdef __cplusplus
-}
-#endif

@@ -18,6 +18,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 /* GPIO pins definitions */
 #define PA0                     PIN_A0
 #define PA1                     PIN_A1
@@ -181,6 +185,13 @@
 #define ADC_PRESCALE_DIV  RCU_CKADC_CKAPB2_DIV6
 #endif
 
+// set any spl modules to be excluded from the build
+#define SPL_ENET_DISABLE
+//#define SPL_EXTI_DISABLE
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 /*----------------------------------------------------------------------------
  *        Arduino objects - C++ only
  *----------------------------------------------------------------------------*/

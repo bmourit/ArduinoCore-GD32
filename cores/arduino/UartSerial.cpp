@@ -1,5 +1,5 @@
 /*
-  HardwareSerial.cpp - Hardware serial library for Wiring
+  UartSerial.cpp - Hardware serial library for Wiring
   Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -24,59 +24,58 @@
 
 #include <stdio.h>
 #include "Arduino.h"
-#include "HardwareSerial.h"
+#include "UartSerial.h"
 
-//#if defined(HAVE_HWSERIAL1) || defined(HAVE_HWSERIAL2) || defined(HAVE_HWSERIAL3) || defined(HAVE_HWSERIAL4)
+#if defined(SPL_USART_ENABLE)
+#if defined(HAVE_HWSERIAL1) || defined(HAVE_HWSERIAL2) || defined(HAVE_HWSERIAL3) || defined(HAVE_HWSERIAL4) || defined(HAVE_HWSERIAL5)
 
 // SerialEvent functions are weak, so when the user doesn't define them,
 // the linker just sets their address to 0 (which is checked below).
-// The Serialx_available is just a wrapper around Serialx.available(),
-// but implemented more low level so that we don't have a reference to Serialx.
-// also we can refer to it weakly so we don't pull in the entire
-// HardwareSerial instance if the user doesn't also refer to it.
-
 #if defined(HAVE_HWSERIAL1)
-HardwareSerial Serial1(UART_0);
+UartSerial Serial1(UART_0);
 void serialEvent1() __attribute__((weak));
 #endif
 
 #if defined(HAVE_HWSERIAL2)
-HardwareSerial Serial2(UART_1);
+UartSerial Serial2(UART_1);
 void serialEvent2() __attribute__((weak));
 #endif
 
 #if defined(HAVE_HWSERIAL3)
-HardwareSerial Serial3(UART_2);
+UartSerial Serial3(UART_2);
 void serialEvent3() __attribute__((weak));
 #endif
 
 #if defined(HAVE_HWSERIAL4)
-HardwareSerial Serial4(UART_3);
+UartSerial Serial4(UART_3);
 void serialEvent4() __attribute__((weak));
 #endif
 
 #if defined(HAVE_HWSERIAL5)
-HardwareSerial Serial5(UART_4);
+UartSerial Serial5(UART_4);
 void serialEvent5() __attribute__((weak));
 #endif
+#endif
 
-#define SERIAL_UART_DATA_MASK   0x07
+//#define SERIAL_UART_DATA_MASK   0x07
 
-HardwareSerial::HardwareSerial(uint32_t rx, uint32_t tx)
+UartSerial::UartSerial(uint32_t rx, uint32_t tx)
 {
   init(DIGITAL_TO_PINNAME(rx), DIGITAL_TO_PINNAME(tx));
 }
 
-HardwareSerial::HardwareSerial(PinName rx, PinName tx)
+UartSerial::UartSerial(PinName rx, PinName tx)
 {
   init(rx, tx);
 }
 
-HardwareSerial::HardwareSerial(UARTName periph, uart_halfduplex_flag hdFlag)
+UartSerial::UartSerial(UARTName periph, uart_halfduplex_flag hdFlag)
 {
+  /* assume half-duplex if pin_rx is not defined */
   _serial.pin_rx = NC;
+  /* set the rx/tx pins if Serial is defined in variant */
 #if defined(Serial) && defined(PIN_SERIAL_TX)
-  if ((void *)this == (void *)&Serial) {
+  if (this == &Serial) {
 #if defined(PIN_SERIAL_RX)
     setRx(PIN_SERIAL_RX);
 #endif
@@ -133,17 +132,17 @@ HardwareSerial::HardwareSerial(UARTName periph, uart_halfduplex_flag hdFlag)
   init(_serial.pin_rx, _serial.pin_tx);
 }
 
-HardwareSerial::HardwareSerial(uint32_t rxtx)
+UartSerial::UartSerial(uint32_t rxtx)
 {
   init(NC, DIGITAL_TO_PINNAME(rxtx));
 }
 
-HardwareSerial::HardwareSerial(PinName rxtx)
+UartSerial::UartSerial(PinName rxtx)
 {
   init(NC, rxtx);
 }
 
-void HardwareSerial::init(PinName rx, PinName tx)
+void UartSerial::init(PinName rx, PinName tx)
 {
   _serial.pin_rx = (rx == tx) ? NC : rx;
   _serial.pin_tx = tx;
@@ -155,7 +154,7 @@ void HardwareSerial::init(PinName rx, PinName tx)
   _serial.tx_tail = 0;
 }
 
-void HardwareSerial::_rx_complete_irq(serial_t *obj)
+void UartSerial::_rx_complete_irq(serial_t *obj)
 {
   unsigned char c;
   if (serial_getc(obj, &c) == 0) {
@@ -167,16 +166,17 @@ void HardwareSerial::_rx_complete_irq(serial_t *obj)
   }
 }
 
-int HardwareSerial::_tx_complete_irq(serial_t *obj)
+int UartSerial::_tx_complete_irq(serial_t *obj)
 {
   obj->tx_tail = (obj->tx_tail + 1) % SERIAL_TX_BUFFER_SIZE;
   if (obj->tx_head == obj->tx_tail) {
     return -1;
   }
+
   return 0;
 }
 
-void HardwareSerial::begin(unsigned long baud, byte config)
+void UartSerial::begin(unsigned long baud, uint16_t config)
 {
   uint32_t databits = 0;
   uint32_t stopbits = 0;
@@ -185,15 +185,15 @@ void HardwareSerial::begin(unsigned long baud, byte config)
   _baud = baud;
   _config = config;
 
-  /* Manage databits */
-  switch (config & SERIAL_UART_DATA_MASK) {
-    case 2:
+  /* manage databits */
+  switch (config & SERIAL_DATA_MASK) {
+    case SERIAL_DATA_6:
       databits = 6;
       break;
-    case 4:
+    case SERIAL_DATA_7:
       databits = 7;
       break;
-    case 6:
+    case SERIAL_DATA_8:
       databits = 8;
       break;
     default:
@@ -201,17 +201,17 @@ void HardwareSerial::begin(unsigned long baud, byte config)
       break;
   }
 
-  if ((config & 0x30) == 0x30) {
+  if ((config & SERIAL_PARITY_MASK) == SERIAL_PARITY_ODD) {
     parity = ParityOdd;
     databits++;
-  } else if ((config & 0x30) == 0x20) {
+  } else if ((config & SERIAL_PARITY_MASK) == SERIAL_PARITY_EVEN) {
     parity = ParityEven;
     databits++;
   } else {
     parity = ParityNone;
   }
 
-  if ((config & 0x08) == 0x08) {
+  if ((config & SERIAL_STOP_BIT_MASK) == SERIAL_STOP_BIT_2) {
     stopbits = USART_STB_2BIT;
   } else {
     stopbits = USART_STB_1BIT;
@@ -235,22 +235,22 @@ void HardwareSerial::begin(unsigned long baud, byte config)
   uart_attach_rx_callback(&_serial, _rx_complete_irq);
 }
 
-void HardwareSerial::end()
+void UartSerial::end()
 {
   // wait for any outstanding data to be sent
   flush();
-  // disable the USART
+  // disable and deinit the USART
   serial_free(&_serial);
-  // clear any received data
+  // clear received data
   _serial.rx_head = _serial.rx_tail;
 }
 
-int HardwareSerial::available(void)
+int UartSerial::available(void)
 {
   return ((unsigned int)(SERIAL_RX_BUFFER_SIZE + _serial.rx_head - _serial.rx_tail)) % SERIAL_RX_BUFFER_SIZE;
 }
 
-int HardwareSerial::peek(void)
+int UartSerial::peek(void)
 {
   if (_serial.rx_head  == _serial.rx_tail) {
     return -1;
@@ -259,10 +259,10 @@ int HardwareSerial::peek(void)
   }
 }
 
-int HardwareSerial::read(void)
+int UartSerial::read(void)
 {
   enableHalfDuplexRx();
-  // if the head isn't ahead of the tail, we don't have any characters
+  // we don't have any characters if the head isn't ahead of the tail
   if (_serial.rx_head == _serial.rx_tail) {
     return -1;
   } else {
@@ -272,7 +272,7 @@ int HardwareSerial::read(void)
   }
 }
 
-int HardwareSerial::availableForWrite(void)
+int UartSerial::availableForWrite(void)
 {
   tx_buffer_index_t head = _serial.tx_head;
   tx_buffer_index_t tail = _serial.tx_tail;
@@ -280,28 +280,26 @@ int HardwareSerial::availableForWrite(void)
   if (head >= tail) {
     return SERIAL_TX_BUFFER_SIZE - 1 - head + tail;
   }
+
   return tail - head - 1;
 }
 
-void HardwareSerial::flush()
+void UartSerial::flush()
 {
-  // If we have never written a byte, no need to flush. This special
-  // case is needed since there is no way to force the TXC (transmit
+  // no need to flush if we have never written a byte. This special
+  // case is needed since there is no way to force the TC (transmit
   // complete) bit to 1 during initialization
   if (!_written) {
     return;
   }
-  // wait for transmit data to be sent
+
   while ((_serial.tx_head != _serial.tx_tail)) {
-    // wait for transmit data to be sent
-    // nop, interrupt handler will free the space
+    // nop, since the interrupt handler will free the space
   }
-  // wait for transmission to complete
-  //while ((_serial.tx_state & OP_STATE_BUSY) != 0);
-  // If we get here, nothing is queued anymore
+  // nothing is queued anymore if we get here
 }
 
-size_t HardwareSerial::write(uint8_t c)
+size_t UartSerial::write(uint8_t c)
 {
   _written = true;
   if (isHalfDuplex()) {
@@ -325,37 +323,37 @@ size_t HardwareSerial::write(uint8_t c)
   return 1;
 }
 
-void HardwareSerial::setRx(uint32_t rx)
+void UartSerial::setRx(uint32_t rx)
 {
   _serial.pin_rx = DIGITAL_TO_PINNAME(rx);
 }
 
-void HardwareSerial::setTx(uint32_t tx)
+void UartSerial::setTx(uint32_t tx)
 {
   _serial.pin_tx = DIGITAL_TO_PINNAME(tx);
 }
 
-void HardwareSerial::setRx(PinName rx)
+void UartSerial::setRx(PinName rx)
 {
   _serial.pin_rx = rx;
 }
 
-void HardwareSerial::setTx(PinName tx)
+void UartSerial::setTx(PinName tx)
 {
   _serial.pin_tx = tx;
 }
 
-void HardwareSerial::setHalfDuplex(void)
+void UartSerial::setHalfDuplex(void)
 {
   _serial.pin_rx = NC;
 }
 
-bool HardwareSerial::isHalfDuplex(void) const
+bool UartSerial::isHalfDuplex(void) const
 {
   return _serial.pin_rx == NC;
 }
 
-void HardwareSerial::enableHalfDuplexRx(void)
+void UartSerial::enableHalfDuplexRx(void)
 {
   if (isHalfDuplex()) {
     // In half-duplex mode we have to wait for all TX characters to
@@ -367,3 +365,5 @@ void HardwareSerial::enableHalfDuplexRx(void)
     }
   }
 }
+
+#endif /* SPL_USART_ENABLE */

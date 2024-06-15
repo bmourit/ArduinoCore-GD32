@@ -26,7 +26,7 @@
 //#include "gd32f10x_fwdgt.h"
 //#include "gd32f10x_rcu.h"
 //#endif
-#include "gd32xxyy.h"
+#include "gd32_def.h"
 
 // Initialize static variable
 bool FWatchdogTimerClass::_FWDGT_enabled = false;

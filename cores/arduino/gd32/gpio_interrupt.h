@@ -3,9 +3,7 @@
 
 #include "gd32_def.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#if defined(SPL_EXTI_ENABLE)
 
 #ifndef EXTI_IRQ_PRIO
 #if (__CORTEX_M == 0x00U)
@@ -18,11 +16,9 @@ extern "C" {
 #define EXTI_IRQ_SUBPRIO  0
 #endif
 
-void gpio_interrupt_enable(uint32_t portNum, uint32_t pinNum, void (*callback)(void), uint32_t mode);
-void gpio_interrupt_disable(uint32_t pinNum);
+void gpio_interrupt_enable(uint32_t gpioPort, uint16_t pin, void (*callback)(void), uint32_t mode);
+void gpio_interrupt_disable(uint32_t gpioPort, uint16_t pin);
 
-#ifdef __cplusplus
-}
-#endif
+#endif /* SPL_EXTI_ENABLE */
 
 #endif /* _GPIO_INTERRUPT_ */

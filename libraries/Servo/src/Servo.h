@@ -26,6 +26,8 @@
 #ifndef _SERVO_H_
 #define _SERVO_H_
 
+#include <inttypes.h>
+
 typedef enum {
   _timer1,                    // Timer1 index
   _Nbr_16timers               // number of Timers

@@ -36,8 +36,10 @@
   ******************************************************************************
   */
 
+#include "gd32_def.h"
 #include "hw_config.h"
-#include "systick.h"
+#include "spl.h"
+#include "dwt.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,8 +52,13 @@ extern "C" {
   */
 void hw_config_init(void)
 {
-  /* start the free running time keeping clock */
-  tickInit(0x00U);
+  /* initialize ARM DWT */
+#ifdef DWT_BASE
+  ARM_DWT_init();
+#endif
+
+  SPL_init();
+
   /* Configure the system clock */
   SystemClock_Config();
 }

@@ -38,6 +38,10 @@ OF SUCH DAMAGE.
 #ifndef GD32F30X_H
 #define GD32F30X_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* define GD32F30x */
 #if !defined (GD32F30X_HD) && !defined (GD32F30X_XD) && !defined (GD32F30X_CL)
   #define GD32F30X_HD
@@ -48,10 +52,6 @@ OF SUCH DAMAGE.
 #if !defined (GD32F30X_HD) && !defined (GD32F30X_XD) && !defined (GD32F30X_CL)
  #error "Please select the target GD32F30x device in gd32f30x.h file"
 #endif /* undefine GD32F30x tip */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* define value of high speed crystal oscillator (HXTAL) in Hz */
 #if !defined(HXTAL_VALUE)
@@ -282,18 +282,10 @@ typedef enum IRQn
 #endif /* GD32F30X_CL */
 } IRQn_Type;
 
-#ifdef __cplusplus
-}
-#endif
-
 /* includes */
 #include "core_cm4.h"
 #include "system_gd32f30x.h"
 #include <stdint.h>
-
-#ifdef __cplusplus
- extern "C" {
-#endif
 
 /* enum definitions */
 typedef enum { DISABLE = 0, ENABLE = !DISABLE } EventStatus, ControlStatus;
@@ -308,49 +300,58 @@ typedef enum { ERROR = 0, SUCCESS = !ERROR } ErrStatus;
 #define BITS(start, end)             ((0xFFFFFFFFUL << (start)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(end))))
 #define GET_BITS(regval, start, end) (((regval) & BITS((start), (end))) >> (start))
 
+#define SET_BIT(REG, BIT)     ((REG) |= (BIT))
+#define CLEAR_BIT(REG, BIT)   ((REG) &= ~(BIT))
+#define READ_BIT(REG, BIT)    ((REG) & (BIT))
+#define CLEAR_REG(REG)        ((REG) = (0x0))
+#define WRITE_REG(REG, VAL)   ((REG) = (VAL))
+#define READ_REG(REG)         ((REG))
+#define MODIFY_REG(REG, CLEARMASK, SETMASK)  WRITE_REG((REG), (((READ_REG(REG)) & (~(CLEARMASK))) | (SETMASK)))
+#define POSITION_VAL(VAL)     (__CLZ(__RBIT(VAL)))
+
 /* main flash and SRAM memory map */
-#define FLASH_BASE            ((uint32_t)0x08000000U)        /*!< main FLASH base address          */
-#define SRAM_BASE             ((uint32_t)0x20000000U)        /*!< SRAM0 base address               */
-#define OB_BASE               ((uint32_t)0x1FFFF800U)        /*!< OB base address                  */
-#define DBG_BASE              ((uint32_t)0xE0042000U)        /*!< DBG base address                 */
-#define EXMC_BASE             ((uint32_t)0xA0000000U)        /*!< EXMC register base address       */
+#define FLASH_BASE            0x08000000UL        /*!< main FLASH base address          */
+#define SRAM_BASE             0x20000000UL        /*!< SRAM0 base address               */
+#define OB_BASE               0x1FFFF800UL        /*!< OB base address                  */
+#define DBG_BASE              0xE0042000UL        /*!< DBG base address                 */
+#define EXMC_BASE             0xA0000000UL        /*!< EXMC register base address       */
 
 /* peripheral memory map */
-#define APB1_BUS_BASE         ((uint32_t)0x40000000U)        /*!< apb1 base address                */
-#define APB2_BUS_BASE         ((uint32_t)0x40010000U)        /*!< apb2 base address                */
-#define AHB1_BUS_BASE         ((uint32_t)0x40018000U)        /*!< ahb1 base address                */
-#define AHB3_BUS_BASE         ((uint32_t)0x60000000U)        /*!< ahb3 base address                */
+#define APB1_BUS_BASE         0x40000000UL        /*!< apb1 base address                */
+#define APB2_BUS_BASE         0x40010000UL        /*!< apb2 base address                */
+#define AHB1_BUS_BASE         0x40018000UL        /*!< ahb1 base address                */
+#define AHB3_BUS_BASE         0x60000000UL        /*!< ahb3 base address                */
 
 /* advanced peripheral bus 1 memory map */
-#define TIMER_BASE            (APB1_BUS_BASE + 0x00000000U)  /*!< TIMER base address               */
-#define RTC_BASE              (APB1_BUS_BASE + 0x00002800U)  /*!< RTC base address                 */
-#define WWDGT_BASE            (APB1_BUS_BASE + 0x00002C00U)  /*!< WWDGT base address               */
-#define FWDGT_BASE            (APB1_BUS_BASE + 0x00003000U)  /*!< FWDGT base address               */
-#define SPI_BASE              (APB1_BUS_BASE + 0x00003800U)  /*!< SPI base address                 */
-#define USART_BASE            (APB1_BUS_BASE + 0x00004400U)  /*!< USART base address               */
-#define I2C_BASE              (APB1_BUS_BASE + 0x00005400U)  /*!< I2C base address                 */
-#define USBD_BASE             (APB1_BUS_BASE + 0x00005C00U)  /*!< USBD base address                */
-#define USBD_RAM_BASE         (APB1_BUS_BASE + 0x00006000U)  /*!< USBD RAM base address            */
-#define CAN_BASE              (APB1_BUS_BASE + 0x00006400U)  /*!< CAN base address                 */
-#define BKP_BASE              (APB1_BUS_BASE + 0x00006C00U)  /*!< BKP base address                 */
-#define PMU_BASE              (APB1_BUS_BASE + 0x00007000U)  /*!< PMU base address                 */
-#define DAC_BASE              (APB1_BUS_BASE + 0x00007400U)  /*!< DAC base address                 */
-#define CTC_BASE              (APB1_BUS_BASE + 0x0000C800U)  /*!< CTC base address                 */
+#define TIMER_BASE            (APB1_BUS_BASE + 0x00000000UL)  /*!< TIMER base address               */
+#define RTC_BASE              (APB1_BUS_BASE + 0x00002800UL)  /*!< RTC base address                 */
+#define WWDGT_BASE            (APB1_BUS_BASE + 0x00002C00UL)  /*!< WWDGT base address               */
+#define FWDGT_BASE            (APB1_BUS_BASE + 0x00003000UL)  /*!< FWDGT base address               */
+#define SPI_BASE              (APB1_BUS_BASE + 0x00003800UL)  /*!< SPI base address                 */
+#define USART_BASE            (APB1_BUS_BASE + 0x00004400UL)  /*!< USART base address               */
+#define I2C_BASE              (APB1_BUS_BASE + 0x00005400UL)  /*!< I2C base address                 */
+#define USBD_BASE             (APB1_BUS_BASE + 0x00005C00UL)  /*!< USBD base address                */
+#define USBD_RAM_BASE         (APB1_BUS_BASE + 0x00006000UL)  /*!< USBD RAM base address            */
+#define CAN_BASE              (APB1_BUS_BASE + 0x00006400UL)  /*!< CAN base address                 */
+#define BKP_BASE              (APB1_BUS_BASE + 0x00006C00UL)  /*!< BKP base address                 */
+#define PMU_BASE              (APB1_BUS_BASE + 0x00007000UL)  /*!< PMU base address                 */
+#define DAC_BASE              (APB1_BUS_BASE + 0x00007400UL)  /*!< DAC base address                 */
+#define CTC_BASE              (APB1_BUS_BASE + 0x0000C800UL)  /*!< CTC base address                 */
 
 /* advanced peripheral bus 2 memory map */
-#define AFIO_BASE             (APB2_BUS_BASE + 0x00000000U)  /*!< AFIO base address                */
-#define EXTI_BASE             (APB2_BUS_BASE + 0x00000400U)  /*!< EXTI base address                */
-#define GPIO_BASE             (APB2_BUS_BASE + 0x00000800U)  /*!< GPIO base address                */
-#define ADC_BASE              (APB2_BUS_BASE + 0x00002400U)  /*!< ADC base address                 */
+#define AFIO_BASE             (APB2_BUS_BASE + 0x00000000UL)  /*!< AFIO base address                */
+#define EXTI_BASE             (APB2_BUS_BASE + 0x00000400UL)  /*!< EXTI base address                */
+#define GPIO_BASE             (APB2_BUS_BASE + 0x00000800UL)  /*!< GPIO base address                */
+#define ADC_BASE              (APB2_BUS_BASE + 0x00002400UL)  /*!< ADC base address                 */
 
 /* advanced high performance bus 1 memory map */
-#define SDIO_BASE             (AHB1_BUS_BASE + 0x00000000U)  /*!< SDIO base address                */
-#define DMA_BASE              (AHB1_BUS_BASE + 0x00008000U)  /*!< DMA base address                 */
-#define RCU_BASE              (AHB1_BUS_BASE + 0x00009000U)  /*!< RCU base address                 */
-#define FMC_BASE              (AHB1_BUS_BASE + 0x0000A000U)  /*!< FMC base address                 */
-#define CRC_BASE              (AHB1_BUS_BASE + 0x0000B000U)  /*!< CRC base address                 */
-#define ENET_BASE             (AHB1_BUS_BASE + 0x00010000U)  /*!< ENET base address                */
-#define USBFS_BASE            (AHB1_BUS_BASE + 0x0FFE8000U)  /*!< USBFS base address               */
+#define SDIO_BASE             (AHB1_BUS_BASE + 0x00000000UL)  /*!< SDIO base address                */
+#define DMA_BASE              (AHB1_BUS_BASE + 0x00008000UL)  /*!< DMA base address                 */
+#define RCU_BASE              (AHB1_BUS_BASE + 0x00009000UL)  /*!< RCU base address                 */
+#define FMC_BASE              (AHB1_BUS_BASE + 0x0000A000UL)  /*!< FMC base address                 */
+#define CRC_BASE              (AHB1_BUS_BASE + 0x0000B000UL)  /*!< CRC base address                 */
+#define ENET_BASE             (AHB1_BUS_BASE + 0x00010000UL)  /*!< ENET base address                */
+#define USBFS_BASE            (AHB1_BUS_BASE + 0x0FFE8000UL)  /*!< USBFS base address               */
 
 /* define marco USE_STDPERIPH_DRIVER */
 #if !defined(USE_STDPERIPH_DRIVER)
