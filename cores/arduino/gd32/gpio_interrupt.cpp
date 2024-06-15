@@ -122,7 +122,7 @@ void gpio_interrupt_enable(uint32_t gpioPort, uint16_t pin, void (*callback)(voi
    * use the currently set mode and configure the port
    * NOTE: only pins set as input will be attaching interrupts.
    */
-  gpio_init(gpioPort, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, pin);
+  gpio_init(gpioPort, pupd, GPIO_OSPEED_50MHZ, pin);
 #elif defined(GD32F3x0) || defined(GD32F1x0) || defined(GD32E23x)
   rcu_periph_clock_enable(RCU_CFGCMP);
   //gpio_mode_set(portNum, GPIO_MODE_INPUT, GPIO_PUPD_NONE, pinNum);
