@@ -40,7 +40,7 @@
 #define __SYS_OSC_CLK   (__IRC8M)                /* main oscillator frequency */
 
 #ifndef VECT_TAB_OFFSET
-#define VECT_TAB_OFFSET   0x00000000UL  /* Vector Table base offset field must be a multiple of 0x200 */
+#define VECT_TAB_OFFSET   0x00007000UL  /* Vector Table base offset field must be a multiple of 0x200 */
 #endif
 
 #define SEL_IRC8M   0x00U
@@ -68,16 +68,15 @@ uint32_t SystemCoreClock = 16000000;
 const uint8_t AHBPrescaler[16U] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
 const uint8_t APBPrescTable[8U] =  {0, 0, 0, 0, 1, 2, 3, 4};
 
-
 static inline void CLOCKS_DELAY(uint32_t delay) {
-    uint32_t start = SysTick->VAL;
-    uint32_t end = start + delay * (SystemCoreClock / 1000U);
-    if (end < start) {  // in case of overflow
-        end -= SysTick->LOAD;  // adjust end to be relative to start
+    volatile uint32_t count;
+    while (delay > 0) {
+        // Simple delay loop
+        for (count = 0; count < 1000; count++) {
+            __asm__ volatile ("nop");
+        }
+        delay--;
     }
-    do {
-        __asm__ volatile("nop");
-    } while (SysTick->VAL < end);
 }
 
 /*!
@@ -86,34 +85,38 @@ static inline void CLOCKS_DELAY(uint32_t delay) {
 void SystemInit(void)
 {
 	// Reset the RCU clock configuration to the default reset state
-	RCU_CTL = RCU_CTL_IRC8MEN;
-	CLOCKS_DELAY(2000UL);
+	RCU_CTL |= 0x00000001U;
+	//CLOCKS_DELAY(2000UL);
 
 	// Reset SCS, SCSS, AHBPSC, APBPSC, APB1PSC, APB2PSC, ADCPSC, ADCPSC_2, and CKOUT0SEL
-	RCU_CFG0 &= 0xE8FF0000UL;
+	//RCU_CFG0 &= 0xE8FF0000UL;
+	RCU_CFG0 &= 0xF8FF0000U;
 
 #if defined(GD32F30X_HD) || defined(GD32F30X_XD)
 	// Reset HXTALEN, CKMEN, and PLLEN bits
-	RCU_CTL &= ~(RCU_CTL_PLLEN | RCU_CTL_CKMEN | RCU_CTL_HXTALEN);
+	//RCU_CTL &= ~(RCU_CTL_PLLEN | RCU_CTL_CKMEN | RCU_CTL_HXTALEN);
+	RCU_CTL &= 0xFEF6FFFFU;
+	RCU_CTL &= 0xFFFBFFFFU;
+	RCU_CFG0 &= 0xFF80FFFFU;
 #else
 	// Reset HXTALEN, CKMEN, PLLEN, PLL1EN, and PLL2EN bits
 	RCU_CTL &= ~(RCU_CTL_PLLEN | RCU_CTL_PLL1EN | RCU_CTL_PLL2EN | RCU_CTL_CKMEN | RCU_CTL_HXTALEN);
 #endif
 
 	// Reset HXTALBPS bit
-	RCU_CTL &= ~(RCU_CTL_HXTALBPS);
+	//RCU_CTL &= ~(RCU_CTL_HXTALBPS);
 
 	// Reset PLLSEL, PREDV0, PLLMF, USBDPSC, PLLMF_4, PLLMF_5, and USBDPSC_2 bits
-	RCU_CFG0 &= ~(RCU_CFG0_PLLSEL | RCU_CFG0_PREDV0 | RCU_CFG0_PLLMF | RCU_CFG0_USBDPSC | RCU_CFG0_PLLMF_4 | RCU_CFG0_PLLMF_5 | RCU_CFG0_USBDPSC_2);
+	//RCU_CFG0 &= ~(RCU_CFG0_PLLSEL | RCU_CFG0_PREDV0 | RCU_CFG0_PLLMF | RCU_CFG0_USBDPSC | RCU_CFG0_PLLMF_4 | RCU_CFG0_PLLMF_5 | RCU_CFG0_USBDPSC_2);
 
 #if defined(GD32F30X_HD) || defined(GD32F30X_XD)
 	// Disable all interrupts
-	RCU_INT = 0x009F0000UL;
+	RCU_INT = 0x009F0000U;
 #else
 	// Reset PLL1EN and PLL2EN bits
 	RCU_CTL &= ~(RCU_CTL_PLL1EN | RCU_CTL_PLL2EN);
 	// Disable all interrupts
-	RCU_INT = 0x00FF0000UL;
+	RCU_INT = 0x00FF0000U;
 #endif
 
 	// Set the vector table offset

@@ -76,7 +76,7 @@ class UartSerial : public arduino::HardwareSerial
 	public:
 		UartSerial(uint32_t rx, uint32_t tx);
 		UartSerial(PinName rx, PinName tx);
-		UartSerial(UARTName periph, uart_halfduplex_flag hfFlag = UART_HALFDUPLEX_DISABLE);
+		UartSerial(UARTName periph, uart_halfduplex_flag hdFlag = UART_HALFDUPLEX_DISABLE);
 		UartSerial(uint32_t rxtx);
 		UartSerial(PinName rxtx);
 		void begin(unsigned long baud)

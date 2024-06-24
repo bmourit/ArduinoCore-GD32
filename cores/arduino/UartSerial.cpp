@@ -73,6 +73,7 @@ UartSerial::UartSerial(UARTName periph, uart_halfduplex_flag hdFlag)
 {
   /* assume half-duplex if pin_rx is not defined */
   _serial.pin_rx = NC;
+  _serial.pin_tx = NC;
   /* set the rx/tx pins if Serial is defined in variant */
 #if defined(Serial) && defined(PIN_SERIAL_TX)
   if (this == &Serial) {
@@ -126,9 +127,12 @@ UartSerial::UartSerial(UARTName periph, uart_halfduplex_flag hdFlag)
     _serial.pin_rx = pinmap_pin((UARTName)periph, PinMap_UART_RX);
     _serial.pin_tx = pinmap_pin((UARTName)periph, PinMap_UART_TX);
   }
+
+  // Handle half-duplex mode
   if (hdFlag == UART_HALFDUPLEX_ENABLE) {
     _serial.pin_rx = NC;
   }
+
   init(_serial.pin_rx, _serial.pin_tx);
 }
 
@@ -185,38 +189,41 @@ void UartSerial::begin(unsigned long baud, uint16_t config)
   _baud = baud;
   _config = config;
 
-  /* manage databits */
+  // Manage databits
   switch (config & SERIAL_DATA_MASK) {
-    case SERIAL_DATA_6:
-      databits = 6;
-      break;
-    case SERIAL_DATA_7:
-      databits = 7;
-      break;
+    //case SERIAL_DATA_6:
+      //databits = USART_WL_6BIT;
+      //break;
+    //case SERIAL_DATA_7:
+      //databits = USART_WL_7BIT;
+      //break;
     case SERIAL_DATA_8:
-      databits = 8;
+      databits = USART_WL_8BIT;
       break;
     default:
       databits = 0;
       break;
   }
 
+  // Manage parity
   if ((config & SERIAL_PARITY_MASK) == SERIAL_PARITY_ODD) {
     parity = ParityOdd;
-    databits++;
+    databits++; // Increase databits for parity
   } else if ((config & SERIAL_PARITY_MASK) == SERIAL_PARITY_EVEN) {
     parity = ParityEven;
-    databits++;
+    databits++; // Increase databits for parity
   } else {
     parity = ParityNone;
   }
 
+  // Manage stopbits
   if ((config & SERIAL_STOP_BIT_MASK) == SERIAL_STOP_BIT_2) {
     stopbits = USART_STB_2BIT;
   } else {
     stopbits = USART_STB_1BIT;
   }
 
+  // Adjust databits
   switch (databits) {
     case 8:
       databits = USART_WL_8BIT;
@@ -225,23 +232,30 @@ void UartSerial::begin(unsigned long baud, uint16_t config)
       databits = USART_WL_9BIT;
       break;
     default:
-    case 0:
+      // Handle invalid databits configuration
       Error_Handler();
       break;
   }
 
+  // Initialize the serial peripheral
   serial_init(&_serial, (uint32_t)baud, databits, (SerialParity)parity, stopbits);
-  enableHalfDuplexRx();
+
+  // Enable half-duplex RX if needed
+  if (_serial.pin_rx == NC) {
+    enableHalfDuplexRx();
+  }
+
+  // Attach RX complete IRQ handler
   uart_attach_rx_callback(&_serial, _rx_complete_irq);
 }
 
 void UartSerial::end()
 {
-  // wait for any outstanding data to be sent
+  // Wait for any outstanding data to be sent
   flush();
-  // disable and deinit the USART
+  // Disable and deinit the USART
   serial_free(&_serial);
-  // clear received data
+  // Clear received data
   _serial.rx_head = _serial.rx_tail;
 }
 

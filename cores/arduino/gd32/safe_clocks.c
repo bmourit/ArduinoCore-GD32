@@ -34,11 +34,20 @@
 #include "safe_clocks.h"
 //#include "gd32_def.h"
 
-static inline void CLOCKS_DELAY(uint32_t delay) {
-	uint32_t cycles_per_ms = (SystemCoreClock / 1000U);
-	volatile uint32_t i;
-	for (i = 0; i < delay * cycles_per_ms; i++) {
-	}
+#define RCU_SOURCE_IRC8M	0U
+#define RCU_SOURCE_HXTAL	1U
+#define RCU_SOURCE_PLL		2U
+
+static inline void CLOCKS_DELAY(uint32_t delay)
+{
+    volatile uint32_t count;
+    while (delay > 0) {
+        // Simple delay loop
+        for (count = 0; count < delay; count++) {
+            __asm__ volatile ("nop");
+        }
+        delay--;
+    }
 }
 
 /**
@@ -90,7 +99,7 @@ SC_error_t SC_set_flash_wait_state(uint32_t wait_state_value)
 SC_error_t SC_Clock_Params(SC_clock_params_t *clock_params, uint32_t wait_state_value)
 {
 	uint32_t reg = 0U;
-	volatile uint32_t timeout = 0U;
+	__IO uint32_t timeout = 0U;
 
 	if (clock_params == NULL) {
 		return SC_ERROR;
@@ -197,12 +206,12 @@ uint32_t SC_get_system_clock_frequency(void)
 	uint32_t sysclk_freq = 0U;
 
 	reg = RCU_CFG0;
-	switch (reg & RCU_CFG0_SCSS) {
-		case RCU_SCSS_HXTAL: {
+	switch ((reg & RCU_CFG0_SCSS) >> 2) {
+		case RCU_SOURCE_HXTAL: {
 			sysclk_freq = HXTAL_VALUE;
 			break;
 		}
-		case RCU_SCSS_PLL: {
+		case RCU_SOURCE_PLL: {
 			pllmf_tmp = ((((reg & PLLMF_4) >> 27) << 4) | ((reg & RCU_CFG0_PLLMF) >> 18));
 			pllmf = pll_multipliers[(uint32_t)pllmf_tmp];
 			if ((reg & RCU_CFG0_PLLSEL) != RCU_PLLSRC_IRC8M_DIV2) {
@@ -215,7 +224,7 @@ uint32_t SC_get_system_clock_frequency(void)
 			sysclk_freq = pllclk;
 			break;
 		}
-		case RCU_SCSS_IRC8M:
+		case RCU_SOURCE_IRC8M:
 		default: {
 			sysclk_freq = IRC8M_VALUE;
 			break;
@@ -236,7 +245,7 @@ SC_error_t SC_Osc_Params(SC_oscillator_params_t *osc_params)
 
 	if (((osc_params->osc) & RCU_OSC_HXTAL) == RCU_OSC_HXTAL) {
 		/* if HXTAL is sytem clock it can never be turned off */
-		if (((RCU_CFG0 & RCU_CFG0_SCSS) == RCU_SCSS_HXTAL) || (((RCU_CFG0 & RCU_CFG0_SCSS) == RCU_SCSS_PLL) && ((RCU_CFG0 & RCU_CFG0_PLLSEL) == RCU_PLLSRC_HXTAL_IRC48M))) {
+		if ((((RCU_CFG0 & RCU_CFG0_SCSS) >> 2) == RCU_SOURCE_HXTAL) || ((((RCU_CFG0 & RCU_CFG0_SCSS) >> 2) == RCU_SOURCE_PLL) && ((RCU_CFG0 & RCU_CFG0_PLLSEL) == RCU_PLLSRC_HXTAL_IRC48M))) {
 			if ((rcu_flag_get(RCU_FLAG_HXTALSTB) != RESET) && (osc_params->HXTAL_state == RCU_HXTAL_OFF)) {
 				return SC_ERROR;
 			}
@@ -296,7 +305,7 @@ SC_error_t SC_Osc_Params(SC_oscillator_params_t *osc_params)
 		}
 	}
 	if (((osc_params->osc) & RCU_OSC_IRC8M) == RCU_OSC_IRC8M) {
-		if (((RCU_CFG0 & RCU_CFG0_SCSS) == RCU_SCSS_IRC8M) || (((RCU_CFG0 & RCU_CFG0_SCSS) == RCU_SCSS_PLL) && ((RCU_CFG0 & RCU_CFG0_PLLSEL) == RCU_PLLSRC_IRC8M_DIV2))) {
+		if ((((RCU_CFG0 & RCU_CFG0_SCSS) >> 2) == RCU_SOURCE_IRC8M) || ((((RCU_CFG0 & RCU_CFG0_SCSS) >> 2) == RCU_SOURCE_PLL) && ((RCU_CFG0 & RCU_CFG0_PLLSEL) == RCU_PLLSRC_IRC8M_DIV2))) {
 			if ((rcu_flag_get(RCU_FLAG_IRC8MSTB) != RESET) && (osc_params->IRC8M_state != RCU_IRC8M_ON)) {
 				return SC_ERROR;
 			} else {
@@ -451,7 +460,7 @@ SC_error_t SC_Osc_Params(SC_oscillator_params_t *osc_params)
 	}
 
 	if ((osc_params->pll_params.pll_status) != RCU_PLL_NONE) {
-		if ((RCU_CFG0 & RCU_CFG0_SCSS) != RCU_SCSS_PLL) {
+		if (((RCU_CFG0 & RCU_CFG0_SCSS) >> 2) != RCU_SOURCE_PLL) {
 			if ((osc_params->pll_params.pll_status) == RCU_PLL_ON) {
 				reg = RCU_CTL;
 				reg &= ~RCU_CTL_PLLEN;

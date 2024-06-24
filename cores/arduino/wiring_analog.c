@@ -41,7 +41,7 @@ static uint32_t _analog_write_freq = PWM_FREQUENCY;
 void analogReference(uint8_t mode)
 {
   // TODO: implement this
-  //(void)mode;
+  (void)mode;
 }
 
 static inline uint32_t mapResolution(uint32_t value, uint32_t from, uint32_t to)
@@ -63,10 +63,29 @@ static inline uint32_t mapResolution(uint32_t value, uint32_t from, uint32_t to)
 int analogRead(pin_size_t pin)
 {
   uint32_t value = 0;
+  bool internalChannel = true;
   PinName p = analog_pin_to_PinName(pin);
+  switch (pin) {
+   case ADC_TEMP:
+      p = ADC_TEMP;
+      break;
+    case ADC_VREF:
+      p = ADC_VREF;
+      break;
+    default:
+      pinMode(pin, INPUT_ANALOG);
+      internalChannel = false;
+      break;
+  }
   if (p != NC) {
+    if (internalChannel) {
+      adc_tempsensor_vrefint_enable();
+    }
     value = get_adc_value(p, internal_analog_read_resolution);
     value = mapResolution(value, internal_analog_read_resolution, _analog_read_resolution);
+    if (internalChannel) {
+      adc_tempsensor_vrefint_disable();
+    }
   }
 
   return value;
@@ -80,22 +99,22 @@ void analogWrite(pin_size_t pin, int value)
 {
   uint8_t needs_init = 0;
   //uint32_t ulValue;
-  PinName pn = DIGITAL_TO_PINNAME(pin);
-  if (pn != NC) {
-    if (pin_in_pinmap(pn, PinMap_DAC)) {
-      if (PIN_IS_CONFIG(pn, gpioOutputPinIsConfigured) == false) {
+  PinName p = DIGITAL_TO_PINNAME(pin);
+  if (p != NC) {
+    if (pin_in_pinmap(p, PinMap_DAC)) {
+      if (PIN_IS_CONFIG(p, gpioOutputPinIsConfigured) == false) {
         needs_init = 1;
-        SET_PIN_CONFIG(pn, gpioOutputPinIsConfigured);
+        SET_PIN_CONFIG(p, gpioOutputPinIsConfigured);
       }
       value = mapResolution(value, _analog_write_resolution, DAC_RESOLUTION);
-      set_dac_value(pn, value, needs_init);
-    } else if (pin_in_pinmap(pn, PinMap_PWM)) {
-      if (PIN_IS_CONFIG(pn, gpioOutputPinIsConfigured) == false) {
-        SET_PIN_CONFIG(pn, gpioOutputPinIsConfigured);
+      set_dac_value(p, value, needs_init);
+    } else if (pin_in_pinmap(p, PinMap_PWM)) {
+      if (PIN_IS_CONFIG(p, gpioOutputPinIsConfigured) == false) {
+        SET_PIN_CONFIG(p, gpioOutputPinIsConfigured);
       }
       value = mapResolution(value, _analog_write_resolution, internal_analog_write_resolution);
       /* handle special cases: 100% off and 100% on */
-      pwm_start(pn, _analog_write_freq, value, internal_analog_write_resolution);
+      pwm_start(p, _analog_write_freq, value, internal_analog_write_resolution);
     } else {
       /* default to digital write */
       pinMode(pin, OUTPUT);

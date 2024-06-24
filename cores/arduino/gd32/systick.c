@@ -147,7 +147,7 @@ uint32_t getTickUs(void)
   uint32_t ms = msTicks;
   uint32_t us = SysTick->LOAD - SysTick->VAL;
 
-  if (SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) {
+  if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == SysTick_CTRL_COUNTFLAG_Msk) {
     ms = msTicks;
     us = SysTick->LOAD - SysTick->VAL;
   }

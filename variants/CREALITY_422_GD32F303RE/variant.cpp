@@ -107,31 +107,26 @@ extern "C" {
 
 #if defined(SAFE_CLOCKS_ENABLE)
 
+static void set_pmu_output_voltage(void);
+static void set_pmu_highdrive(void);
+
 WEAK void SystemClock_Config(void)
 {
   SC_oscillator_params_t osc_params = {};
   SC_clock_params_t clock_params = {};
   SC_peripheral_params_t pclk_params = {};
 
-  uint32_t reg = RCU_APB1EN;
-  reg &= ~RCU_APB1EN_PMUEN;
-  reg |= RCU_APB1EN_PMUEN;
-  RCU_APB1EN = reg;
-
-  reg = PMU_CTL;
-  reg &= ~PMU_CTL_LDOVS;
-  reg |= (3 << 14);
-  PMU_CTL = reg;
+  set_pmu_output_voltage();
 
   osc_params.osc = RCU_OSC_HXTAL;
   osc_params.HXTAL_state = RCU_HXTAL_ON;
-  //osc_params.HXTAL_prediv = RCU_HXTAL_PREDIV2;
-  osc_params.HXTAL_prediv = RCU_HXTAL_PREDIV1;
+  osc_params.HXTAL_prediv = RCU_HXTAL_PREDIV2;
+  //osc_params.HXTAL_prediv = RCU_HXTAL_PREDIV1;
   osc_params.IRC8M_state = RCU_IRC8M_ON;
   osc_params.pll_params.pll_status = RCU_PLL_ON;
   osc_params.pll_params.pll_source_clock = RCU_PLLSRC_HXTAL_IRC48M;
-  //osc_params.pll_params.pll_multiplier = RCU_PLL_MUL30;
-  osc_params.pll_params.pll_multiplier = RCU_PLL_MUL9;
+  osc_params.pll_params.pll_multiplier = RCU_PLL_MUL30;
+  //osc_params.pll_params.pll_multiplier = RCU_PLL_MUL9;
   if (SC_Osc_Params(&osc_params) != SC_OK) {
     Error_Handler();
   }
@@ -145,29 +140,45 @@ WEAK void SystemClock_Config(void)
     Error_Handler();
   }
 
-  /* enable the high-drive to extend the clock frequency to 120 MHz */
-  reg = PMU_CTL;
-  reg &= ~PMU_CTL_HDEN;
-  reg |= PMU_CTL_HDEN;
-  PMU_CTL = reg;
-  volatile uint32_t stable = ((PMU_CS & PMU_CS_HDRF) >> 16);
-  while (stable == 0U) {
-  }
-
-  /* select the high-drive mode */
-  reg = PMU_CTL;
-  reg &= ~PMU_CTL_HDS;
-  reg |= PMU_CTL_HDS;
-  PMU_CTL = reg;
-  volatile uint32_t stable = ((PMU_CS & PMU_CS_HDSRF) >> 17);
-  while (stable == 0U) {
-  }
+  set_pmu_highdrive();
 
   pclk_params.pclock = RCU_PERIPHCLK_ADC;
   //pclk_params.adc_clk = RCU_CKADC_CKAPB2_DIV8;
   pclk_params.adc_clk = RCU_CKADC_CKAPB2_DIV4;
   if (SC_Periph_Params(&pclk_params) != SC_OK) {
     Error_Handler();
+  }
+}
+
+static void set_pmu_output_voltage(void)
+{
+  uint32_t reg = PMU_CTL;
+  reg &= ~PMU_CTL_LDOVS;
+  reg |= (3 << 14);
+  PMU_CTL = reg;
+}
+
+static void set_pmu_highdrive(void)
+{
+  if (((PMU_CS & (PMU_CS_HDRF)) >> 16) == 0U) {
+    //do {
+      //__IO uint32_t read;
+      uint32_t reg = PMU_CTL;
+      reg &= ~PMU_CTL_HDEN;
+      reg |= PMU_CTL_HDEN;
+      PMU_CTL = reg;
+      //read = (PMU_CS & (PMU_CS_HDRF));
+    //} while (0U);
+  }
+
+  if (((PMU_CS & (PMU_CS_HDSRF)) >> 17) == 0U) {
+    //do {
+      //__IO uint32_t read;
+      uint32_t reg = PMU_CTL;
+      reg &= ~PMU_CTL_HDS;
+      reg |= PMU_CTL_HDS;
+      //read = (PMU_CS & (PMU_CS_HDSRF));
+    //} while (0U);
   }
 }
 

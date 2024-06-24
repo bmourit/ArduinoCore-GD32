@@ -44,17 +44,17 @@
 extern "C" {
 #endif
 
-__STATIC_INLINE void gpio_digital_toggle(uint32_t gpiox, uint32_t pins)
+static inline void gpio_digital_toggle(uint32_t gpiox, uint32_t pins)
 {
 	GPIO_OCTL(gpiox) = ((GPIO_OCTL(gpiox)) ^ (pins & 0x0000FFFFU));
 }
 
-__STATIC_INLINE void gpio_pin_set_output(uint32_t gpiox, uint32_t pins)
+static inline void gpio_pin_set_output(uint32_t gpiox, uint32_t pins)
 {
 	GPIO_BOP(gpiox) = (pins & 0x0000FFFFU);
 }
 
-__STATIC_INLINE void gpio_pin_reset_output(uint32_t gpiox, uint32_t pins)
+static inline void gpio_pin_reset_output(uint32_t gpiox, uint32_t pins)
 {
 	GPIO_BC(gpiox) = (pins & 0x0000FFFFU);
 }

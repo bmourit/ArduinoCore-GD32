@@ -18,10 +18,6 @@
 
 #include "pins_arduino.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 uint32_t PinName_to_digital(PinName p)
 {
   uint32_t i = DIGITAL_PINS_NUM;
@@ -99,7 +95,3 @@ uint32_t digital_pin_to_analog(uint32_t pin)
 #endif /* ANALOG_PINS_NUM > 0 */
   return ret;
 }
-
-#ifdef __cplusplus
-}
-#endif

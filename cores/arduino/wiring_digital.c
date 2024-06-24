@@ -90,58 +90,6 @@ void digitalToggle(pin_size_t pin)
   gpio_bit_write(port, gpiopin, (bit_status)(1 - (FlagStatus)gpio_input_bit_get(port, gpiopin)));
 }
 
-/**
- * converts PORTx to GPIOx that correspond to the register base addresses
- * 
- * Problem: These are defined per mcu family in the header file, which means
- * they could be defined even if the specific mcu chip doesn't have them
- * 
- * TODO: consider adding a file for undefining these beforehand on a per-chip basis.
- */
-//const uint32_t gpio_port[] = {
-//  GPIOA,
-//  GPIOB,
-//  GPIOC,
-//#ifdef GPIOD
-//  GPIOD,
-//#endif
-//#ifdef GPIOE
-//  GPIOE,
-//#endif
-//#ifdef GPIOF
-//  GPIOF,
-//#endif
-//#ifdef GPIOG
-//  GPIOG,
-//#endif
-//#ifdef GPIOH
-//  GPIOH,
-//#endif
-//#ifdef GPIOI
-//  GPIOI
-//#endif
-//};
-
-/* converts pinname to gpio pin bit location in register */
-/*const uint32_t gpio_pin[] = {
-  GPIO_PIN_0,
-  GPIO_PIN_1,
-  GPIO_PIN_2,
-  GPIO_PIN_3,
-  GPIO_PIN_4,
-  GPIO_PIN_5,
-  GPIO_PIN_6,
-  GPIO_PIN_7,
-  GPIO_PIN_8,
-  GPIO_PIN_9,
-  GPIO_PIN_10,
-  GPIO_PIN_11,
-  GPIO_PIN_12,
-  GPIO_PIN_13,
-  GPIO_PIN_14,
-  GPIO_PIN_15
-};*/
-
 #ifdef __cplusplus
 }
 #endif

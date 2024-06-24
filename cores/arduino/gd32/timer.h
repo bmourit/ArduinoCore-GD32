@@ -31,6 +31,7 @@ OF SUCH DAMAGE.
 #include "gd32_def.h"
 #include "PinNames.h"
 #include "PeripheralNames.h"
+
 #include <stdbool.h>
 
 #ifdef __cplusplus

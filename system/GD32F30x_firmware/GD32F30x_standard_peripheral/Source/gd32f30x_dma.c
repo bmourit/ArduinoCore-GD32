@@ -246,7 +246,7 @@ void dma_memory_to_memory_disable(uint32_t dma_periph, dma_channel_enum channelx
 */
 void dma_channel_enable(uint32_t dma_periph, dma_channel_enum channelx)
 {
-    if(ERROR == dma_periph_and_channel_check(dma_periph, channelx)){
+    if (ERROR == dma_periph_and_channel_check(dma_periph, channelx)) {
         DMA_WRONG_HANDLE
     }
 

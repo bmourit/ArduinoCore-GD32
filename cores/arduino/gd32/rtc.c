@@ -28,10 +28,6 @@ OF SUCH DAMAGE.
 #include "rtc.h"
 #include <time.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 static clock_source_t _clk_src = SOURCE_LXTAL;
 static uint8_t _HXTAL_divider = 0;
 
@@ -491,7 +487,3 @@ uint32_t mkTimtoStamp(UTCTimeStruct *utcTime)
                        utcTime->seconds);
   return timestamp;
 }
-
-#ifdef __cplusplus
-}
-#endif

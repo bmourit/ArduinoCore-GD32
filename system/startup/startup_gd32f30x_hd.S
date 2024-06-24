@@ -304,13 +304,13 @@ g_pfnVectors:
 	.thumb_set SPI1_IRQHandler,Default_Handler
 
 	.weak USART0_IRQHandler
-	.thumb_set USART1_IRQHandler,Default_Handler
+	.thumb_set USART0_IRQHandler,Default_Handler
 
 	.weak USART1_IRQHandler
-	.thumb_set USART2_IRQHandler,Default_Handler
+	.thumb_set USART1_IRQHandler,Default_Handler
 
 	.weak USART2_IRQHandler
-	.thumb_set USART3_IRQHandler,Default_Handler
+	.thumb_set USART2_IRQHandler,Default_Handler
 
 	.weak EXTI10_15_IRQHandler
 	.thumb_set EXTI10_15_IRQHandler,Default_Handler

@@ -77,10 +77,10 @@ uint32_t getTickUs(void);
   * @brief  This function checks if the Systick counter flag is active
   * @retval State of bit (1 or 0).
   */
-__STATIC_INLINE uint32_t systick_active_counter_flag(void)
-{
-  return ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == (SysTick_CTRL_COUNTFLAG_Msk));
-}
+//static inline uint32_t systick_active_counter_flag(void)
+//{
+//  return ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == (SysTick_CTRL_COUNTFLAG_Msk));
+//}
 
 #ifdef __cplusplus
 }

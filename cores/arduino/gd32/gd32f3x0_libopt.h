@@ -37,31 +37,76 @@ OF SUCH DAMAGE.
 #ifndef GD32F3X0_LIBOPT_H
 #define GD32F3X0_LIBOPT_H
 
-#include "gd32f3x0_adc.h"
-#include "gd32f3x0_crc.h"
-#include "gd32f3x0_ctc.h"
-#include "gd32f3x0_dbg.h"
-#include "gd32f3x0_dma.h"
-#include "gd32f3x0_exti.h"
-#include "gd32f3x0_fmc.h"
-#include "gd32f3x0_gpio.h"
-#include "gd32f3x0_syscfg.h"
-#include "gd32f3x0_i2c.h"
-#include "gd32f3x0_fwdgt.h"
-#include "gd32f3x0_pmu.h"
-#include "gd32f3x0_rcu.h"
-#include "gd32f3x0_rtc.h"
-#include "gd32f3x0_spi.h"
-#include "gd32f3x0_timer.h"
-#include "gd32f3x0_usart.h"
-#include "gd32f3x0_wwdgt.h"
-#include "gd32f3x0_misc.h"
-#include "gd32f3x0_tsi.h"
+#include "gd32xxyy_spl_config.h"
 
-#ifdef GD32F350
+#if defined(SPL_ADC_ENABLE)
+#include "gd32f3x0_adc.h"
+#endif
+#if defined(SPL_CRC_ENABLE)
+#include "gd32f3x0_crc.h"
+#endif
+#if defined(SPL_CTC_ENABLE)
+#include "gd32f3x0_ctc.h"
+#endif
+#if defined(SPL_DBG_ENABLE)
+#include "gd32f3x0_dbg.h"
+#endif
+#if defined(SPL_DMA_ENABLE)
+#include "gd32f3x0_dma.h"
+#endif
+#if defined(SPL_EXTI_ENABLE)
+#include "gd32f3x0_exti.h"
+#endif
+#if defined(SPL_FMC_ENABLE)
+#include "gd32f3x0_fmc.h"
+#endif
+#if defined(SPL_GPIO_ENABLE)
+#include "gd32f3x0_gpio.h"
+#endif
+#if defined(SPL_SYSCFG_ENABLE)
+#include "gd32f3x0_syscfg.h"
+#endif
+#if defined(SPL_I2C_ENABLE)
+#include "gd32f3x0_i2c.h"
+#endif
+#if defined(SPL_FWDGT_ENABLE)
+#include "gd32f3x0_fwdgt.h"
+#endif
+#if defined(SPL_PMU_ENABLE)
+#include "gd32f3x0_pmu.h"
+#endif
+#if defined(SPL_RCU_ENABLE)
+#include "gd32f3x0_rcu.h"
+#endif
+#if defined(SPL_RTC_ENABLE)
+#include "gd32f3x0_rtc.h"
+#endif
+#if defined(SPL_SPI_ENABLE)
+#include "gd32f3x0_spi.h"
+#endif
+#if defined(SPL_TIMER_ENABLE)
+#include "gd32f3x0_timer.h"
+#endif
+#if defined(SPL_USART_ENABLE)
+#include "gd32f3x0_usart.h"
+#endif
+#if defined(SPL_WWDGT_ENABLE)
+#include "gd32f3x0_wwdgt.h"
+#endif
+#if defined(SPL_MISC_ENABLE)
+#include "gd32f3x0_misc.h"
+#endif
+#if defined(SPL_TSI_ENABLE)
+#include "gd32f3x0_tsi.h"
+#endif
+#if defined(SPL_CEC_ENABLE)
 #include "gd32f3x0_cec.h"
+#endif
+#if defined(SPL_CMP_ENABLE)
 #include "gd32f3x0_cmp.h"
+#endif
+#if defined(SPL_DAC_ENABLE)
 #include "gd32f3x0_dac.h"
-#endif /* GD32F350 */
+#endif
 
 #endif /* GD32F3X0_LIBOPT_H */

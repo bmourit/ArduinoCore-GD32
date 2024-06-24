@@ -227,10 +227,10 @@ maximum_ram_size = board_config.get("upload.maximum_ram_size")
 
 env.Append(
 	ASFLAGS=machine_flags,
-	ASPPFLAGS=[
-		"-x",
-		"assembler-with-cpp",
-	],
+	#ASPPFLAGS=[
+	#	"-x",
+	#	"assembler-with-cpp",
+	#],
 	CFLAGS=[
 		"-std=gnu11",
 	],

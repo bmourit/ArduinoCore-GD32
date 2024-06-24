@@ -41,10 +41,6 @@
 #include "spl.h"
 #include "dwt.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
   * @brief  This function performs the global system clock init
   * @param  None
@@ -62,7 +58,3 @@ void hw_config_init(void)
   /* Configure the system clock */
   SystemClock_Config();
 }
-
-#ifdef __cplusplus
-}
-#endif

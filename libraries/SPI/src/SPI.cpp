@@ -23,9 +23,9 @@
 
 #include "SPI.h"
 
-SPIClass SPI;
+SPIClassGD SPI;
 
-SPIClass::SPIClass(void) : _CSPinConfig(NO_CONFIG)
+SPIClassGD::SPIClassGD(void) : SPISettings(0, MSBFIRST, SPI_MODE0)
 {
   _spi.pin_miso = DIGITAL_TO_PINNAME(MISO);
   _spi.pin_mosi = DIGITAL_TO_PINNAME(MOSI);
@@ -34,7 +34,7 @@ SPIClass::SPIClass(void) : _CSPinConfig(NO_CONFIG)
   _initialized = false;
 }
 
-SPIClass::SPIClass(uint32_t mosi, uint32_t miso, uint32_t sclk, uint32_t ssel) : _CSPinConfig(NO_CONFIG)
+SPIClassGD::SPIClassGD(uint32_t mosi, uint32_t miso, uint32_t sclk, uint32_t ssel) : SPISettings(0, MSBFIRST, SPI_MODE0)
 {
   _spi.pin_miso = DIGITAL_TO_PINNAME(miso);
   _spi.pin_mosi = DIGITAL_TO_PINNAME(mosi);
@@ -43,26 +43,19 @@ SPIClass::SPIClass(uint32_t mosi, uint32_t miso, uint32_t sclk, uint32_t ssel) :
   _initialized = false;
 }
 
-void SPIClass::begin(uint8_t pin)
+void SPIClassGD::begin()
+{
+  init();
+  spi_begin(&_spi, spiSettings.clock, spiSettings.datamode, spiSettings.bitorder);
+}
+
+void SPIClassGD::init()
 {
   if (_initialized) {
     return;
   }
-  uint8_t idx;
-  if (pin > DIGITAL_PINS_NUM) {
-    return;
-  }
-  idx = pinIdx(pin, ADD_NEW_PIN);
-  if (idx >= SPI_SETTINGS_MAX) {
-    return;
-  }
-  if ((pin != CS_PIN_CONTROLLED_BY_USER) && (_spi.pin_ssel == NC)) {
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, HIGH);
-  }
 
-  spi_begin(&_spi, spiSettings[idx].speed, spiSettings[idx].datamode, spiSettings[idx].bitorder);
-  _CSPinConfig = pin;
+  config(DEFAULT_SPI_SETTINGS);
   _initialized = true;
 }
 

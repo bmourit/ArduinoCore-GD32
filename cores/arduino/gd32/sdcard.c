@@ -42,10 +42,9 @@ OF SUCH DAMAGE.
 #include <stddef.h>
 #include "sdcard.h"
 
-#include <gd32f30x_sdio.h>
-#include <gd32f30x_dma.h>
-#include <gd32f30x_rcu.h>
-
+#include <gd32xxyy_spl_sdio.h>
+#include <gd32xxyy_spl_dma.h>
+#include <gd32xxyy_spl_rcu.h>
 
 uint32_t sd_scr[2] = {0,0};										/* content of SCR register */
 
