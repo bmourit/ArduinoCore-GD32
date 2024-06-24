@@ -1,3 +1,16 @@
+This fork is specifically for GD32F303RET6 chip with the goal of getting it to work with Marlin.
+This has been increasingly frustrated by apparent differences in this exact chip and what is documented.
+For instance, many of these chip used in Creality 3D printers do NOT have an FPU, even though GigaDevice states that all of them do.
+Additionally, it appears that many RCU clock bits are different from what is claimed, since setting these bits as is done by the code from GigaDivice, results in bootloops and errors.
+When using only the bits set comparabile with STM32F103RET6, it will boot. This suggests some of these chips are missing advertised features. Additionally, some chips are also missing MPU, even though GD states that all chips of this version have MPUs.
+
+In the end, GigaDevice has been very unreliable as far as providing the needed info for these chip, so the user is left guessing what is supported and what isn't.
+I have reached out to GigaDevice and the only response was that "All chips are as stated in the User Manual", which is not true. When I ask for more info about the pointed out differences, I get no response.
+
+If you can avoid this chip, I would advise doing so unless you love headaches! :)
+
+AFAIK other chip versions are unaffected.
+
 # GD32 Arduino Core (New) 
 
 [![Lint Code Base](https://github.com/CommunityGD32Cores/GD32Core-New/actions/workflows/linter.yml/badge.svg)](https://github.com/CommunityGD32Cores/GD32Core-New/actions/workflows/linter.yml) [![GitHub pull-requests](https://img.shields.io/github/issues-pr/CommunityGD32Cores/GD32Core-New)](https://GitHub.com/CommunityGD32Cores/GD32Core-New/pull/) [![GitHub issues](https://img.shields.io/github/issues/CommunityGD32Cores/GD32Core-New.svg)](https://GitHub.com/CommunityGD32Cores/GD32Core-New/issues/) [![GitHub issues-closed](https://img.shields.io/github/issues-closed/CommunityGD32Cores/GD32Core-New.svg)](https://GitHub.com/CommunityGD32Cores/GD32Core-New/issues?q=is%3Aissue+is%3Aclosed)
